@@ -1,0 +1,42 @@
+{
+  "run_id": "local-smoke-20261015",
+  "started_at": "2026-10-15T10:55:29.120076Z",
+  "completed_at": "2026-10-15T11:03:48.516309Z",
+  "expected_count": 100,
+  "emitted_envelopes": 100,
+  "resumed_profiles": 10,
+  "profiles_fetched_this_run": 90,
+  "modules": [
+    "registry",
+    "accounting_obligation",
+    "registry_live",
+    "financials",
+    "roles",
+    "group",
+    "locations",
+    "website"
+  ],
+  "registry": {
+    "registry_snapshot_sha256": "18834432981433b6cf01836b076154978ff9520b27bac0d8c04efeb53e2f3d72",
+    "registry_rows_scanned": 1173495,
+    "requested": 100,
+    "selected": 100
+  },
+  "operations": {
+    "requests": 482,
+    "bytes": 2342823,
+    "p50_ms": 1693,
+    "p95_ms": 2867
+  },
+  "validation": {
+    "passed": true,
+    "checks": {
+      "exact_expected_count": true,
+      "unique_organisation_numbers": true,
+      "all_entity_states_terminal": true,
+      "all_module_states_terminal": true,
+      "zero_silent_drops": true
+    },
+    "invalid_states": []
+  }
+}

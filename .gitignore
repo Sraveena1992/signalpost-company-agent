@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+brreg-enheter.csv
+out/*
+!out/smoke-report.json
+!out/refresh-demo.json
+
+entry-companies.jsonl
+
+data/
