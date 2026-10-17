@@ -1,19 +1,47 @@
-# Signalpost reference agent
+# Signalpost — Norwegian Company Intelligence Agent
 
-This is a runnable starting point for the Signalpost company-research challenge. It is intentionally a solid baseline, not a winning submission.
+An evidence-first company research agent for Norwegian businesses. It combines official registry data, company website research, structured company records, and traceable source evidence into a reproducible batch-processing workflow.
 
-The public universe contains 411,160 eligible companies. Run the starter on 100 companies before submitting. Larger local tests, including 1,000 or more companies, are encouraged but their precomputed profiles are not submitted or scored.
+**Core principle:** every published company fact should be traceable to its source, linked to the correct legal entity, and distinguishable from information that could not be verified.
 
-## What it already does
+## Key capabilities
 
-- reads a batch of Norwegian organisation numbers;
-- anchors identity in the Brønnøysund bulk registry;
-- fetches official financials, roles, group links and registered workplaces;
-- visits the registry-listed website and rejects weak entity matches;
-- emits one terminal JSONL envelope per input;
-- records sources, retrieval times, content hashes, request counts and latency;
-- supports checkpoint/resume and a deterministic refresh replay;
-- includes examples for external-footprint discovery and an evidence-bounded research agent.
+- **Entity resolution:** uses the Norwegian organisation number as the primary identity anchor.
+- **Official company data:** retrieves available registry, financial, role, group, and workplace information.
+- **Website research:** checks registry-listed company websites while applying entity-matching safeguards.
+- **Evidence traceability:** records source information, retrieval timestamps, and content hashes.
+- **Batch processing:** processes organisation-number inputs and emits terminal JSONL envelopes.
+- **Reliability:** supports checkpoint/resume, validation, request metrics, and machine-readable run reports.
+- **Refresh verification:** compares saved profile snapshots to identify material changes and preserve evidence.
+- **Conservative publication:** avoids treating an unverified company or website match as established fact.
+
+## Quick start
+
+Requirements: Python 3.12+ and `uv`.
+
+Install project dependencies:
+
+```bash
+uv sync
+```
+
+Run the saved refresh-replay example without requiring live company data or an API key:
+
+```bash
+uv run python scripts/run_refresh_replay.py --manifest tests/fixtures/refresh-snapshots.json --output out/refresh-demo.json
+```
+
+Inspect `out/refresh-demo.json` to review the detected changes and supporting evidence.
+
+## Validation
+
+The local 100-company practice run recorded 100 terminal envelopes for 100 expected companies, passed the configured validation checks, and reported zero silent drops. The run report records request volume, transferred data, latency, and resumed profiles.
+
+This is a local smoke-test result, not an official competition score or qualification result.
+
+## Reproducibility and source responsibility
+
+The project is designed for repeatable batch execution and auditable evidence collection. Live runs depend on the supplied input batch and required registry data. External sources must be accessed in accordance with their terms, licences, permissions, and rate limits.
 
 ## First run: try one saved example
 
