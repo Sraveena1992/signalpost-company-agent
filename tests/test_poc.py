@@ -739,6 +739,42 @@ class OperationsTests(unittest.TestCase):
         self.assertTrue(validate_envelopes([envelope], 1)["passed"])
         self.assertFalse(validate_envelopes([envelope], 2)["passed"])
 
+    def test_batch_validator_rejects_missing_or_unexpected_company(self):
+        def make_envelope(org):
+            return {
+                "organisation_number": org,
+                "state": "complete",
+                "modules": {"registry": {"state": "complete"}},
+            }
+
+        expected = ["923609016", "912345678"]
+        missing = validate_envelopes(
+            [make_envelope("923609016")], 1, expected
+        )
+        self.assertFalse(missing["passed"])
+        self.assertEqual(missing["missing_organisations"], ["912345678"])
+
+        substituted = validate_envelopes(
+            [make_envelope("923609016"), make_envelope("999999999")],
+            2,
+            expected,
+        )
+        self.assertFalse(substituted["passed"])
+        self.assertEqual(substituted["missing_organisations"], ["912345678"])
+        self.assertEqual(substituted["unexpected_organisations"], ["999999999"])
+
+    def test_batch_validator_rejects_duplicate_expected_ids(self):
+        envelope = {
+            "organisation_number": "923609016",
+            "state": "complete",
+            "modules": {"registry": {"state": "complete"}},
+        }
+        result = validate_envelopes(
+            [envelope], 1, ["923609016", "923609016"]
+        )
+        self.assertFalse(result["passed"])
+        self.assertFalse(result["checks"]["exact_organisation_membership"])
+
     def test_unknown_evidence_state_is_submission_error(self):
         self.assertEqual(evidence_terminal_state({"status": "not_fetched"}), "submission_error")
 

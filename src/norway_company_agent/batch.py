@@ -141,8 +141,25 @@ def terminal_envelope(
     }
 
 
-def validate_envelopes(envelopes: list[dict[str, Any]], expected_count: int) -> dict[str, Any]:
+def validate_envelopes(
+    envelopes: list[dict[str, Any]],
+    expected_count: int,
+    expected_organisation_numbers: Iterable[str] | None = None,
+) -> dict[str, Any]:
     orgs = [item.get("organisation_number") for item in envelopes]
+    expected_orgs = (
+        [str(org) for org in expected_organisation_numbers]
+        if expected_organisation_numbers is not None
+        else None
+    )
+    expected_set = set(expected_orgs) if expected_orgs is not None else None
+    actual_set = set(orgs)
+    missing_organisations = (
+        sorted(expected_set - actual_set) if expected_set is not None else []
+    )
+    unexpected_organisations = (
+        sorted(actual_set - expected_set) if expected_set is not None else []
+    )
     invalid_states = [
         {"organisation_number": item.get("organisation_number"), "state": state.get("state")}
         for item in envelopes
@@ -152,11 +169,24 @@ def validate_envelopes(envelopes: list[dict[str, Any]], expected_count: int) -> 
     checks = {
         "exact_expected_count": len(envelopes) == expected_count,
         "unique_organisation_numbers": len(orgs) == len(set(orgs)),
+        "exact_organisation_membership": (
+            expected_set is None
+            or (
+                len(expected_orgs) == len(expected_set)
+                and actual_set == expected_set
+            )
+        ),
         "all_entity_states_terminal": all(item.get("state") in TERMINAL_STATES for item in envelopes),
         "all_module_states_terminal": not invalid_states,
         "zero_silent_drops": len(envelopes) == expected_count and len(orgs) == len(set(orgs)),
     }
-    return {"passed": all(checks.values()), "checks": checks, "invalid_states": invalid_states}
+    return {
+        "passed": all(checks.values()),
+        "checks": checks,
+        "invalid_states": invalid_states,
+        "missing_organisations": missing_organisations,
+        "unexpected_organisations": unexpected_organisations,
+    }
 
 
 def profile_complete_for_modules(profile: dict[str, Any], modules: Iterable[str]) -> bool:

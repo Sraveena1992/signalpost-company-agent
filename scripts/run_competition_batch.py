@@ -103,7 +103,7 @@ def main() -> None:
         terminal_envelope(profile, run_id=args.run_id, modules=requested_modules, started_at=started_at, completed_at=completed_at)
         for profile in ordered_profiles
     ]
-    validation = validate_envelopes(envelopes, args.expected_count)
+    validation = validate_envelopes(envelopes, args.expected_count, orgs)
     write_jsonl(profiles_output, ordered_profiles)
     write_jsonl(Path(args.output), envelopes)
     latencies = sorted(operations.pop("latencies_ms"))
