@@ -4,6 +4,20 @@ An evidence-first company research agent for Norwegian businesses. It combines o
 
 **Core principle:** Every published company fact should be traceable to its source, linked to the correct legal entity, and distinguishable from information that could not be verified.
 
+### 🔍 Live Verification & Probes
+- **Live App Deployment:** https://signalpost-company-agent.onrender.com/
+- **Health Check Report:**
+-   
+         {
+            "status": "ok",
+            "service": "signalpost-company-agent"
+         }
+
+- **GitHub Repository:** https://github.com/Sraveena1992/signalpost-company-agent
+- **Batch runner:** https://github.com/Sraveena1992/signalpost-company-agent/blob/main/scripts/run_competition_batch.py
+- **Smoke-test report:** https://github.com/Sraveena1992/signalpost-company-agent/blob/main/out/smoke-report.json
+
+
 ## Key capabilities
 
 - **Entity resolution:** Uses the Norwegian organisation number as the primary identity anchor.
