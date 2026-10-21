@@ -6,7 +6,7 @@ An evidence-first company research agent for Norwegian businesses. It combines o
 
 ### 🔍 Live Verification & Probes
 - **Live App Deployment:** https://signalpost-company-agent.onrender.com/
-- **Health Check Report:**
+- **Health Check Report:** https://signalpost-company-agent.onrender.com/healthz
 -   
          {
             "status": "ok",
@@ -16,6 +16,7 @@ An evidence-first company research agent for Norwegian businesses. It combines o
 - **GitHub Repository:** https://github.com/Sraveena1992/signalpost-company-agent
 - **Batch runner:** https://github.com/Sraveena1992/signalpost-company-agent/blob/main/scripts/run_competition_batch.py
 - **Smoke-test report:** https://github.com/Sraveena1992/signalpost-company-agent/blob/main/out/smoke-report.json
+- **Challenge requirements and submission instructions:** https://builderr.ai/challenges/signalpost
 
 
 ## Key capabilities
@@ -28,6 +29,22 @@ An evidence-first company research agent for Norwegian businesses. It combines o
 - **Reliability:** Supports checkpoint/resume, validation, request metrics, and machine-readable run reports.
 - **Refresh verification:** Compares saved profile snapshots to identify material changes and preserve evidence.
 - **Conservative publication:** Avoids treating an unverified company or website match as established fact.
+
+## 2. Latest code version and test results
+
+Git branch: fix/exact-batch-membership
+
+Exact commit: b67cab4
+
+Commit message: Add web demo and strengthen batch validation
+
+Automated tests: 109 passed, 7 subtests passed
+
+Warnings: 11 dependency deprecation warnings
+
+Git diff check: Passed after the README whitespace cleanup
+
+Code repository: Available at the link above
 
 ## Quick start
 
