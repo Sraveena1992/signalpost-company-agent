@@ -88,6 +88,17 @@ class PublicAppSecurityTests(unittest.TestCase):
         self.assertIn("object-src 'none'", policy)
         self.assertIn("frame-ancestors 'none'", policy)
 
+    def test_research_requests_are_rate_limited_per_client(self):
+        from app import _RATE_LIMITS, _RATE_LIMIT_LOCK, _research_rate_limited
+        with _RATE_LIMIT_LOCK:
+            _RATE_LIMITS.pop("unit-test-client", None)
+        for second in range(5):
+            self.assertFalse(_research_rate_limited("unit-test-client", now=float(second)))
+        self.assertTrue(_research_rate_limited("unit-test-client", now=5.0))
+        self.assertFalse(_research_rate_limited("unit-test-client", now=60.0))
+        with _RATE_LIMIT_LOCK:
+            _RATE_LIMITS.pop("unit-test-client", None)
+
     def test_research_concurrency_is_bounded(self):
         from app import _RESEARCH_SLOTS
         self.assertTrue(_RESEARCH_SLOTS.acquire(blocking=False))
