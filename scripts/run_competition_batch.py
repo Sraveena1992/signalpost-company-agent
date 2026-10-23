@@ -8,6 +8,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# Direct CLI execution sets sys.path[0] to scripts/, not the repository root.
+# Add both paths explicitly so `from scripts.*` imports work in Render and clean machines.
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from norway_company_agent.batch import attach_synthesis, profile_complete_for_modules, profiles_from_bulk, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
