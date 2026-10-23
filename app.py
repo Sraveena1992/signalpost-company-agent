@@ -347,6 +347,31 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 .article-evidence details,.result details{min-width:0;max-width:100%}
 @media(max-width:640px){.evidence-grid{grid-template-columns:minmax(0,1fr)}.result table{font-size:12px}.result th,.result td{padding:9px 6px}}
 @media(max-width:640px){main{padding:18px 14px 40px}.hero{padding:39px 0 20px}h1{letter-spacing:-1.7px}.panel,.result{padding:18px;border-radius:17px}.search-row .button{width:100%}.match{align-items:flex-start;flex-direction:column;gap:12px}.match .button{width:100%}.result th{width:40%;padding-right:10px}.result th,.result td{font-size:13px;padding:11px 5px}.purpose{grid-template-columns:1fr}.status{font-size:9px}.topbar{align-items:flex-start}}
+
+/* Premium light theme: calmer surfaces, stronger contrast, and less visual weight. */
+:root{color-scheme:light;--bg:#f3f6fb;--panel:#ffffff;--panel2:#f8fafc;--line:#dce4ee;--muted:#58677c;--ink:#152238;--mint:#087f78;--blue:#b77927}
+body{background:radial-gradient(ellipse at 8% 0%,#d9f2ee 0,transparent 34%),radial-gradient(ellipse at 100% 8%,#e6edff 0,transparent 34%),var(--bg);color:var(--ink)}
+.topbar{border-bottom:1px solid #dbe4ee}
+.logo{background:#e0f5f1;border-color:#a8dcd4}
+.status{color:#087f78;border-color:#b7e3dc;background:#e5f7f3}
+.kicker,.section-kicker,.match-type{color:#087f78}
+.hero p,.brand-sub,.hint,.muted{color:#58677c}
+.hero strong{color:#152238}
+.panel,.result{background:rgba(255,255,255,.92);border-color:#dce4ee;box-shadow:0 12px 32px rgba(24,44,76,.07)}
+.search-input{background:#f8fafc;border-color:#cbd6e3;color:#152238}
+.search-input::placeholder{color:#748197}
+.search-input:focus{border-color:#0b958b;box-shadow:0 0 0 3px rgba(11,149,139,.13)}
+.button{background:#0b958b;color:#fff;font-weight:750}
+.button:hover{filter:brightness(.97)}
+.button.secondary{background:#fff;border-color:#cbd6e3;color:#25364f}
+.result th,.result td{border-bottom-color:#e6ebf2}
+.result-actions,.footer{border-top-color:#e2e8f0}
+.purpose article{background:#f8fafc;border-color:#e2e8f0}
+.error{background:#fff1f2;border-color:#fecdd3;color:#881337}
+.error p{color:#9f1239}
+.source-link,.footer a{color:#087f78}
+.result .facts-table .source-link{color:#087f78}
+@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 16px 38px rgba(24,44,76,.09);border-color:#c8d5e4}}
 </style>
 </head>
 <body><main>
