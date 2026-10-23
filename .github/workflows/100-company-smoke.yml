@@ -3,7 +3,7 @@ name: 100-company-smoke-test
 on:
   workflow_dispatch:
   push:
-    branches: ["fix/exact-batch-membership", "final/builderr-contract"]
+    branches: ["main", "fix/exact-batch-membership", "final/builderr-contract"]
     paths:
       - "scripts/run_100_company_smoke.py"
       - "scripts/run_competition_batch.py"
