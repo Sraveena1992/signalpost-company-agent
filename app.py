@@ -287,10 +287,14 @@ def _search_results(query: str, results: list[dict]) -> str:
 
 
 @app.get("/", response_class=HTMLResponse)
-def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="", max_length=120)):
+def home(orgnr: str = "", q: str = ""):
+    # Plain Python defaults avoid leaking FastAPI Query objects when this view is
+    # invoked directly by tests or internal callers. Validate again at the boundary.
+    orgnr = str(orgnr or "").strip()[:30]
+    q = str(q or "").strip()[:120]
     result_html = ""
     error_message = ""
-    search_text = q.strip()
+    search_text = q
     direct_orgnr = orgnr.strip() or (search_text if re.fullmatch(r"\d{9}", re.sub(r"\s+", "", search_text)) else "")
     if direct_orgnr:
         try:
