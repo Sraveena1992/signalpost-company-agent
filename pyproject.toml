@@ -21,7 +21,7 @@ crawler = [
 ]
 sentiment = [
   "accelerate>=1.10,<2",
-  "torch>=2.5,<3",
+  "torch>=2.14.1,<3",
   "transformers>=4.51,<5",
 ]
 
