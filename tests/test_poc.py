@@ -88,6 +88,17 @@ class PublicAppSecurityTests(unittest.TestCase):
         self.assertIn("object-src 'none'", policy)
         self.assertIn("frame-ancestors 'none'", policy)
 
+    def test_research_requests_are_rate_limited_per_client(self):
+        from app import _RATE_LIMITS, _RATE_LIMIT_LOCK, _research_rate_limited
+        with _RATE_LIMIT_LOCK:
+            _RATE_LIMITS.pop("unit-test-client", None)
+        for second in range(5):
+            self.assertFalse(_research_rate_limited("unit-test-client", now=float(second)))
+        self.assertTrue(_research_rate_limited("unit-test-client", now=5.0))
+        self.assertFalse(_research_rate_limited("unit-test-client", now=60.0))
+        with _RATE_LIMIT_LOCK:
+            _RATE_LIMITS.pop("unit-test-client", None)
+
     def test_research_concurrency_is_bounded(self):
         from app import _RESEARCH_SLOTS
         self.assertTrue(_RESEARCH_SLOTS.acquire(blocking=False))
@@ -1607,6 +1618,7 @@ class PublicLookupPrototypeTests(unittest.TestCase):
         self.assertIn("grid-template-columns:repeat(2,minmax(0,1fr))", body)
 
     def test_research_api_returns_real_pipeline_outputs(self):
+        from types import SimpleNamespace
         from app import research_api
 
         def fake_run(command, **kwargs):
@@ -1622,7 +1634,7 @@ class PublicLookupPrototypeTests(unittest.TestCase):
             "organisation_number": "912900584",
             "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/912900584",
         }), patch("app.subprocess.run", side_effect=fake_run):
-            result = research_api("912900584")
+            result = research_api("912900584", SimpleNamespace(client=SimpleNamespace(host="unit-test-client")))
         self.assertEqual(result["profile"]["name"], "VIK MEDIA HOLDING AS")
         self.assertEqual(result["terminal"]["terminal_state"], "available")
         self.assertEqual(result["report"]["processed"], 1)
