@@ -21,36 +21,22 @@
 | Company identity | Conservative identity checks |
 | Research modules | Registry, accounting obligations, financials, roles, group, locations and website research |
 | Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
-| Web interface | Lightweight live official-registry lookup prototype |
+| Public web interface | Live single-company official-registry lookup prototype |
 | API | JSON company lookup and health endpoint |
-| Test suite | 111 tests passed in the latest recorded CI run |
+| Automated regression suite | Latest recorded successful run: 111 tests and 7 subtests |
 
-## Live demo and verification
+## Live demo
 
-**Local web interface**
+- **Public web app:** https://signalpost-company-agent.onrender.com/
+- **API documentation:** https://signalpost-company-agent.onrender.com/docs
+- **Health endpoint:** https://signalpost-company-agent.onrender.com/healthz
+- **Example official record:** https://data.brreg.no/enhetsregisteret/api/enheter/912900584
 
-Run the application locally and open:
+The public interface accepts a nine-digit Norwegian organisation number and requests the company record from the official Brønnøysund Register API. It displays available registry fields and links to the original record.
 
-- Web interface: http://127.0.0.1:8000
-- Interactive API documentation: http://127.0.0.1:8000/docs
-- Health endpoint: http://127.0.0.1:8000/healthz
+The public web demo is intentionally a **single-company registry lookup**. It is not a hosted UI for the full batch research pipeline and does not claim to verify every company fact, social account, news item, or financial result.
 
-These addresses work on the developer's computer only. They are **not public deployment URLs**.
-
-**Health check**
-
-The local health endpoint returned:
-
-```json
-{
-  "status": "ok",
-  "service": "signalpost-company-agent"
-}
-```
-
-This confirms that the local application responded successfully at the time of testing. It does not establish public availability.
-
-**Public deployment:** To be added after the Render deployment succeeds.
+A successful health response confirms service responsiveness only; it does not establish research accuracy or an official competition score. Public hosting may be subject to cold starts or temporary availability issues.
 
 ## How it works
 
@@ -64,7 +50,7 @@ The research pipeline contains modules for registry information, accounting obli
 
 ### 3. Preserve provenance
 
-The project structures evidence and records source information so that retrieved facts can be traced and reviewed. Search results or name similarity alone should not be treated as proof of company identity.
+The project structures evidence and records source information so retrieved facts can be traced and reviewed. Search results or name similarity alone should not be treated as proof of company identity.
 
 ### 4. Validate batch output
 
@@ -72,7 +58,7 @@ The batch workflow checks expected output counts and company membership, alongsi
 
 ### 5. Present results
 
-The lightweight web prototype provides an official-registry lookup for a single Norwegian organisation number. The broader research pipeline remains available through the CLI.
+The lightweight public web prototype provides a live official-registry lookup for one Norwegian organisation number. The broader research pipeline is run through the CLI and supporting scripts, not through the public web interface.
 
 ## Architecture
 
@@ -95,7 +81,7 @@ Structured company profiles
 Batch validation and reports
 ```
 
-The web prototype is a separate, lightweight entry point for live registry lookups. It should not be confused with the complete batch research workflow.
+The public web prototype is a separate, lightweight entry point for live registry lookups. It should not be confused with the complete batch research workflow.
 
 ## Quick start
 
@@ -117,7 +103,7 @@ uv sync --frozen
 uv run pytest -q
 ```
 
-### Start the web prototype
+### Start the web prototype locally
 
 ```powershell
 uv run uvicorn app:app --host 127.0.0.1 --port 8000
@@ -156,16 +142,11 @@ The project also includes batch utilities in [`src/norway_company_agent/batch.py
 
 ## Testing and validation
 
-The last recorded local test run completed with:
+The latest recorded successful GitHub Actions regression run completed with **111 tests passed and 7 subtests passed**:
 
-- **111 tests passed**
-- 11 warnings
-- 7 subtests passed
-- `git diff --check` returned no whitespace errors
+https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/39902015868
 
-These are local development results, not an official Builderr score or an independently verified competition result. Rerun the commands above to confirm the current working tree.
-
-The local practice smoke report is available at [`out/smoke-report.json`](out/smoke-report.json), if that file is present in the checkout. A local smoke report is not an official evaluation result.
+These automated tests exercise defined behaviours and regressions. They are **not** an official Builderr score, a fresh-company evaluation, or proof of qualification. Rerun the workflow after subsequent changes to confirm the current commit.
 
 ## Data sources and evidence policy
 
@@ -185,17 +166,17 @@ Do not commit private API keys, credentials, or large local registry downloads. 
 
 ## Scope and limitations
 
-- The web interface currently demonstrates a single-company official-registry lookup.
+- The public web interface currently demonstrates a single-company official-registry lookup.
 - It is not a complete hosted dashboard for every research module.
 - A successful health check verifies service responsiveness, not research accuracy.
 - Registry fields may be missing or change over time.
 - The local smoke test is not the official competition evaluation.
-- Public hosting and deployment health must be verified separately before a public URL is advertised.
+- Batch research and structured reports must be verified separately from the public web demo.
 - Performance, cost per official run and competition scores should be reported only when measured or confirmed.
 
 ## Project status
 
 **Prototype in active development.** The goal is to make company research more traceable, reproducible and robust against wrong-company matches and incomplete batch outputs.
 
-**Maintainer:** Raveena Sharma
+**Maintainer:** Raveena Sharma  
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
