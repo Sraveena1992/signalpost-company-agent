@@ -1,0 +1,56 @@
+name: live-render-security-check
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/live-render-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify live health and documentation endpoints
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 30 -D /tmp/health.headers -o /tmp/health.body https://signalpost-company-agent.onrender.com/healthz
+          cat /tmp/health.body
+          python - <<'PY'
+          import json
+          with open("/tmp/health.body", encoding="utf-8") as f:
+              body = json.load(f)
+          assert body.get("status") == "ok", body
+          print("Health endpoint: OK")
+          PY
+          curl --fail --silent --show-error --max-time 30 -D /tmp/home.headers -o /tmp/home.html https://signalpost-company-agent.onrender.com/
+          curl --fail --silent --show-error --max-time 30 -D /tmp/docs.headers -o /tmp/docs.html https://signalpost-company-agent.onrender.com/docs
+          python - <<'PY'
+          from pathlib import Path
+          def headers(path):
+              result = {}
+              for line in Path(path).read_text(errors="replace").splitlines():
+                  if ":" in line:
+                      k, v = line.split(":", 1)
+                      result[k.lower().strip()] = v.strip()
+              return result
+          health, home, docs = (headers(p) for p in ("/tmp/health.headers", "/tmp/home.headers", "/tmp/docs.headers"))
+          required = {
+              "x-content-type-options": "nosniff",
+              "x-frame-options": "DENY",
+              "referrer-policy": "strict-origin-when-cross-origin",
+          }
+          for name, expected in required.items():
+              assert health.get(name) == expected, f"/healthz missing or wrong {name}: {health.get(name)!r}"
+              assert home.get(name) == expected, f"/ missing or wrong {name}: {home.get(name)!r}"
+          csp = home.get("content-security-policy", "")
+          assert "default-src 'self'" in csp and "object-src 'none'" in csp and "frame-ancestors 'none'" in csp, f"Missing restrictive homepage CSP: {csp!r}"
+          assert "swagger-ui" in Path("/tmp/docs.html").read_text(errors="replace").lower(), "Docs page did not render expected Swagger UI"
+          print("Live Render health, docs, baseline headers, and homepage CSP: PASS")
+          print("Live /healthz headers:", health)
+          print("Live homepage headers:", home)
+          PY
