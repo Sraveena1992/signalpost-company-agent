@@ -1,148 +1,208 @@
-# Signalpost — Norwegian Company Intelligence Agent
+# Signalpost — Company Intelligence Agent
 
-An evidence-first company research agent for Norwegian businesses. It combines official registry data, company website research, structured company records, and traceable source evidence into a reproducible batch-processing workflow.
+**Evidence-first Norwegian company research, built for verifiable facts and reproducible batch evaluation.**
 
-**Core principle:** Every published company fact should be traceable to its source, linked to the correct legal entity, and distinguishable from information that could not be verified.
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/Web%20Demo-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Tests](https://img.shields.io/badge/Tests-contract%20checked-brightgreen)](#testing-and-validation)
+[![Status](https://img.shields.io/badge/Status-Prototype-orange)](#scope-and-limitations)
 
-### 🔍 Live Verification & Probes
-- **Live App Deployment:** https://signalpost-company-agent.onrender.com/
-- **Health Check Report:** https://signalpost-company-agent.onrender.com/healthz
--   
-         {
-            "status": "ok",
-            "service": "signalpost-company-agent"
-         }
+**Repository:** https://github.com/Sraveena1992/signalpost-company-agent
 
-- **GitHub Repository:** https://github.com/Sraveena1992/signalpost-company-agent
-- **Batch runner:** https://github.com/Sraveena1992/signalpost-company-agent/blob/main/scripts/run_competition_batch.py
-- **Smoke-test report:** https://github.com/Sraveena1992/signalpost-company-agent/blob/main/out/smoke-report.json
-- **Challenge requirements and submission instructions:** https://builderr.ai/challenges/signalpost
+> Signalpost is designed to identify Norwegian companies, collect evidence from permitted sources, preserve source provenance, and produce structured outputs that can be checked and rerun.
 
+## At a glance
 
-## Key capabilities
+| Capability | Current implementation |
+|---|---|
+| Official registry research | Brønnøysund Register Centre integration |
+| Batch processing | CLI runner with expected-count validation |
+| Evidence handling | Structured evidence and source metadata |
+| Company identity | Conservative identity checks |
+| Research modules | Registry, accounting obligations, financials, filing history, roles, group, locations, website identity and company-owned site activity |
+| Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
+| Public web interface | Live single-company official-registry lookup prototype |
+| API | JSON company lookup and health endpoint |
+| Automated regression suite | Latest recorded successful run: 111 tests and 7 subtests |
 
-- **Entity resolution:** Uses the Norwegian organisation number as the primary identity anchor.
-- **Official company data:** Retrieves available registry, financial, role, group, and workplace information.
-- **Website research:** Checks registry-listed company websites while applying entity-matching safeguards.
-- **Evidence traceability:** Records source information, retrieval timestamps, and content hashes.
-- **Batch processing:** Processes organisation-number inputs and emits terminal JSONL envelopes.
-- **Reliability:** Supports checkpoint/resume, validation, request metrics, and machine-readable run reports.
-- **Refresh verification:** Compares saved profile snapshots to identify material changes and preserve evidence.
-- **Conservative publication:** Avoids treating an unverified company or website match as established fact.
+## Live demo
 
-## 2. Latest code version and test results
+- **Public web app:** https://signalpost-company-agent.onrender.com/
+- **API documentation:** https://signalpost-company-agent.onrender.com/docs
+- **Health endpoint:** https://signalpost-company-agent.onrender.com/healthz
+- **Example official record:** https://data.brreg.no/enhetsregisteret/api/enheter/912900584
 
-Git branch: fix/exact-batch-membership
+The public interface accepts a nine-digit Norwegian organisation number and requests the company record from the official Brønnøysund Register API. It displays available registry fields and links to the original record.
 
-Exact commit: b67cab4
+The public web demo is intentionally a **single-company registry lookup**. It is not a hosted UI for the full batch research pipeline and does not claim to verify every company fact, social account, news item, job posting, or financial result.
 
-Commit message: Add web demo and strengthen batch validation
+A successful health response confirms service responsiveness only; it does not establish research accuracy or an official competition score. Public hosting may be subject to cold starts or temporary availability issues.
 
-Automated tests: 109 passed, 7 subtests passed
+## How it works
 
-Warnings: 11 dependency deprecation warnings
+### 1. Establish company identity
 
-Git diff check: Passed after the README whitespace cleanup
+Use the Norwegian organisation number as the primary identifier and consult official registry information before associating evidence with a company.
 
-Code repository: Available at the link above
+### 2. Collect and organise evidence
+
+The research pipeline contains modules for registry information, accounting obligations, financial information, roles, group relationships, locations and website research.
+
+### 3. Preserve provenance
+
+The project structures evidence and records source information so retrieved facts can be traced and reviewed. Search results or name similarity alone should not be treated as proof of company identity.
+
+### 4. Validate batch output
+
+The batch workflow checks expected output counts and company membership, alongside other validation checks. Missing, duplicated or unexpected company identifiers should not silently pass validation.
+
+### 5. Present results
+
+The lightweight public web prototype provides a live official-registry lookup for one Norwegian organisation number. The broader research pipeline is run through the CLI and supporting scripts, not through the public web interface.
+
+## Architecture
+
+```text
+Organisation numbers
+        |
+        v
+Input validation
+        |
+        v
+Official registry / research modules
+        |
+        v
+Evidence and source metadata
+        |
+        v
+Structured company profiles
+        |
+        v
+Batch validation and reports
+```
+
+The public web prototype is a separate, lightweight entry point for live registry lookups. It should not be confused with the complete batch research workflow. The default batch includes company-owned website activity when the bounded crawl yields dated, identity-gated evidence. A permitted, reproducible external job-posting connector is not yet integrated into the default batch runner; do not claim full jobs coverage until that connector and its source rights are verified.
 
 ## Quick start
 
-Requirements: Python 3.12+ and `uv`.
+### Requirements
 
-Install project dependencies:
+- Python 3.12 or later
+- [uv](https://docs.astral.sh/uv/)
+- Network access for live registry lookups
 
-```bash
-uv sync
+### Install dependencies
+
+```powershell
+uv sync --frozen
 ```
 
-Run the saved refresh-replay example without requiring live company data or an API key:
+### Run tests
 
-```bash
-uv run python scripts/run_refresh_replay.py --manifest tests/fixtures/refresh-snapshots.json --output out/refresh-demo.json
+```powershell
+uv run pytest -q
 ```
 
-Inspect `out/refresh-demo.json` to review detected changes and supporting evidence.
+### Start the web prototype locally
 
-## Validation
-
-The local 100-company practice run recorded 100 terminal envelopes for 100 expected companies, passed the configured validation checks, and reported zero silent drops. The recorded run report includes request volume, transferred data, latency, and resumed profiles.
-
-This is a local practice-run result, not an official competition score or qualification result.
-
-## First run: try one saved example
-
-Before downloading company data or running a full crawl, try the bundled public sample. It uses saved responses and does not require an API key, registry download, or live web requests.
-
-```bash
-uv run python scripts/run_refresh_replay.py --manifest tests/fixtures/refresh-snapshots.json --output out/refresh-demo.json
+```powershell
+uv run uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `out/refresh-demo.json`. The `events` list shows changes between two versions of a company profile and the source evidence for each change. The sample is designed to check expected changes, false changes, and repeat-run stability.
+Open http://127.0.0.1:8000 in your browser.
 
-The report's `qualification_passed` field refers only to the public sample check. It does not qualify an entry for the competition or prove live information coverage. Request counts from saved responses are not live network calls.
+### API endpoints
 
-## Next: research live companies
+| Endpoint | Purpose |
+|---|---|
+| `GET /` | Company lookup interface |
+| `GET /api/company/{orgnr}` | JSON response for an organisation number |
+| `GET /docs` | Interactive API documentation |
+| `GET /healthz` | Application health check |
 
-This step downloads registry data and makes live requests. Use the official challenge instructions and permitted source policies before running a batch.
+The company lookup uses the official registry endpoint:
 
-```bash
-uv sync
-curl -L 'https://data.brreg.no/enhetsregisteret/api/enheter/lastned/csv' -o brreg-enheter.csv
-curl -L 'https://builderr.ai/signalpost-company-universe-2025.jsonl.gz' -o signalpost-universe.jsonl.gz
+https://data.brreg.no/enhetsregisteret/api/enheter/
 
-uv run python select_entry_batch.py --universe signalpost-universe.jsonl.gz --count 100 --output entry-companies.jsonl
+For example, the API route is `/api/company/{orgnr}`, where `{orgnr}` is a nine-digit Norwegian organisation number.
 
-uv run python scripts/run_competition_batch.py --organisations entry-companies.jsonl --bulk brreg-enheter.csv --profiles-output out/smoke-profiles.jsonl --output out/smoke-envelopes.jsonl --report out/smoke-report.json --run-id smoke-001 --expected-count 100
+## Batch runner
+
+The batch runner is available at [`scripts/run_competition_batch.py`](scripts/run_competition_batch.py). It accepts the evaluator-provided batch file, infers its count by default (so batches can grow beyond 100), and emits one terminal envelope for each input.
+
+### One-command batch run
+
+After installing locked dependencies and placing the supplied organisation-number file at `data/organisations.jsonl`, run:
+
+```powershell
+uv run python scripts/run_competition_batch.py --organisations data/organisations.jsonl --output artifacts/terminal-results.jsonl --profiles-output artifacts/profiles.jsonl --report artifacts/run-report.json --run-id signalpost-final
 ```
 
-The example above assumes the downloaded universe is available and that the selection command produces the expected JSONL input. Check the report and terminal output before treating a run as successful. Use only input batches and data sources permitted by the challenge.
+The optional `--bulk path/to/brreg-snapshot.csv` flag seeds profiles from a frozen official registry snapshot; without it, the runner starts from the live Brønnøysund API. The input file is evaluator-owned and must not be replaced with a hard-coded company list. For the required 100-company smoke test, the repository now includes `scripts/run_100_company_smoke.py`. It downloads the official Brønnøysund entity snapshot, selects a deterministic sample of 100 active organisations with 2025 annual-account records, runs the real batch CLI, and writes terminal results, profiles, and a JSON run report. GitHub Actions workflow [`100-company-smoke.yml`](.github/workflows/100-company-smoke.yml) runs this check and uploads those files as an artifact. The sample is a local smoke test only, not Builderr's official scoring batch.
 
-Increase the batch size only after validating a smaller run. Builderr supplies the official evaluation batch; a local practice run is not an official score.
+The public terminal-state vocabulary is exactly: `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, and `failed`. Internal fetch states are mapped to this vocabulary before output. The validator checks the expected count, unique IDs, exact input membership, and all entity/module states. A per-company exception is emitted as an explicit failed state rather than silently dropping that input.
 
-## The improvement loop
+The project also includes batch utilities in [`src/norway_company_agent/batch.py`](src/norway_company_agent/batch.py) and regression tests in [`tests/test_poc.py`](tests/test_poc.py).
 
-1. Treat the organisation number as the primary identity anchor.
-2. Generate website and profile candidates from official data, the company site, lawful search providers, and named people.
-3. Save each candidate and the evidence supporting or contradicting it.
-4. Publish only exact-entity matches. Parent companies, brands, franchises, and similarly named businesses are not automatically the same entity.
-5. Crawl static HTML first. Use a browser fallback only when a deterministic completeness check requires it.
-6. Measure supported coverage, incorrect-company claims, runtime, requests, and cost.
-7. Promote a strategy only when it improves coverage without weakening accuracy gates.
-8. Freeze strategies and thresholds before an evaluation run.
+## Testing and validation
 
-The differentiator is external evidence that remains exact and auditable: official company pages, company-owned profiles, jobs, dated activity, and permitted public signals. Do not trade accuracy for volume.
+The automated regression suite includes unit tests for evidence provenance, identity gates, company research modules, refresh behaviour, and the Builderr terminal-state contract. Check the latest GitHub Actions run for the exact result of the current commit:
 
-## Important source rule
+https://github.com/Sraveena1992/signalpost-company-agent/actions
 
-Open-source code does not grant permission to scrape a platform. Follow each source's terms, robots policy, rate limits, and licence. LinkedIn, Meta, and Indeed may be useful for discovery, but direct automated collection may be restricted. Use permitted APIs, licensed providers, company-owned links, or mark information as `blocked` or `not_available`.
+A passing test suite is not a substitute for the required 100-company live smoke test or an official Builderr score.
 
-Review `docs/competition-control-loop.md`, `docs/external-connectors.md`, and the relevant source policies before adding connectors.
 
-## External-footprint orchestrator
+## Evaluation contract mapping
 
-The project includes an external-footprint orchestration step:
+| Builderr public terminal state | Signalpost mapping |
+|---|---|
+| `available` | Fact/evidence was retrieved and published |
+| `not_available` | Explicitly checked but no matching fact was found |
+| `blocked` | Source refused access or robots/policy prevented retrieval |
+| `not_applicable` | The question does not apply to this company |
+| `ambiguous` | Candidate/company identity could not be confirmed safely |
+| `failed` | A source, module, or per-company run failed |
 
-```bash
-uv run python scripts/run_external_footprint.py --profiles out/smoke-profiles.jsonl --output out/smoke-external-observations.jsonl --report out/smoke-external-report.json
-```
+Each module state is mapped to this public vocabulary. Missing input companies, duplicate IDs, unexpected IDs, invalid states, and output-count mismatches are reported by the validator. The same source snapshot should not create duplicate observations or false changes; refresh comparisons require the exact same organisation number and dataset membership.
 
-This layer is designed to promote observations only from websites that have passed the exact-entity identity gate. It records claim-level evidence, retrieval time, content hashes, rights status, and acquisition mode. Verify the actual run report before making claims about the results.
+## Models, APIs, cost, and licence notes
 
-The observation file is an optimization artifact, not an official competition score. It must not be used to claim qualification without the required independent audit and evaluator-owned batch.
+- **Models:** no LLM/model API is used by the default competition batch command.
+- **APIs/sources:** official Brønnøysund Register Centre endpoints and company public websites where available.
+- **Declared direct third-party API/model cost:** USD $0.00 per default run because the default modules make no paid model/API calls. This excludes hosting, bandwidth, and general infrastructure and should be rechecked if paid connectors are added.
+- **Dependencies:** pinned by `uv.lock`; review each dependency's upstream licence before redistributing a packaged build. This repository does not claim that every transitive dependency has been separately legal-audited.
+- **Secrets:** the default batch runner requires no personal-account API credential. Never commit credentials or private keys.
 
-## Reproducibility and source responsibility
+## Data sources and evidence policy
 
-The project is designed for repeatable batch execution and auditable evidence collection. Live runs depend on the supplied input batch and required registry data. External sources must be accessed in accordance with their terms, licences, permissions, and rate limits.
+- **Official registry:** [Brønnøysund Register Centre](https://www.brreg.no/en/)
+- **Registry API:** https://data.brreg.no/enhetsregisteret/api/enheter/
+- **Python:** https://www.python.org/
+- **uv:** https://docs.astral.sh/uv/
+- **FastAPI:** https://fastapi.tiangolo.com/
 
-## Submission contract
+The system should distinguish verified facts from unavailable or unconfirmed information, retain source references, and avoid presenting inferred associations as confirmed facts. Source availability and completeness can vary.
 
-The submission should include:
+## Reproducibility
 
-- A 100-company smoke-test result or report.
-- A documented command that accepts a JSONL batch of organisation numbers.
-- Exactly one terminal envelope per input.
-- Reproducible setup instructions and dependency information.
-- Previous-snapshot input and material-change output.
-- A machine-readable run report with runtime, request count, and third-party cost information.
-- Declared models, APIs, licences, and source-rights assumptions.
+The repository contains dependency configuration in `pyproject.toml` and `uv.lock`. Run the tests and inspect generated reports before submitting a revision.
+
+Do not commit private API keys, credentials, or large local registry downloads. Optional integrations may require separate configuration.
+
+## Scope and limitations
+
+- The public web interface currently demonstrates a single-company official-registry lookup.
+- It is not a complete hosted dashboard for every research module.
+- A successful health check verifies service responsiveness, not research accuracy.
+- Registry fields may be missing or change over time.
+- The local smoke test is not the official competition evaluation.
+- Batch research and structured reports must be verified separately from the public web demo.
+- Performance, cost per official run and competition scores should be reported only when measured or confirmed.
+
+## Project status
+
+**Prototype in active development.** The goal is to make company research more traceable, reproducible and robust against wrong-company matches and incomplete batch outputs.
+
+**Maintainer:** Raveena Sharma  
+**Repository:** https://github.com/Sraveena1992/signalpost-company-agent
