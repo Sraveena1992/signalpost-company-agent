@@ -45,13 +45,13 @@ def assess_website_identity(profile: dict[str, Any]) -> dict[str, Any]:
     ]
     # Ownership must be established from the homepage, not from a subsidiary
     # mention on a parent group's contact, locations, or portfolio page.
+    homepage_identity_text = " ".join(str(part or "") for part in homepage_identity_parts)
     homepage_candidate_text = " ".join(str(part or "") for part in [*homepage_identity_parts, value.get("main_text_excerpt"), rendered.get("main_text_excerpt")])
     candidate_text = homepage_candidate_text
     normalized_candidate_text = " ".join(_tokens(candidate_text))
     candidate_tokens = set(_tokens(candidate_text))
     org_digits = re.sub(r"\D", "", str(profile.get("organisation_number") or ""))
-    compact_candidate = re.sub(r"\D", "", candidate_text)
-    compact_homepage_candidate = re.sub(r"\D", "", homepage_candidate_text)
+    compact_identity_text = re.sub(r"\D", "", homepage_identity_text)
     overlap = sorted(set(core) & candidate_tokens)
     ratio = len(overlap) / len(set(core)) if core else 0.0
     reasons = []
@@ -71,9 +71,9 @@ def assess_website_identity(profile: dict[str, Any]) -> dict[str, Any]:
     elif is_business_sports_club and "bedriftsidrett" not in normalized_candidate_text and "b i l" not in normalized_candidate_text:
         score = 0.3
         reasons.append("business sports-club entity points to the operating company's site without club evidence")
-    elif org_digits and org_digits in compact_homepage_candidate:
+    elif org_digits and len(org_digits) >= 9 and org_digits in compact_identity_text:
         score = 1.0
-        reasons.append("exact organisation number appears in homepage identity evidence")
+        reasons.append("exact organisation number appears in homepage title, description, identity metadata, or hostname")
     elif len(core) >= 2 and exact_homepage_name:
         score = 0.95
         reasons.append("all normalized legal-name tokens appear together in homepage identity evidence")
