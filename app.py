@@ -334,6 +334,12 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 .result{min-width:0;max-width:100%;overflow:hidden}
 .result table{width:100%;max-width:100%;table-layout:fixed;display:block;overflow-x:auto}
 .result th,.result td{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+/* Keep evidence source links readable instead of wrapping one character per line. */
+.result .facts-table{display:table;table-layout:auto;overflow:visible;border-collapse:collapse}
+.result .facts-table th:first-child{width:24%}
+.result .facts-table td:nth-child(2){width:48%}
+.result .facts-table th:last-child,.result .facts-table td:last-child{width:120px;min-width:120px;white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.result .facts-table .source-link{white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .evidence-grid{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
 .article-evidence{min-width:0;max-width:100%;overflow:hidden;overflow-wrap:anywhere}
 .article-evidence .source-link{overflow-wrap:anywhere;word-break:break-all}
