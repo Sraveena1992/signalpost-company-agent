@@ -88,6 +88,15 @@ class PublicAppSecurityTests(unittest.TestCase):
         self.assertIn("object-src 'none'", policy)
         self.assertIn("frame-ancestors 'none'", policy)
 
+    def test_unexpected_homepage_search_error_is_sanitized(self):
+        from app import home
+        with patch("app.search_companies", side_effect=TypeError("internal diagnostic must not leak")):
+            response = home(q="ZAP")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("The company search could not be completed. Please retry later.", response.body.decode())
+        self.assertNotIn("internal diagnostic must not leak", response.body.decode())
+        self.assertNotIn("Traceback", response.body.decode())
+
     def test_research_requests_are_rate_limited_per_client(self):
         from app import _RATE_LIMITS, _RATE_LIMIT_LOCK, _research_rate_limited
         with _RATE_LIMIT_LOCK:
