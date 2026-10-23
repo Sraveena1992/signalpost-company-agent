@@ -20,7 +20,7 @@ crawler = [
   "scrapy-playwright>=0.0.44,<1",
 ]
 sentiment = [
-  "accelerate>=1.10,<2",
+  "accelerate>=1.15.0,<2",
   "torch>=2.5,<3",
   "transformers>=4.51,<5",
 ]
