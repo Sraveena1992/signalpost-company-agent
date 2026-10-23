@@ -1568,8 +1568,8 @@ class PublicLookupPrototypeTests(unittest.TestCase):
         def fake_run(command, **kwargs):
             def arg(name):
                 return Path(command[command.index(name) + 1])
-            arg("--output").write_text(json.dumps({"organisation_number": "912900584", "terminal_state": "available"}) + "\\n", encoding="utf-8")
-            arg("--profiles-output").write_text(json.dumps({"organisation_number": "912900584", "name": "VIK MEDIA HOLDING AS", "evidence": {}, "synthesis": {"facts": [], "unsupported_or_uncertain": []}}) + "\\n", encoding="utf-8")
+            arg("--output").write_text(json.dumps({"organisation_number": "912900584", "terminal_state": "available"}) + "\n", encoding="utf-8")
+            arg("--profiles-output").write_text(json.dumps({"organisation_number": "912900584", "name": "VIK MEDIA HOLDING AS", "evidence": {}, "synthesis": {"facts": [], "unsupported_or_uncertain": []}}) + "\n", encoding="utf-8")
             arg("--report").write_text(json.dumps({"processed": 1}), encoding="utf-8")
             return type("Completed", (), {"returncode": 0, "stdout": "", "stderr": ""})()
 
