@@ -220,13 +220,13 @@ def _published_date(soup: BeautifulSoup) -> str | None:
     ):
         node = soup.select_one(selector)
         raw = str(node.get(attribute) or "").strip() if node else ""
-        if re.search(r"\\b(?:19|20)\\d{2}[-/]\\d{1,2}[-/]\\d{1,2}\\b", raw) or re.fullmatch(r"(?:19|20)\\d{2}", raw):
+        if re.search(r"(?:19|20)\d{2}[-/]\d{1,2}[-/]\d{1,2}", raw) or re.fullmatch(r"(?:19|20)\d{2}", raw):
             return raw[:80]
     # JSON-LD Article/NewsArticle datePublished is acceptable; dateModified is not.
     def find_published(node: Any) -> str | None:
         if isinstance(node, dict):
             raw = node.get("datePublished")
-            if isinstance(raw, str) and re.search(r"\\b(?:19|20)\\d{2}(?:[-/]\\d{1,2}(?:[-/]\\d{1,2})?)?", raw):
+            if isinstance(raw, str) and re.search(r"\b(?:19|20)\d{2}(?:[-/]\d{1,2}(?:[-/]\d{1,2})?)?", raw):
                 return raw[:80]
             for child in node.values():
                 found = find_published(child)
