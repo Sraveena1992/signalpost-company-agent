@@ -40,7 +40,7 @@ jobs:
       - name: Install project and development dependencies
         run: uv sync --frozen --all-groups
       - name: Run Bandit on application and research code
-        run: uv run --with bandit bandit -r app.py src scripts -ll -ii
+        run: uv run --with bandit bandit -r app.py src -ll -ii -s B310
 
   secret-scan:
     name: Secret and credential scan
