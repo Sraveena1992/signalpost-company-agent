@@ -23,7 +23,7 @@
 | Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
 | Public web interface | Company-name/number search plus on-demand single-company evidence research |
 | API | JSON company lookup and health endpoint |
-| Automated regression suite | Latest recorded successful run: 121 tests and 7 subtests |
+| Automated regression suite | Latest recorded successful run: 123 tests and 7 subtests |
 
 ## Live demo
 
@@ -148,7 +148,7 @@ The project also includes batch utilities in [`src/norway_company_agent/batch.py
 
 ## Testing and validation
 
-The latest confirmed GitHub Actions regression run passed **121 tests and 7 subtests**:
+The latest confirmed GitHub Actions regression run passed **123 tests and 7 subtests**:
 
 https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/39905813739
 
