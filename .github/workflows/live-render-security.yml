@@ -2,9 +2,10 @@ name: live-render-security-check
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "fix/exact-batch-membership"]
     paths:
       - ".github/workflows/live-render-security.yml"
+      - "app.py"
   workflow_dispatch:
 
 permissions:
@@ -15,6 +16,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify official registry search API directly
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 30 \
+            -H 'Accept: application/vnd.brreg.enhetsregisteret.enhet.v2+json, application/json;q=0.9' \
+            'https://data.brreg.no/enhetsregisteret/api/enheter?navn=Equinor&size=5' \
+            -o /tmp/brreg-search.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          body = json.loads(Path("/tmp/brreg-search.json").read_text(encoding="utf-8"))
+          embedded = body.get("_embedded") or {}
+          entities = embedded.get("enheter") or embedded.get("entities") or []
+          assert entities, f"Official Brreg search returned no entities. Top-level keys: {list(body)}"
+          print(f"Official Brreg live search: PASS ({len(entities)} entities)")
+          print("First registry result:", entities[0].get("navn"), entities[0].get("organisasjonsnummer"))
+          PY
       - name: Verify live health and documentation endpoints
         run: |
           set -euo pipefail
@@ -29,6 +47,17 @@ jobs:
           PY
           curl --fail --silent --show-error --max-time 30 -D /tmp/home.headers -o /tmp/home.html https://signalpost-company-agent.onrender.com/
           curl --fail --silent --show-error --max-time 30 -D /tmp/docs.headers -o /tmp/docs.html https://signalpost-company-agent.onrender.com/docs
+          curl --fail --silent --show-error --max-time 30 -D /tmp/search.headers -o /tmp/search.json 'https://signalpost-company-agent.onrender.com/api/search?q=Equinor'
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          body = json.loads(Path("/tmp/search.json").read_text(encoding="utf-8"))
+          results = body.get("results")
+          assert isinstance(results, list) and results, f"Live Render company search returned no results: {body}"
+          assert any(str(item.get("organisation_number", "")).isdigit() and len(str(item.get("organisation_number", ""))) == 9 for item in results), f"No valid organisation number in results: {results}"
+          print(f"Live Render company search: PASS ({len(results)} results)")
+          print("First result:", results[0].get("name"), results[0].get("organisation_number"))
+          PY
           python - <<'PY'
           from pathlib import Path
           def headers(path):
