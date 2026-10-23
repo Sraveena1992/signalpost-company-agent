@@ -15,6 +15,8 @@ from norway_company_agent.evidence import evidence, utc_now  # noqa: E402
 from norway_company_agent.identity import apply_website_identity_gate  # noqa: E402
 from norway_company_agent.official import accounting_obligation_assessment, fetch_official_modules  # noqa: E402
 from norway_company_agent.website import fetch_website  # noqa: E402
+from scripts.extract_company_site_activity import observation as site_activity_observation  # noqa: E402
+from scripts.extract_company_site_news import observation as site_news_observation  # noqa: E402
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -40,7 +42,7 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument(
         "--modules",
-        default="registry,accounting_obligation,registry_live,financials,financial_history,roles,group,locations,website",
+        default="registry,accounting_obligation,registry_live,financials,financial_history,roles,group,locations,website,public_activity",
         help="Comma-separated implemented modules",
     )
     args = parser.parse_args()
@@ -120,6 +122,57 @@ def main() -> None:
                     "website", "source_error", "company_website",
                     str(profile.get("website") or "https://www.brreg.no/"),
                     note=f"Website module failed safely: {type(exc).__name__}",
+                )
+
+        if "public_activity" in requested_modules:
+            website_record = profile["evidence"].get("website") or {}
+            website_value = website_record.get("value") or {}
+            observations = []
+            for extractor in (site_activity_observation, site_news_observation):
+                try:
+                    observation = extractor(profile)
+                    if observation:
+                        observations.append(observation)
+                except Exception:
+                    # A malformed optional activity extraction must not abort a company.
+                    continue
+            website_source = website_value.get("final_url") or website_record.get("source_url") or "https://www.brreg.no/"
+            website_time = website_record.get("retrieved_at") or utc_now()
+            if observations:
+                profile["evidence"]["public_activity"] = evidence(
+                    "public_activity", "available", "verified_company_site_activity",
+                    website_source, value={"observations": observations, "scope": "company-owned site activity only"},
+                    retrieved_at=website_time,
+                    content_sha256=website_value.get("content_sha256") or website_record.get("content_sha256"),
+                )
+            elif website_record.get("status") == "blocked":
+                profile["evidence"]["public_activity"] = evidence(
+                    "public_activity", "blocked", "verified_company_site_activity", website_source,
+                    note="The company website blocked the bounded public-activity check.", retrieved_at=website_time,
+                )
+            elif website_record.get("status") == "source_error":
+                profile["evidence"]["public_activity"] = evidence(
+                    "public_activity", "source_error", "verified_company_site_activity", website_source,
+                    note="The company website activity check failed.", retrieved_at=website_time,
+                )
+            elif website_record.get("status") == "not_found":
+                profile["evidence"]["public_activity"] = evidence(
+                    "public_activity", "not_applicable", "verified_company_site_activity", "https://www.brreg.no/",
+                    note="No registered company website was available for this company-site-only activity check.",
+                    retrieved_at=website_time,
+                )
+            elif not (website_value.get("identity_assessment") or {}).get("publishable"):
+                profile["evidence"]["public_activity"] = evidence(
+                    "public_activity", "ambiguous", "verified_company_site_activity", website_source,
+                    note="Website identity did not pass the publication gate; activity was not attributed to this company.",
+                    retrieved_at=website_time,
+                )
+            else:
+                profile["evidence"]["public_activity"] = evidence(
+                    "public_activity", "not_found", "verified_company_site_activity", website_source,
+                    note="No publishable dated company-site activity was found in the bounded verified crawl.",
+                    retrieved_at=website_time,
+                    content_sha256=website_value.get("content_sha256") or website_record.get("content_sha256"),
                 )
 
         metric = {
