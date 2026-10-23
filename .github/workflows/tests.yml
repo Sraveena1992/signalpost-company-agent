@@ -2,7 +2,7 @@ name: tests
 
 on:
   push:
-    branches: ["main", "fix/exact-batch-membership"]
+    branches: ["main", "fix/exact-batch-membership", "final/builderr-contract"]
   pull_request:
     branches: ["main"]
 
