@@ -148,9 +148,11 @@ The project also includes batch utilities in [`src/norway_company_agent/batch.py
 
 ## Testing and validation
 
-The automated regression suite includes unit tests for evidence provenance, identity gates, company research modules, refresh behaviour, and the Builderr terminal-state contract. Check the latest GitHub Actions run for the exact result of the current commit:
+The latest confirmed GitHub Actions regression run passed **121 tests and 7 subtests**:
 
-https://github.com/Sraveena1992/signalpost-company-agent/actions
+https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/39905813739
+
+The suite includes evidence provenance, identity gates, company research modules, refresh behaviour, and the Builderr terminal-state contract. Check Actions again after later code changes.
 
 A passing test suite is not a substitute for the required 100-company live smoke test or an official Builderr score.
 
