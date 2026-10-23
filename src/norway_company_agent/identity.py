@@ -40,7 +40,7 @@ def assess_website_identity(profile: dict[str, Any]) -> dict[str, Any]:
     structured_names = _structured_names(value.get("structured_organisations") or [])
     rendered = value.get("js_fallback") or {}
     homepage_identity_parts = [
-        value.get("title"), value.get("description"), value.get("identity_text_excerpt"), hostname, *structured_names,
+        value.get("title"), value.get("description"), value.get("identity_text_excerpt"), hostname,
         rendered.get("title"),
     ]
     # Ownership must be established from the homepage, not from a subsidiary
