@@ -754,10 +754,51 @@ class OperationsTests(unittest.TestCase):
             },
         }
         envelope = terminal_envelope(profile, run_id="day-1", modules=["registry", "website"], started_at="2026-01-01T00:00:00Z", completed_at="2026-01-01T00:01:00Z")
-        self.assertEqual(envelope["modules"]["registry"]["state"], "complete")
-        self.assertEqual(envelope["modules"]["website"]["state"], "blocked_robots")
+        self.assertEqual(envelope["modules"]["registry"]["state"], "available")
+        self.assertEqual(envelope["modules"]["website"]["state"], "blocked")
         self.assertTrue(validate_envelopes([envelope], 1)["passed"])
         self.assertFalse(validate_envelopes([envelope], 2)["passed"])
+
+    def test_batch_envelope_uses_only_builderr_contract_states(self):
+        from norway_company_agent.batch import TERMINAL_STATES, entity_terminal_state
+        profile = {
+            "organisation_number": "923609016",
+            "evidence": {
+                "registry": evidence("registry", "available", "official", "https://example.test", value={"name": "Example AS"}),
+                "financials": evidence("financials", "available", "official_accounts", "https://example.test/accounts", value={"records": [{"period": "2025", "revenue": 100}]}),
+            },
+        }
+        envelope = terminal_envelope(profile, run_id="day-1", modules=["registry", "financials"], started_at="2026-01-01T00:00:00Z", completed_at="2026-01-01T00:01:00Z")
+        self.assertEqual(envelope["state"], "available")
+        self.assertTrue(set(TERMINAL_STATES) >= {envelope["state"], *(item["state"] for item in envelope["modules"].values())})
+        self.assertTrue(validate_envelopes([envelope], 1)["passed"])
+
+    def test_batch_entity_is_not_available_for_identity_only_profile(self):
+        from norway_company_agent.batch import entity_terminal_state
+        profile = {
+            "organisation_number": "923609016",
+            "evidence": {
+                "registry": evidence("registry", "available", "official", "https://example.test", value={"name": "Example AS"}),
+                "accounting_obligation": evidence("accounting_obligation", "available", "rules", "https://example.test/rules", value={"classification": "unknown"}),
+                "financials": evidence("financials", "available", "official_accounts", "https://example.test/accounts", value={"records": []}),
+            },
+        }
+        self.assertEqual(entity_terminal_state(profile, ["registry", "accounting_obligation", "financials"]), "not_available")
+
+    def test_batch_entity_maps_missing_registry_to_failed_and_404_to_not_available(self):
+        from norway_company_agent.batch import entity_terminal_state
+        self.assertEqual(entity_terminal_state({"organisation_number": "923609016", "evidence": {}}, ["registry"]), "failed")
+        profile = {"organisation_number": "923609016", "evidence": {
+            "registry": evidence("registry", "not_found", "official", "https://example.test")
+        }}
+        self.assertEqual(entity_terminal_state(profile, ["registry"]), "not_available")
+
+    def test_batch_validator_rejects_non_contract_state_names(self):
+        envelope = {"organisation_number": "923609016", "state": "complete", "modules": {"registry": {"state": "source_error"}}}
+        result = validate_envelopes([envelope], 1, ["923609016"])
+        self.assertFalse(result["passed"])
+        self.assertFalse(result["checks"]["all_entity_states_contract_valid"])
+        self.assertFalse(result["checks"]["all_module_states_contract_valid"])
 
     def test_batch_validator_rejects_missing_or_unexpected_company(self):
         def make_envelope(org):
@@ -796,7 +837,7 @@ class OperationsTests(unittest.TestCase):
         self.assertFalse(result["checks"]["exact_organisation_membership"])
 
     def test_unknown_evidence_state_is_submission_error(self):
-        self.assertEqual(evidence_terminal_state({"status": "not_fetched"}), "submission_error")
+        self.assertEqual(evidence_terminal_state({"status": "not_fetched"}), "failed")
 
     def test_batch_resume_only_skips_profiles_with_all_terminal_modules(self):
         complete = {"evidence": {"registry": {"status": "available"}, "website": {"status": "not_found"}}}
