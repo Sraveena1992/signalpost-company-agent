@@ -91,7 +91,7 @@ class PublicAppSecurityTests(unittest.TestCase):
     def test_unexpected_homepage_search_error_is_sanitized(self):
         from app import home
         with patch("app.search_companies", side_effect=TypeError("internal diagnostic must not leak")):
-            response = home(q="ZAP")
+            response = home(orgnr="", q="ZAP")
         self.assertEqual(response.status_code, 200)
         self.assertIn("The company search could not be completed. Please retry later.", response.body.decode())
         self.assertNotIn("internal diagnostic must not leak", response.body.decode())
