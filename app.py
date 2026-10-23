@@ -186,8 +186,7 @@ def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="
     if error_message:
         result_html = '<section class="error"><strong>Could not complete search</strong><p>' + html.escape(error_message) + '</p><a class="button secondary" href="/">↺ Reset and try again</a></section>'
 
-    return HTMLResponse(
-        """<!doctype html>
+    html_page = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -207,11 +206,12 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 <body><main>
 <nav class="topbar"><a class="brand" href="/" aria-label="Signalpost home"><span class="logo"><svg width="27" height="27" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 24V8h5l12 10V8h5v16h-5L10 14v10z" fill="#7ce8c2"/><path d="M4 28h24" stroke="#8ab9ff" stroke-width="2" stroke-linecap="round"/></svg></span><span><span class="brand-name">SIGNALPOST</span><span class="brand-sub">COMPANY INTELLIGENCE</span></span></a><span class="status">● LIVE PROTOTYPE</span></nav>
 <header class="hero"><div class="kicker">NORWEGIAN COMPANY RESEARCH</div><h1>Know the company.<br>Verify the evidence.</h1><p>Find a registered Norwegian organisation by <strong>company name or organisation number</strong>. Start with the official register, then follow the source for yourself.</p></header>
-<section class="panel"><form method="get" action="/" id="search-form"><label class="search-label" for="search-query">What company are you looking for?</label><div class="search-row"><input class="search-input" id="search-query" name="q" value="""" + html.escape(q, quote=True) + """" placeholder="Company name or 9-digit organisation number" autocomplete="off" aria-describedby="search-hint" required><button class="button" type="submit">Search registry ↗</button></div><p class="hint" id="search-hint">Tip: enter a company name if you don’t know its organisation number. Search uses the official Brønnøysund Register.</p></form></section>
+<section class="panel"><form method="get" action="/" id="search-form"><label class="search-label" for="search-query">What company are you looking for?</label><div class="search-row"><input class="search-input" id="search-query" name="q" value="__SEARCH_VALUE__" placeholder="Company name or 9-digit organisation number" autocomplete="off" aria-describedby="search-hint" required><button class="button" type="submit">Search registry ↗</button></div><p class="hint" id="search-hint">Tip: enter a company name if you don’t know its organisation number. Search uses the official Brønnøysund Register.</p></form></section>
 """ + result_html + """
 <section class="panel"><div class="section-kicker">WHY SIGNALPOST</div><h2>Research you can trace back to its source.</h2><div class="purpose"><article><div class="purpose-icon">⌕</div><b>Find the right entity</b><p>Search by name or number and check the legal organisation before relying on its details.</p></article><article><div class="purpose-icon">↗</div><b>Verify the source</b><p>Open the original public registry record instead of treating an unlinked claim as fact.</p></article><article><div class="purpose-icon">◎</div><b>Start due diligence</b><p>Use official identity details as a starting point for supplier, customer, or partner research.</p></article></div><p class="hint">This public prototype currently provides official-registry search and lookup. It is not the full batch research pipeline and does not independently verify every financial, social, or news claim.</p><p class="hint">Source: <a class="source-link" href="https://www.brreg.no/en/" target="_blank" rel="noopener noreferrer">Brønnøysund Register Centre</a> · <a class="source-link" href="/docs">API documentation ↗</a> · <a class="source-link" href="/healthz">Service health ↗</a></p></section>
 <footer class="footer">Signalpost Company Intelligence · Prototype · Registry data may be incomplete or change over time. <a href="https://data.brreg.no/enhetsregisteret/api/dokumentasjon/en/index.html" target="_blank" rel="noopener noreferrer">Registry API documentation</a></footer>
 </main><script>
 (function(){const input=document.getElementById('search-query');if(!input)return;input.addEventListener('keydown',function(e){if(e.key==='Escape'){input.value='';input.focus();}});})();
 </script></body></html>"""
-    )
+    html_page = html_page.replace("__SEARCH_VALUE__", html.escape(q, quote=True))
+    return HTMLResponse(html_page)
