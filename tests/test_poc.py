@@ -27,7 +27,7 @@ from norway_company_agent.external_footprint import aggregate_footprint, publish
 from norway_company_agent.external_tasks import plan_external_tasks  # noqa: E402
 from norway_company_agent.external_control import development_score, run_company_control, strategy_order  # noqa: E402
 from norway_company_agent.identity import apply_website_identity_gate, assess_social_identity, assess_website_identity  # noqa: E402
-from norway_company_agent.website import _extraction_state, _priority_links, _social_links, assert_public_url, fetch_website, normalize_homepage, normalize_social_url, structured_social_links  # noqa: E402
+from norway_company_agent.website import _extraction_state, _priority_links, _published_date, _social_links, assert_public_url, fetch_website, normalize_homepage, normalize_social_url, structured_social_links  # noqa: E402
 from norway_company_agent.batch import evidence_terminal_state, profile_complete_for_modules, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
 from norway_company_agent.snapshots import SnapshotFetcher  # noqa: E402
 from bs4 import BeautifulSoup  # noqa: E402
@@ -573,17 +573,37 @@ class CompletenessScoreTests(unittest.TestCase):
     def test_site_news_requires_exact_identity_and_a_captured_news_path(self):
         profile = {
             "organisation_number": "923609016",
+            "name": "Example AS",
             "evidence": {"website": {
                 "status": "available", "retrieved_at": "2026-08-23T00:00:00Z",
                 "value": {
                     "identity_assessment": {"publishable": True, "score": 1.0},
-                    "pages": [{"url": "https://example.test/aktuelt/new-contract", "title": "New contract", "content_sha256": "a" * 64}],
+                    "pages": [{
+                        "url": "https://example.test/aktuelt/new-contract",
+                        "title": "Example signs a new contract",
+                        "published_at": "2026-08-20",
+                        "article_like": True,
+                        "main_text_excerpt": ("Example announced a new contract. " * 8),
+                        "content_sha256": "a" * 64,
+                    }],
                 },
             }},
         }
         item = site_news_observation(profile)
         self.assertEqual(item["signal_type"], "public_post")
+        self.assertEqual(item["published_at"], "2026-08-20")
         self.assertTrue(publishable_observation(item))
+        profile["evidence"]["website"]["value"]["pages"][0]["title"] = "Another company signs a new contract"
+        profile["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = ("Another Company announced a new contract. " * 8)
+        self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["title"] = "Example signs a new contract"
+        profile["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = ("Example announced a new contract. " * 8)
+        profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = ""
+        self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2026-08-20"
+        profile["evidence"]["website"]["value"]["pages"][0]["article_like"] = False
+        self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["article_like"] = True
         profile["evidence"]["website"]["value"]["pages"][0]["url"] = "https://example.test/contact"
         self.assertIsNone(site_news_observation(profile))
 
@@ -734,13 +754,90 @@ class OperationsTests(unittest.TestCase):
             },
         }
         envelope = terminal_envelope(profile, run_id="day-1", modules=["registry", "website"], started_at="2026-01-01T00:00:00Z", completed_at="2026-01-01T00:01:00Z")
-        self.assertEqual(envelope["modules"]["registry"]["state"], "complete")
-        self.assertEqual(envelope["modules"]["website"]["state"], "blocked_robots")
+        self.assertEqual(envelope["modules"]["registry"]["state"], "available")
+        self.assertEqual(envelope["modules"]["website"]["state"], "blocked")
         self.assertTrue(validate_envelopes([envelope], 1)["passed"])
         self.assertFalse(validate_envelopes([envelope], 2)["passed"])
 
+    def test_batch_envelope_uses_only_builderr_contract_states(self):
+        from norway_company_agent.batch import TERMINAL_STATES, entity_terminal_state
+        profile = {
+            "organisation_number": "923609016",
+            "evidence": {
+                "registry": evidence("registry", "available", "official", "https://example.test", value={"name": "Example AS"}),
+                "financials": evidence("financials", "available", "official_accounts", "https://example.test/accounts", value={"records": [{"period": "2025", "revenue": 100}]}),
+            },
+        }
+        envelope = terminal_envelope(profile, run_id="day-1", modules=["registry", "financials"], started_at="2026-01-01T00:00:00Z", completed_at="2026-01-01T00:01:00Z")
+        self.assertEqual(envelope["state"], "available")
+        self.assertTrue(set(TERMINAL_STATES) >= {envelope["state"], *(item["state"] for item in envelope["modules"].values())})
+        self.assertTrue(validate_envelopes([envelope], 1)["passed"])
+
+    def test_batch_entity_is_not_available_for_identity_only_profile(self):
+        from norway_company_agent.batch import entity_terminal_state
+        profile = {
+            "organisation_number": "923609016",
+            "evidence": {
+                "registry": evidence("registry", "available", "official", "https://example.test", value={"name": "Example AS"}),
+                "accounting_obligation": evidence("accounting_obligation", "available", "rules", "https://example.test/rules", value={"classification": "unknown"}),
+                "financials": evidence("financials", "available", "official_accounts", "https://example.test/accounts", value={"records": []}),
+            },
+        }
+        self.assertEqual(entity_terminal_state(profile, ["registry", "accounting_obligation", "financials"]), "not_available")
+
+    def test_batch_entity_maps_missing_registry_to_failed_and_404_to_not_available(self):
+        from norway_company_agent.batch import entity_terminal_state
+        self.assertEqual(entity_terminal_state({"organisation_number": "923609016", "evidence": {}}, ["registry"]), "failed")
+        profile = {"organisation_number": "923609016", "evidence": {
+            "registry": evidence("registry", "not_found", "official", "https://example.test")
+        }}
+        self.assertEqual(entity_terminal_state(profile, ["registry"]), "not_available")
+
+    def test_batch_validator_rejects_non_contract_state_names(self):
+        envelope = {"organisation_number": "923609016", "state": "complete", "modules": {"registry": {"state": "source_error"}}}
+        result = validate_envelopes([envelope], 1, ["923609016"])
+        self.assertFalse(result["passed"])
+        self.assertFalse(result["checks"]["all_entity_states_contract_valid"])
+        self.assertFalse(result["checks"]["all_module_states_contract_valid"])
+
+    def test_batch_validator_rejects_missing_or_unexpected_company(self):
+        def make_envelope(org):
+            return {
+                "organisation_number": org,
+                "state": "complete",
+                "modules": {"registry": {"state": "complete"}},
+            }
+
+        expected = ["923609016", "912345678"]
+        missing = validate_envelopes(
+            [make_envelope("923609016")], 1, expected
+        )
+        self.assertFalse(missing["passed"])
+        self.assertEqual(missing["missing_organisations"], ["912345678"])
+
+        substituted = validate_envelopes(
+            [make_envelope("923609016"), make_envelope("999999999")],
+            2,
+            expected,
+        )
+        self.assertFalse(substituted["passed"])
+        self.assertEqual(substituted["missing_organisations"], ["912345678"])
+        self.assertEqual(substituted["unexpected_organisations"], ["999999999"])
+
+    def test_batch_validator_rejects_duplicate_expected_ids(self):
+        envelope = {
+            "organisation_number": "923609016",
+            "state": "complete",
+            "modules": {"registry": {"state": "complete"}},
+        }
+        result = validate_envelopes(
+            [envelope], 1, ["923609016", "923609016"]
+        )
+        self.assertFalse(result["passed"])
+        self.assertFalse(result["checks"]["exact_organisation_membership"])
+
     def test_unknown_evidence_state_is_submission_error(self):
-        self.assertEqual(evidence_terminal_state({"status": "not_fetched"}), "submission_error")
+        self.assertEqual(evidence_terminal_state({"status": "not_fetched"}), "failed")
 
     def test_batch_resume_only_skips_profiles_with_all_terminal_modules(self):
         complete = {"evidence": {"registry": {"status": "available"}, "website": {"status": "not_found"}}}
@@ -1242,6 +1339,25 @@ class RefreshTests(unittest.TestCase):
 
 
 class WebsiteIdentityTests(unittest.TestCase):
+    def test_publication_date_uses_published_metadata_not_modified_date(self):
+        published = BeautifulSoup(
+            '<meta property="article:published_time" content="2026-08-20T10:00:00Z">'
+            '<meta property="article:modified_time" content="2026-10-21T10:00:00Z">',
+            "lxml",
+        )
+        self.assertEqual(_published_date(published), "2026-08-20T10:00:00Z")
+        modified_only = BeautifulSoup(
+            '<meta property="article:modified_time" content="2026-10-21T10:00:00Z">',
+            "lxml",
+        )
+        self.assertIsNone(_published_date(modified_only))
+
+    def test_jsonld_date_published_is_supported(self):
+        soup = BeautifulSoup(
+            '<script type="application/ld+json">{"@type":"NewsArticle","datePublished":"2026-08-20"}</script>',
+            "lxml",
+        )
+        self.assertEqual(_published_date(soup), "2026-08-20")
     def test_group_contact_page_listing_subsidiary_org_number_is_not_exact_homepage_identity(self):
         profile = {
             "organisation_number": "915637353",
@@ -1249,7 +1365,12 @@ class WebsiteIdentityTests(unittest.TestCase):
             "evidence": {"website": evidence("website", "available", "company_site", "https://sks.no", value={
                 "final_url": "https://sks.no/",
                 "title": "Konsern - SKS - Forside",
-                "main_text_excerpt": "SKS is a power group with multiple subsidiaries.",
+                "main_text_excerpt": "SKS is a power group with multiple subsidiaries. Contact: SKS Produksjon AS, organisation number 915 637 353.",
+                "structured_organisations": [{
+                    "@type": "Organization",
+                    "name": "SKS Produksjon AS",
+                    "identifier": "915637353",
+                }],
                 "pages": [{"title": "Contact", "main_text_excerpt": "SKS Produksjon AS organisation number 915 637 353"}],
             })},
         }
@@ -1303,8 +1424,10 @@ class WebsiteIdentityTests(unittest.TestCase):
     def test_social_handle_requires_exact_entity_name_evidence(self):
         aon = {"name": "Aon Norway AS"}
         fish = {"name": "Norsk Fiskeeksport AS"}
+        fuzzy = {"name": "Nordic Door Group AS"}
         self.assertFalse(assess_social_identity(aon, {"platform": "linkedin", "url": "https://linkedin.com/company/aon"})["publishable"])
         self.assertTrue(assess_social_identity(fish, {"platform": "linkedin", "url": "https://linkedin.com/company/norsk-fiskeeksport"})["publishable"])
+        self.assertFalse(assess_social_identity(fuzzy, {"platform": "linkedin", "url": "https://linkedin.com/company/nordic-door"})["publishable"])
 
 
 class VerifiedSiteSeedTests(unittest.TestCase):
@@ -1344,6 +1467,55 @@ class VerifiedSiteSeedTests(unittest.TestCase):
             failed = subprocess.run(command, capture_output=True, text=True)
             self.assertNotEqual(failed.returncode, 0)
             self.assertIn("unknown organisations", failed.stderr)
+
+
+class PublicLookupPrototypeTests(unittest.TestCase):
+    def test_company_name_search_parses_official_registry_results(self):
+        from app import search_companies
+        payload = {
+            "_embedded": {
+                "enheter": [{
+                    "navn": "VIK MEDIA HOLDING AS",
+                    "organisasjonsnummer": "912900584",
+                    "organisasjonsform": {"beskrivelse": "Aksjeselskap"},
+                    "forretningsadresse": {"adresse": ["Lalandsvegen 90"], "postnummer": "4353", "poststed": "KLEPP STASJON"},
+                    "naeringskode1": {"beskrivelse": "Business consulting"},
+                }]
+            }
+        }
+        with patch("app._get_json", return_value=payload) as get_json:
+            rows = search_companies("VIK MEDIA")
+        self.assertEqual(rows[0]["organisation_number"], "912900584")
+        self.assertEqual(rows[0]["name"], "VIK MEDIA HOLDING AS")
+        self.assertIn("navn=VIK+MEDIA", get_json.call_args.args[0])
+
+    def test_company_name_search_rejects_too_short_query(self):
+        from app import search_companies
+        with self.assertRaises(ValueError):
+            search_companies(" ")
+
+    def test_homepage_contains_brand_and_resettable_search(self):
+        from app import home
+        response = home(orgnr="", q="")
+        self.assertIn("SIGNALPOST", response.body.decode("utf-8"))
+        self.assertIn('name="q"', response.body.decode("utf-8"))
+        self.assertIn("New search", response.body.decode("utf-8"))
+        self.assertIn("data:image/svg+xml", response.body.decode("utf-8"))
+
+    def test_homepage_renders_company_name_matches(self):
+        from app import home
+        with patch("app.search_companies", return_value=[{
+            "name": "VIK MEDIA HOLDING AS",
+            "organisation_number": "912900584",
+            "organisation_form": "Aksjeselskap",
+            "address": "KLEPP STASJON",
+            "industry": "Consulting",
+        }]):
+            response = home(orgnr="", q="VIK MEDIA")
+        body = response.body.decode("utf-8")
+        self.assertIn("VIK MEDIA HOLDING AS", body)
+        self.assertIn("912900584", body)
+        self.assertIn("View record", body)
 
 
 if __name__ == "__main__":
