@@ -171,7 +171,7 @@ def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="
     result_html = ""
     error_message = ""
     search_text = q.strip()
-    direct_orgnr = orgnr.strip() or (search_text if re.fullmatch(r"\\d{9}", re.sub(r"\\s+", "", search_text)) else "")
+    direct_orgnr = orgnr.strip() or (search_text if re.fullmatch(r"\d{9}", re.sub(r"\s+", "", search_text)) else "")
     if direct_orgnr:
         try:
             result_html = _company_result(lookup_company(direct_orgnr))
