@@ -4,7 +4,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/Web%20Demo-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/Tests-109%20passing-brightgreen)](#testing-and-validation)
+[![Tests](https://img.shields.io/badge/Tests-111%20passing-brightgreen)](#testing-and-validation)
 [![Status](https://img.shields.io/badge/Status-Prototype-orange)](#scope-and-limitations)
 
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
@@ -23,7 +23,7 @@
 | Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
 | Web interface | Lightweight live official-registry lookup prototype |
 | API | JSON company lookup and health endpoint |
-| Test suite | 109 tests passed in the last recorded local run |
+| Test suite | 111 tests passed in the latest recorded CI run |
 
 ## Live demo and verification
 
@@ -158,7 +158,7 @@ The project also includes batch utilities in [`src/norway_company_agent/batch.py
 
 The last recorded local test run completed with:
 
-- **109 tests passed**
+- **111 tests passed**
 - 11 warnings
 - 7 subtests passed
 - `git diff --check` returned no whitespace errors
