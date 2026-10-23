@@ -170,14 +170,16 @@ def _search_results(query: str, results: list[dict]) -> str:
 def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="", max_length=120)):
     result_html = ""
     error_message = ""
-    if orgnr.strip():
+    search_text = q.strip()
+    direct_orgnr = orgnr.strip() or (search_text if re.fullmatch(r"\\d{9}", re.sub(r"\\s+", "", search_text)) else "")
+    if direct_orgnr:
         try:
-            result_html = _company_result(lookup_company(orgnr.strip()))
+            result_html = _company_result(lookup_company(direct_orgnr))
         except (ValueError, LookupError, RuntimeError) as exc:
             error_message = str(exc)
-    elif q.strip():
+    elif search_text:
         try:
-            result_html = _search_results(q.strip(), search_companies(q.strip()))
+            result_html = _search_results(search_text, search_companies(search_text))
         except (ValueError, LookupError, RuntimeError) as exc:
             error_message = str(exc)
 
