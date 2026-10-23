@@ -1535,11 +1535,19 @@ class PublicLookupPrototypeTests(unittest.TestCase):
 
     def test_homepage_contains_brand_and_resettable_search(self):
         from app import home
-        response = home(orgnr="", q="")
-        self.assertIn("SIGNALPOST", response.body.decode("utf-8"))
-        self.assertIn('name="q"', response.body.decode("utf-8"))
-        self.assertIn("New search", response.body.decode("utf-8"))
-        self.assertIn("data:image/svg+xml", response.body.decode("utf-8"))
+        with patch("app.lookup_company", return_value={
+            "name": "VIK MEDIA HOLDING AS",
+            "organisation_number": "912900584",
+            "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/912900584",
+        }):
+            response = home(orgnr="912900584", q="")
+        body = response.body.decode("utf-8")
+        self.assertIn("SIGNALPOST", body)
+        self.assertIn('name="q"', body)
+        self.assertIn("New search", body)
+        self.assertIn('value=""', body)
+        self.assertNotIn("html.escape(q", body)
+        self.assertIn("data:image/svg+xml", body)
 
     def test_homepage_renders_company_name_matches(self):
         from app import home
