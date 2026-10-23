@@ -1292,6 +1292,25 @@ class RefreshTests(unittest.TestCase):
 
 
 class WebsiteIdentityTests(unittest.TestCase):
+    def test_publication_date_uses_published_metadata_not_modified_date(self):
+        published = BeautifulSoup(
+            '<meta property="article:published_time" content="2026-08-20T10:00:00Z">'
+            '<meta property="article:modified_time" content="2026-10-21T10:00:00Z">',
+            "lxml",
+        )
+        self.assertEqual(_published_date(published), "2026-08-20T10:00:00Z")
+        modified_only = BeautifulSoup(
+            '<meta property="article:modified_time" content="2026-10-21T10:00:00Z">',
+            "lxml",
+        )
+        self.assertIsNone(_published_date(modified_only))
+
+    def test_jsonld_date_published_is_supported(self):
+        soup = BeautifulSoup(
+            '<script type="application/ld+json">{"@type":"NewsArticle","datePublished":"2026-08-20"}</script>',
+            "lxml",
+        )
+        self.assertEqual(_published_date(soup), "2026-08-20")
     def test_group_contact_page_listing_subsidiary_org_number_is_not_exact_homepage_identity(self):
         profile = {
             "organisation_number": "915637353",
