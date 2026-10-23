@@ -21,9 +21,9 @@
 | Company identity | Conservative identity checks |
 | Research modules | Registry, accounting obligations, financials, filing history, roles, group, locations, website identity and company-owned site activity |
 | Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
-| Public web interface | Live single-company official-registry lookup prototype |
+| Public web interface | Company-name/number search plus on-demand single-company evidence research |
 | API | JSON company lookup and health endpoint |
-| Automated regression suite | Latest recorded successful run: 111 tests and 7 subtests |
+| Automated regression suite | Latest recorded successful run: 123 tests and 7 subtests |
 
 ## Live demo
 
@@ -32,9 +32,9 @@
 - **Health endpoint:** https://signalpost-company-agent.onrender.com/healthz
 - **Example official record:** https://data.brreg.no/enhetsregisteret/api/enheter/912900584
 
-The public interface accepts a nine-digit Norwegian organisation number and requests the company record from the official Brønnøysund Register API. It displays available registry fields and links to the original record.
+The public interface accepts a company name or nine-digit Norwegian organisation number and requests live results from the official Brønnøysund Register API. From a selected company record, the **Run evidence research** action invokes the same batch research pipeline for that company and displays source-linked synthesis, module states, evidence, and the run report.
 
-The public web demo is intentionally a **single-company registry lookup**. It is not a hosted UI for the full batch research pipeline and does not claim to verify every company fact, social account, news item, job posting, or financial result.
+The public web demo supports **single-company registry search plus on-demand evidence research**. It does not provide a hosted 100-company batch dashboard, and the default pipeline still lacks a permitted external job-posting connector. It does not claim to verify every company fact, social account, news item, job posting, or financial result.
 
 A successful health response confirms service responsiveness only; it does not establish research accuracy or an official competition score. Public hosting may be subject to cold starts or temporary availability issues.
 
@@ -81,7 +81,7 @@ Structured company profiles
 Batch validation and reports
 ```
 
-The public web prototype is a separate, lightweight entry point for live registry lookups. It should not be confused with the complete batch research workflow. The default batch includes company-owned website activity when the bounded crawl yields dated, identity-gated evidence. A permitted, reproducible external job-posting connector is not yet integrated into the default batch runner; do not claim full jobs coverage until that connector and its source rights are verified.
+The public web prototype is a lightweight entry point for live registry search and one-company research; the reproducible multi-company workflow remains available through the CLI. The default batch includes company-owned website activity when the bounded crawl yields dated, identity-gated evidence. A permitted, reproducible external job-posting connector is not yet integrated into the default batch runner; do not claim full jobs coverage until that connector and its source rights are verified.
 
 ## Quick start
 
@@ -140,15 +140,19 @@ uv run python scripts/run_competition_batch.py --organisations data/organisation
 
 The optional `--bulk path/to/brreg-snapshot.csv` flag seeds profiles from a frozen official registry snapshot; without it, the runner starts from the live Brønnøysund API. The input file is evaluator-owned and must not be replaced with a hard-coded company list. For the required 100-company smoke test, the repository now includes `scripts/run_100_company_smoke.py`. It downloads the official Brønnøysund entity snapshot, selects a deterministic sample of 100 active organisations with 2025 annual-account records, runs the real batch CLI, and writes terminal results, profiles, and a JSON run report. GitHub Actions workflow [`100-company-smoke.yml`](.github/workflows/100-company-smoke.yml) runs this check and uploads those files as an artifact. The sample is a local smoke test only, not Builderr's official scoring batch.
 
-The public terminal-state vocabulary is exactly: `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, and `failed`. Internal fetch states are mapped to this vocabulary before output. The validator checks the expected count, unique IDs, exact input membership, and all entity/module states. A per-company exception is emitted as an explicit failed state rather than silently dropping that input.
+The public terminal-state vocabulary is exactly: `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, and `failed`. Internal fetch states are mapped to this vocabulary before output. The validator checks the expected count, unique IDs, exact input membership, allowed entity/module states, and source URL plus retrieval time for available evidence. A per-company exception is emitted as an explicit failed state rather than silently dropping that input.
+
+Every profile also includes a deterministic `synthesis` object with source-linked facts and an `unsupported_or_uncertain` list. To compare against a prior profile snapshot, pass `--previous-profiles artifacts/previous-profiles.jsonl`; the run emits a `changes` list and marks the baseline honestly as `no_previous_snapshot`, `no_material_changes`, or `changes_detected`. Re-running against unchanged facts should not invent a change.
 
 The project also includes batch utilities in [`src/norway_company_agent/batch.py`](src/norway_company_agent/batch.py) and regression tests in [`tests/test_poc.py`](tests/test_poc.py).
 
 ## Testing and validation
 
-The automated regression suite includes unit tests for evidence provenance, identity gates, company research modules, refresh behaviour, and the Builderr terminal-state contract. Check the latest GitHub Actions run for the exact result of the current commit:
+The latest confirmed GitHub Actions regression run passed **123 tests and 7 subtests**:
 
-https://github.com/Sraveena1992/signalpost-company-agent/actions
+https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/39905813739
+
+The suite includes evidence provenance, identity gates, company research modules, refresh behaviour, and the Builderr terminal-state contract. Check Actions again after later code changes.
 
 A passing test suite is not a substitute for the required 100-company live smoke test or an official Builderr score.
 
