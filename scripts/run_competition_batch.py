@@ -199,6 +199,8 @@ def main() -> None:
         "modules": requested_modules,
         "registry": registry_metadata,
         "operations": operations,
+        "third_party_cost_usd": 0.0,
+        "cost_basis": "Default modules make no paid model/API calls; excludes hosting and general infrastructure.",
         "validation": validation,
     }
     Path(args.report).parent.mkdir(parents=True, exist_ok=True)
