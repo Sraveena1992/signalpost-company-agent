@@ -1319,6 +1319,11 @@ class WebsiteIdentityTests(unittest.TestCase):
                 "final_url": "https://sks.no/",
                 "title": "Konsern - SKS - Forside",
                 "main_text_excerpt": "SKS is a power group with multiple subsidiaries.",
+                "structured_organisations": [{
+                    "@type": "Organization",
+                    "name": "SKS Produksjon AS",
+                    "identifier": "915637353",
+                }],
                 "pages": [{"title": "Contact", "main_text_excerpt": "SKS Produksjon AS organisation number 915 637 353"}],
             })},
         }
