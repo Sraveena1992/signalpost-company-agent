@@ -294,11 +294,17 @@ def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="
             result_html = _company_result(lookup_company(direct_orgnr))
         except (ValueError, LookupError, RuntimeError) as exc:
             error_message = str(exc)
+        except Exception:
+            logger.exception("Unexpected company lookup error")
+            error_message = "The company lookup could not be completed. Please retry later."
     elif search_text:
         try:
             result_html = _search_results(search_text, search_companies(search_text))
         except (ValueError, LookupError, RuntimeError) as exc:
             error_message = str(exc)
+        except Exception:
+            logger.exception("Unexpected company search error")
+            error_message = "The company search could not be completed. Please retry later."
 
     if error_message:
         result_html = '<section class="error"><strong>Could not complete search</strong><p>' + html.escape(error_message) + '</p><a class="button secondary" href="/">↺ Reset and try again</a></section>'
