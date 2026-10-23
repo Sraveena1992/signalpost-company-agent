@@ -36,7 +36,13 @@ jobs:
       - name: Verify live health and documentation endpoints
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --max-time 30 -D /tmp/health.headers -o /tmp/health.body https://signalpost-company-agent.onrender.com/healthz
+          # Render free instances may sleep; retry cold starts and transient network timeouts.
+          for attempt in $(seq 1 8); do
+            if curl --fail --silent --show-error --connect-timeout 10 --max-time 45 -D /tmp/health.headers -o /tmp/health.body https://signalpost-company-agent.onrender.com/healthz; then break; fi
+            echo "Health check attempt $attempt failed; waiting for Render to wake up."
+            sleep 10
+          done
+          test -s /tmp/health.body || { echo "Health endpoint did not respond after retries"; exit 1; }
           cat /tmp/health.body
           python - <<'PY'
           import json
@@ -45,10 +51,21 @@ jobs:
           assert body.get("status") == "ok", body
           print("Health endpoint: OK")
           PY
-          home_status=$(curl --silent --show-error --max-time 30 -D /tmp/home.headers -o /tmp/home.html -w '%{http_code}' https://signalpost-company-agent.onrender.com/)
+          home_status=000
+          for attempt in $(seq 1 8); do
+            home_status=$(curl --silent --show-error --connect-timeout 10 --max-time 45 -D /tmp/home.headers -o /tmp/home.html -w '%{http_code}' https://signalpost-company-agent.onrender.com/ || true)
+            [ "$home_status" = "200" ] && break
+            echo "Homepage attempt $attempt returned $home_status; waiting for Render to wake up."
+            sleep 10
+          done
           echo "Live homepage HTTP status: $home_status"
           if [ "$home_status" != "200" ]; then head -c 4000 /tmp/home.html; echo; exit 1; fi
-          curl --fail --silent --show-error --max-time 30 -D /tmp/docs.headers -o /tmp/docs.html https://signalpost-company-agent.onrender.com/docs
+          for attempt in $(seq 1 8); do
+            if curl --fail --silent --show-error --connect-timeout 10 --max-time 45 -D /tmp/docs.headers -o /tmp/docs.html https://signalpost-company-agent.onrender.com/docs; then break; fi
+            echo "Docs attempt $attempt failed; retrying after cold start."
+            sleep 10
+          done
+          test -s /tmp/docs.html || { echo "Docs endpoint did not respond after retries"; exit 1; }
           search_status=$(curl --silent --show-error --max-time 30 -D /tmp/search.headers -o /tmp/search.json -w '%{http_code}' 'https://signalpost-company-agent.onrender.com/api/search?q=Equinor')
           echo "Live search HTTP status: $search_status"
           if [ "$search_status" != "200" ]; then head -c 4000 /tmp/search.json; echo; exit 1; fi
