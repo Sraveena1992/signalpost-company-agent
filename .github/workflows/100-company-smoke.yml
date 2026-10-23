@@ -9,6 +9,8 @@ on:
       - "scripts/run_competition_batch.py"
       - "src/norway_company_agent/batch.py"
       - ".github/workflows/100-company-smoke.yml"
+      - "uv.lock"
+      - "pyproject.toml"
 
 permissions:
   contents: read
