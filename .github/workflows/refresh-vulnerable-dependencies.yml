@@ -1,0 +1,44 @@
+name: refresh-vulnerable-dependencies
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/refresh-vulnerable-dependencies.yml"
+      - "pyproject.toml"
+      - "uv.lock"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Resolve patched versions
+        run: uv lock --upgrade-package certifi --upgrade-package urllib3 --upgrade-package pypdf
+      - name: Install resolved lockfile
+        run: uv sync --frozen --all-groups
+      - name: Run regression tests
+        run: uv run pytest -q
+      - name: Export production dependencies
+        run: uv export --locked --no-dev --format requirements-txt --output-file /tmp/requirements.txt
+      - name: Verify no known runtime dependency vulnerabilities
+        run: uv run --with pip-audit pip-audit -r /tmp/requirements.txt
+      - name: Commit verified dependency lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add uv.lock
+          if git diff --cached --quiet; then
+            echo "Lockfile already current."
+            exit 0
+          fi
+          git commit -m "Update vulnerable runtime dependencies"
+          git push
