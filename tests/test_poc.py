@@ -28,7 +28,7 @@ from norway_company_agent.external_tasks import plan_external_tasks  # noqa: E40
 from norway_company_agent.external_control import development_score, run_company_control, strategy_order  # noqa: E402
 from norway_company_agent.identity import apply_website_identity_gate, assess_social_identity, assess_website_identity  # noqa: E402
 from norway_company_agent.website import _extraction_state, _priority_links, _published_date, _social_links, assert_public_url, fetch_website, normalize_homepage, normalize_social_url, structured_social_links  # noqa: E402
-from norway_company_agent.batch import evidence_terminal_state, profile_complete_for_modules, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
+from norway_company_agent.batch import attach_synthesis, evidence_terminal_state, profile_complete_for_modules, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
 from norway_company_agent.snapshots import SnapshotFetcher  # noqa: E402
 from bs4 import BeautifulSoup  # noqa: E402
 from scripts.build_prototype import compact as compact_prototype, qualification_copy  # noqa: E402
@@ -738,6 +738,45 @@ class OperationsTests(unittest.TestCase):
             self.assertAlmostEqual(official._history_last_request, 13.3)
         finally:
             official._history_last_request = old
+
+    def test_synthesis_is_source_linked_and_marks_missing_baseline_honestly(self):
+        profile = {
+            "organisation_number": "923609016",
+            "name": "Example AS",
+            "legal_form": "AS",
+            "municipality": "Oslo",
+            "employees": 12,
+            "evidence": {
+                "registry": evidence("registry", "available", "official_registry", "https://example.test/registry", value={"name": "Example AS"}),
+                "financials": evidence("financials", "available", "official_accounts", "https://example.test/accounts", value={"records": [{"period": "2025", "revenue": 100}]}),
+            },
+        }
+        attach_synthesis(profile)
+        self.assertEqual(profile["synthesis"]["change_status"], "no_previous_snapshot")
+        revenue = next(item for item in profile["synthesis"]["facts"] if item["claim"] == "Revenue")
+        self.assertEqual(revenue["source_url"], "https://example.test/accounts")
+        self.assertEqual(revenue["value"], 100)
+
+    def test_synthesis_refresh_diff_is_idempotent_and_detects_real_change(self):
+        previous = {
+            "organisation_number": "923609016",
+            "name": "Example AS",
+            "legal_form": "AS",
+            "municipality": "Oslo",
+            "employees": 12,
+            "evidence": {
+                "registry": evidence("registry", "available", "official_registry", "https://example.test/registry", value={"name": "Example AS"}),
+            },
+        }
+        current = json.loads(json.dumps(previous))
+        attach_synthesis(current, previous)
+        self.assertEqual(current["synthesis"]["change_status"], "no_material_changes")
+        self.assertEqual(current["changes"], [])
+        changed = json.loads(json.dumps(current))
+        changed["municipality"] = "Bergen"
+        attach_synthesis(changed, previous)
+        self.assertEqual(changed["synthesis"]["change_status"], "changes_detected")
+        self.assertTrue(any(item["field"] == "registry.municipality" for item in changed["changes"]))
 
     def test_batch_input_preserves_split_annotations(self):
         with tempfile.TemporaryDirectory() as directory:
