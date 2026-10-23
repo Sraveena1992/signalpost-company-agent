@@ -71,10 +71,30 @@ def _get(value: Any, *path: str) -> Any:
     return value
 
 
+def _financial_period_sort_key(item: Any) -> str:
+    """Return the period end date used to select the newest annual account first."""
+    if not isinstance(item, dict):
+        return ""
+    period = item.get("regnskapsperiode") or {}
+    if not isinstance(period, dict):
+        return ""
+    # ISO dates sort lexicographically; missing dates sort after dated records
+    # only when all records lack a usable period.
+    return str(period.get("tilDato") or period.get("fraDato") or "")
+
+
 def normalize_financials(body: Any) -> dict[str, Any]:
     records = body if isinstance(body, list) else []
     if not records:
         return {"records": []}
+    # The API response order is not a reliable recency contract. Sort all records
+    # before limiting the payload so an older first page/order cannot hide newer
+    # submitted accounts from the synthesis layer.
+    records = sorted(
+        records,
+        key=lambda item: (_financial_period_sort_key(item), str(item.get("id") or "")),
+        reverse=True,
+    )
     normalized = []
     for item in records[:3]:
         normalized.append({

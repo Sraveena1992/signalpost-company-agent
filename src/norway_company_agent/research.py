@@ -41,7 +41,16 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     if all_topics or any(term in q for term in financial_terms):
         records = (financial.get("value") or {}).get("records") or []
         if records:
-            latest = records[0]
+            # Defend synthesis against records created by older snapshots or
+            # alternate callers that did not normalize financial recency.
+            def period_end(record: dict[str, Any]) -> str:
+                period = record.get("period") or {}
+                if not isinstance(period, dict):
+                    return ""
+                return str(period.get("tilDato") or period.get("fraDato") or "")
+
+            dated_records = [record for record in records if period_end(record)]
+            latest = max(dated_records, key=period_end) if dated_records else records[0]
             for label, key in (
                 ("Reporting period", "period"),
                 ("Revenue", "revenue"),
