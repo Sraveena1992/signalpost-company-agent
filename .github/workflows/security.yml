@@ -1,0 +1,55 @@
+name: security-audit
+
+on:
+  push:
+    branches: ["main", "fix/exact-batch-membership", "final/builderr-contract"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependency-audit:
+    name: Dependency vulnerability audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked dependencies
+        run: uv sync --frozen --all-groups
+      - name: Export runtime dependencies
+        run: uv export --locked --no-dev --format requirements-txt --output-file /tmp/requirements.txt
+      - name: Audit runtime dependencies
+        run: uv run --with pip-audit pip-audit -r /tmp/requirements.txt
+
+  static-security:
+    name: Static security checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install project and development dependencies
+        run: uv sync --frozen --all-groups
+      - name: Run Bandit on application and research code
+        run: uv run --with bandit bandit -r app.py src scripts -ll -ii
+
+  secret-scan:
+    name: Secret and credential scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan repository history for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
