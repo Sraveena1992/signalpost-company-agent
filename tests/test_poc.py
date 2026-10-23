@@ -57,6 +57,35 @@ from scripts.discover_linkedin_company_profiles import (  # noqa: E402
 )
 
 
+class PublicAppSecurityTests(unittest.TestCase):
+    def test_security_headers_are_present(self):
+        from fastapi.testclient import TestClient
+        from app import app
+        response = TestClient(app).get("/healthz")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get("x-content-type-options"), "nosniff")
+        self.assertEqual(response.headers.get("x-frame-options"), "DENY")
+        self.assertEqual(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin")
+        self.assertIn("camera=()", response.headers.get("permissions-policy", ""))
+
+    def test_homepage_has_restrictive_content_security_policy(self):
+        from fastapi.testclient import TestClient
+        from app import app
+        response = TestClient(app).get("/")
+        policy = response.headers.get("content-security-policy", "")
+        self.assertIn("default-src 'self'", policy)
+        self.assertIn("object-src 'none'", policy)
+        self.assertIn("frame-ancestors 'none'", policy)
+
+    def test_research_concurrency_is_bounded(self):
+        from app import _RESEARCH_SLOTS
+        self.assertTrue(_RESEARCH_SLOTS.acquire(blocking=False))
+        self.assertTrue(_RESEARCH_SLOTS.acquire(blocking=False))
+        self.assertFalse(_RESEARCH_SLOTS.acquire(blocking=False))
+        _RESEARCH_SLOTS.release()
+        _RESEARCH_SLOTS.release()
+
+
 class EvidenceTests(unittest.TestCase):
     def test_missing_is_not_zero_and_provenance_is_required(self):
         record = evidence("financials", "not_found", "official_annual_accounts", "https://example.test/123")
