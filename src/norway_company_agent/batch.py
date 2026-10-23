@@ -98,13 +98,17 @@ def profiles_from_bulk(path: str | Path, organisation_numbers: Iterable[str]) ->
         if len(found) == len(wanted):
             break
     missing = [org for org in requested if org not in found]
-    if missing:
-        raise ValueError(f"Organisation numbers absent from registry snapshot: {missing[:10]}")
+    # A frozen snapshot can lag or omit a newly supplied identifier. Keep that
+    # company in the batch and let the live official-registry module resolve it;
+    # do not abort the entire run or silently drop the input.
+    for org in missing:
+        found[org] = {"organisation_number": org, "evidence": {}}
     return [found[org] for org in requested], {
         "registry_snapshot_sha256": snapshot_sha256,
         "registry_rows_scanned": scanned,
         "requested": len(requested),
-        "selected": len(found),
+        "selected_from_snapshot": len(requested) - len(missing),
+        "missing_from_snapshot": missing,
     }
 
 
