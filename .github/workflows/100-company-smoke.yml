@@ -1,0 +1,43 @@
+name: 100-company-smoke-test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["fix/exact-batch-membership"]
+    paths:
+      - "scripts/run_100_company_smoke.py"
+      - "scripts/run_competition_batch.py"
+      - "src/norway_company_agent/batch.py"
+      - ".github/workflows/100-company-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned dependencies
+        run: uv sync --frozen --all-groups
+      - name: Run official-registry 100-company smoke test
+        run: uv run python scripts/run_100_company_smoke.py
+      - name: Upload smoke-test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signalpost-100-company-smoke
+          path: |
+            artifacts/smoke/organisations.jsonl
+            artifacts/smoke/terminal-results.jsonl
+            artifacts/smoke/profiles.jsonl
+            artifacts/smoke/run-report.json
+          if-no-files-found: warn
+          retention-days: 30
