@@ -1428,5 +1428,54 @@ class VerifiedSiteSeedTests(unittest.TestCase):
             self.assertIn("unknown organisations", failed.stderr)
 
 
+class PublicLookupPrototypeTests(unittest.TestCase):
+    def test_company_name_search_parses_official_registry_results(self):
+        from app import search_companies
+        payload = {
+            "_embedded": {
+                "enheter": [{
+                    "navn": "VIK MEDIA HOLDING AS",
+                    "organisasjonsnummer": "912900584",
+                    "organisasjonsform": {"beskrivelse": "Aksjeselskap"},
+                    "forretningsadresse": {"adresse": ["Lalandsvegen 90"], "postnummer": "4353", "poststed": "KLEPP STASJON"},
+                    "naeringskode1": {"beskrivelse": "Business consulting"},
+                }]
+            }
+        }
+        with patch("app._get_json", return_value=payload) as get_json:
+            rows = search_companies("VIK MEDIA")
+        self.assertEqual(rows[0]["organisation_number"], "912900584")
+        self.assertEqual(rows[0]["name"], "VIK MEDIA HOLDING AS")
+        self.assertIn("navn=VIK+MEDIA", get_json.call_args.args[0])
+
+    def test_company_name_search_rejects_too_short_query(self):
+        from app import search_companies
+        with self.assertRaises(ValueError):
+            search_companies(" ")
+
+    def test_homepage_contains_brand_and_resettable_search(self):
+        from app import home
+        response = home()
+        self.assertIn("SIGNALPOST", response.body.decode("utf-8"))
+        self.assertIn('name="q"', response.body.decode("utf-8"))
+        self.assertIn("New search", response.body.decode("utf-8"))
+        self.assertIn("data:image/svg+xml", response.body.decode("utf-8"))
+
+    def test_homepage_renders_company_name_matches(self):
+        from app import home
+        with patch("app.search_companies", return_value=[{
+            "name": "VIK MEDIA HOLDING AS",
+            "organisation_number": "912900584",
+            "organisation_form": "Aksjeselskap",
+            "address": "KLEPP STASJON",
+            "industry": "Consulting",
+        }]):
+            response = home(q="VIK MEDIA")
+        body = response.body.decode("utf-8")
+        self.assertIn("VIK MEDIA HOLDING AS", body)
+        self.assertIn("912900584", body)
+        self.assertIn("View record", body)
+
+
 if __name__ == "__main__":
     unittest.main()
