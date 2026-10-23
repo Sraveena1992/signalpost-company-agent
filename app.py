@@ -8,6 +8,8 @@ import re
 import subprocess
 import sys
 import threading
+import time
+from collections import deque
 import tempfile
 import uuid
 from pathlib import Path
@@ -15,7 +17,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
 app = FastAPI(
@@ -30,6 +32,28 @@ REGISTRY_URL = "https://data.brreg.no/enhetsregisteret/api/enheter/"
 REGISTRY_SEARCH_URL = REGISTRY_URL
 # Bound expensive on-demand research so a burst of requests cannot spawn unlimited workers.
 _RESEARCH_SLOTS = threading.BoundedSemaphore(value=2)
+_RATE_LIMIT_LOCK = threading.Lock()
+_RATE_LIMITS: dict[str, deque[float]] = {}
+_RESEARCH_RATE_LIMIT = 5
+_RESEARCH_RATE_WINDOW_SECONDS = 60
+
+
+def _research_rate_limited(client_host: str, now: float | None = None) -> bool:
+    """Simple per-client fixed-window limiter; concurrency is separately bounded."""
+    current = time.monotonic() if now is None else now
+    with _RATE_LIMIT_LOCK:
+        requests = _RATE_LIMITS.setdefault(client_host or "unknown", deque())
+        while requests and current - requests[0] >= _RESEARCH_RATE_WINDOW_SECONDS:
+            requests.popleft()
+        if len(requests) >= _RESEARCH_RATE_LIMIT:
+            return True
+        requests.append(current)
+        if len(_RATE_LIMITS) > 256:
+            # Bound memory used by client buckets under random-source traffic.
+            oldest_key = next(iter(_RATE_LIMITS))
+            if oldest_key != (client_host or "unknown"):
+                _RATE_LIMITS.pop(oldest_key, None)
+        return False
 
 
 @app.middleware("http")
@@ -142,8 +166,11 @@ def company_api(orgnr: str):
 
 
 @app.get("/api/research/{orgnr}")
-def research_api(orgnr: str):
+def research_api(orgnr: str, request: Request):
     """Run the actual evidence-rich single-company batch pipeline on demand."""
+    client_host = request.client.host if request.client else "unknown"
+    if _research_rate_limited(client_host):
+        return JSONResponse(status_code=429, content={"error": "Research rate limit reached. Please wait a minute before trying again."})
     try:
         company = lookup_company(orgnr)
     except ValueError as exc:
