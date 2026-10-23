@@ -1,0 +1,31 @@
+name: OWASP ZAP passive baseline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/owasp-zap-baseline.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Run non-destructive OWASP ZAP baseline against public demo
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: "https://signalpost-company-agent.onrender.com"
+          cmd_options: "-a"
+          fail_action: false
+      - name: Upload ZAP baseline report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signalpost-zap-baseline
+          path: report_html.html
+          if-no-files-found: warn
+          retention-days: 30
