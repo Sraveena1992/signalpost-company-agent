@@ -214,9 +214,9 @@ def _published_date(soup: BeautifulSoup) -> str | None:
         ('meta[name="datePublished"]', "content"),
         ('meta[itemprop="datePublished"]', "content"),
         ('meta[name="publishdate"]', "content"),
-        ('meta[name="date"]', "content"),
         ('meta[name="DC.date.issued"]', "content"),
-        ("time[datetime]", "datetime"),
+        ('time[itemprop="datePublished"][datetime]', "datetime"),
+        ('time.published[datetime]', "datetime"),
     ):
         node = soup.select_one(selector)
         raw = str(node.get(attribute) or "").strip() if node else ""
