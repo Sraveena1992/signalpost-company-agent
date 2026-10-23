@@ -16,7 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 crawler = [
-  "scrapy>=2.13,<3",
+  "scrapy>=2.19.0,<3",
   "scrapy-playwright>=0.0.44,<1",
 ]
 sentiment = [
