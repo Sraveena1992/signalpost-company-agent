@@ -19,6 +19,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.14.0
         with:
           target: "https://signalpost-company-agent.onrender.com"
+          allow_issue_writing: false
           cmd_options: "-a"
           fail_action: false
       - name: Upload ZAP baseline report
