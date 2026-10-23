@@ -78,9 +78,9 @@ jobs:
           assert len(set(terminal_orgs)) == 100 and set(terminal_orgs) == input_set, "terminal envelopes are missing, duplicated, or mismatched"
           assert len(set(profile_orgs)) == 100 and set(profile_orgs) == input_set, "profiles are missing, duplicated, or mismatched"
           for row in terminals:
-              state = row.get("terminal_state") or row.get("status")
+              state = row.get("state") or row.get("terminal_state") or row.get("status")
               assert state in allowed, f"invalid terminal state {state!r} for {row}"
-          print(json.dumps({"inputs":len(inputs),"terminal_envelopes":len(terminals),"profiles":len(profiles),"terminal_states":{state:sum(1 for row in terminals if (row.get('terminal_state') or row.get('status'))==state) for state in sorted(allowed)},"report_keys":sorted(report)}, indent=2))
+          print(json.dumps({"inputs":len(inputs),"terminal_envelopes":len(terminals),"profiles":len(profiles),"terminal_states":{state:sum(1 for row in terminals if (row.get('state') or row.get('terminal_state') or row.get('status'))==state) for state in sorted(allowed)},"report_keys":sorted(report)}, indent=2))
           PY
       - name: Upload smoke-test report and outputs
         if: always()
