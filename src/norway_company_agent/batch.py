@@ -150,6 +150,8 @@ def entity_terminal_state(profile: dict[str, Any], modules: Iterable[str]) -> st
         return "not_available"
     if registry_status == "blocked":
         return "blocked"
+    if registry_status == "available" and not _has_substantive_value(registry.get("value")):
+        return "failed"
 
     substantive_modules = {
         "financials", "financial_history", "roles", "group", "locations",
