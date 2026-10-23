@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
+import subprocess
+import sys
+import tempfile
+import uuid
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -16,6 +22,7 @@ app = FastAPI(
     version="1.1.0",
 )
 
+ROOT = Path(__file__).resolve().parent
 REGISTRY_URL = "https://data.brreg.no/enhetsregisteret/api/enheter/"
 REGISTRY_SEARCH_URL = REGISTRY_URL
 
@@ -110,6 +117,54 @@ def company_api(orgnr: str):
         return JSONResponse(status_code=502, content={"error": str(exc)})
 
 
+@app.get("/api/research/{orgnr}")
+def research_api(orgnr: str):
+    """Run the actual evidence-rich single-company batch pipeline on demand."""
+    try:
+        company = lookup_company(orgnr)
+    except ValueError as exc:
+        return JSONResponse(status_code=400, content={"error": str(exc)})
+    except LookupError as exc:
+        return JSONResponse(status_code=404, content={"error": str(exc)})
+    except RuntimeError as exc:
+        return JSONResponse(status_code=502, content={"error": str(exc)})
+
+    run_id = "web-" + uuid.uuid4().hex[:12]
+    with tempfile.TemporaryDirectory(prefix="signalpost-research-") as temporary:
+        work = Path(temporary)
+        inputs = work / "organisations.json"
+        terminal_path = work / "terminal.jsonl"
+        profiles_path = work / "profiles.jsonl"
+        report_path = work / "report.json"
+        inputs.write_text(json.dumps([company["organisation_number"]]), encoding="utf-8")
+        command = [
+            sys.executable, str(ROOT / "scripts" / "run_competition_batch.py"),
+            "--organisations", str(inputs),
+            "--output", str(terminal_path),
+            "--profiles-output", str(profiles_path),
+            "--report", str(report_path),
+            "--run-id", run_id,
+            "--expected-count", "1",
+            "--workers", "1",
+            "--checkpoint-every", "1",
+        ]
+        try:
+            completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=150, check=False, env={**os.environ, "PYTHONUNBUFFERED": "1"})
+        except subprocess.TimeoutExpired:
+            return JSONResponse(status_code=504, content={"error": "Research exceeded the 150-second limit. Try again later."})
+        if completed.returncode != 0:
+            return JSONResponse(status_code=502, content={"error": "The research pipeline did not complete successfully.", "run_id": run_id, "diagnostic": (completed.stderr or completed.stdout or "No diagnostic output")[-1200:]})
+        try:
+            profiles = [json.loads(line) for line in profiles_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            terminals = [json.loads(line) for line in terminal_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            return JSONResponse(status_code=502, content={"error": "Research finished but its output could not be read.", "run_id": run_id, "detail": type(exc).__name__})
+        if len(profiles) != 1 or len(terminals) != 1:
+            return JSONResponse(status_code=502, content={"error": "Research output did not contain exactly one company.", "run_id": run_id})
+        return {"company": company, "run_id": run_id, "terminal": terminals[0], "profile": profiles[0], "report": report, "scope_note": "This runs the real implemented batch modules. It does not include an external jobs connector or guarantee a Builderr score."}
+
+
 @app.get("/api/search")
 def company_search_api(q: str = Query(min_length=2, max_length=120), size: int = Query(default=10, ge=1, le=20)):
     try:
@@ -144,7 +199,7 @@ def _company_result(company: dict) -> str:
         '<h2>' + html.escape(str(company.get("name") or "Company record")) + '</h2>'
         '<table>' + rows + '</table>'
         '<a class="source-link" target="_blank" rel="noopener noreferrer" href="' + source + '">Open original registry record ↗</a>'
-        '<div class="result-actions"><a class="button secondary" href="/">↺ New search</a></div></section>'
+        '<div class="result-actions"><button class="button" type="button" id="run-research" data-orgnr="' + html.escape(str(company.get("organisation_number") or ""), quote=True) + '">Run evidence research ↗</button> <a class="button secondary" href="/">↺ New search</a><p class="hint">Runs the real research pipeline for this company. It may take up to 150 seconds.</p><div id="research-output" aria-live="polite"></div></div></section>'
     )
 
 
@@ -211,7 +266,29 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 <section class="panel"><div class="section-kicker">WHY SIGNALPOST</div><h2>Research you can trace back to its source.</h2><div class="purpose"><article><div class="purpose-icon">⌕</div><b>Find the right entity</b><p>Search by name or number and check the legal organisation before relying on its details.</p></article><article><div class="purpose-icon">↗</div><b>Verify the source</b><p>Open the original public registry record instead of treating an unlinked claim as fact.</p></article><article><div class="purpose-icon">◎</div><b>Start due diligence</b><p>Use official identity details as a starting point for supplier, customer, or partner research.</p></article></div><p class="hint">This public prototype currently provides official-registry search and lookup. It is not the full batch research pipeline and does not independently verify every financial, social, or news claim.</p><p class="hint">Source: <a class="source-link" href="https://www.brreg.no/en/" target="_blank" rel="noopener noreferrer">Brønnøysund Register Centre</a> · <a class="source-link" href="/docs">API documentation ↗</a> · <a class="source-link" href="/healthz">Service health ↗</a></p></section>
 <footer class="footer">Signalpost Company Intelligence · Prototype · Registry data may be incomplete or change over time. <a href="https://data.brreg.no/enhetsregisteret/api/dokumentasjon/en/index.html" target="_blank" rel="noopener noreferrer">Registry API documentation</a></footer>
 </main><script>
-(function(){const input=document.getElementById('search-query');if(!input)return;input.addEventListener('keydown',function(e){if(e.key==='Escape'){input.value='';input.focus();}});})();
+(function(){
+const input=document.getElementById('search-query');
+if(input)input.addEventListener('keydown',function(e){if(e.key==='Escape'){input.value='';input.focus();}});
+const button=document.getElementById('run-research'),output=document.getElementById('research-output');
+if(!button||!output)return;
+button.addEventListener('click',async function(){
+button.disabled=true;button.textContent='Research running…';output.innerHTML='<p class="hint">Checking registry, accounting, financials, roles, group/location and verified company-site evidence. Keep this page open.</p>';
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+try{
+const response=await fetch('/api/research/'+encodeURIComponent(button.dataset.orgnr)),data=await response.json();
+if(!response.ok)throw new Error(data.error||'Research failed');
+const profile=data.profile||{},evidence=profile.evidence||{},synthesis=profile.synthesis||{};
+let cards='',facts='';
+for(const [key,item] of Object.entries(evidence)){
+const value=item.value;
+cards+='<article class="purpose article-evidence"><div class="match-type">'+esc(key.replaceAll('_',' '))+' · '+esc(item.status)+'</div><p>'+esc(item.note||'Evidence captured for this module.')+'</p><p class="hint">Source: '+(item.source_url?'<a class="source-link" target="_blank" rel="noopener noreferrer" href="'+esc(item.source_url)+'">'+esc(item.source_url)+'</a>':'not provided')+'</p><details><summary>Inspect returned data</summary><pre>'+esc(JSON.stringify(value??null,null,2))+'</pre></details></article>';
+}
+for(const fact of (synthesis.facts||[]))facts+='<tr><th>'+esc(fact.claim)+'</th><td>'+esc(fact.value)+'</td><td>'+(fact.source_url?'<a class="source-link" target="_blank" rel="noopener noreferrer" href="'+esc(fact.source_url)+'">Source ↗</a>':'Source unavailable')+'</td></tr>';
+output.innerHTML='<section class="result"><div class="section-kicker">EVIDENCE RESEARCH RESULT</div><h2>'+esc(profile.name||data.company?.name)+'</h2><p class="hint">Run '+esc(data.run_id)+' · '+esc(data.terminal?.terminal_state||data.terminal?.status||'Completed')+'</p><h3>Source-linked synthesis</h3><p>'+esc(synthesis.summary||'No summary was produced; inspect the module evidence below.')+'</p><p class="hint">Baseline: '+esc(synthesis.change_status||'not stated')+' · Facts: '+esc((synthesis.facts||[]).length)+' · Unsupported/uncertain: '+esc((synthesis.unsupported_or_uncertain||[]).length)+'</p>'+(facts?'<table>'+facts+'</table>':'')+'<h3>Module evidence</h3><div class="purpose evidence-grid">'+cards+'</div><details><summary>Run report and terminal envelope</summary><pre>'+esc(JSON.stringify({terminal:data.terminal,report:data.report,unsupported_or_uncertain:synthesis.unsupported_or_uncertain,changes:profile.changes},null,2))+'</pre></details><p class="hint">'+esc(data.scope_note)+'</p></section>';
+}catch(error){output.innerHTML='<section class="error"><strong>Research could not be completed</strong><p>'+esc(error.message)+'</p></section>';}
+finally{button.disabled=false;button.textContent='Run evidence research ↗';}
+});
+})();
 </script></body></html>"""
     html_page = html_page.replace("__SEARCH_VALUE__", html.escape(q, quote=True))
     return HTMLResponse(html_page)
