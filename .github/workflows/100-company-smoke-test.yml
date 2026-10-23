@@ -1,0 +1,96 @@
+name: 100-company-smoke-test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["fix/exact-batch-membership", "final/builderr-contract"]
+    paths:
+      - "scripts/run_competition_batch.py"
+      - "src/norway_company_agent/**"
+      - "scripts/extract_company_site_*.py"
+      - ".github/workflows/100-company-smoke-test.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked dependencies
+        run: uv sync --frozen --all-groups
+      - name: Fetch 100 distinct real organisations from official Brønnøysund API
+        run: |
+          python - <<'PY'
+          import json, urllib.request
+          url = "https://data.brreg.no/enhetsregisteret/api/enheter/?navn=a&size=100"
+          req = urllib.request.Request(url, headers={"Accept":"application/vnd.brreg.enhetsregisteret.enhet.v2+json, application/json;q=0.9","User-Agent":"SignalpostCompanyAgent/1.2"})
+          with urllib.request.urlopen(req, timeout=30) as response:
+              payload = json.load(response)
+          embedded = payload.get("_embedded") or {}
+          entities = embedded.get("enheter") or embedded.get("entities") or []
+          numbers = []
+          for entity in entities:
+              number = str(entity.get("organisasjonsnummer") or "")
+              if len(number) == 9 and number.isdigit() and number not in numbers:
+                  numbers.append(number)
+          if len(numbers) < 100:
+              raise SystemExit(f"Official registry returned only {len(numbers)} distinct valid organisations; cannot claim a 100-company smoke test.")
+          with open("smoke-organisations.json", "w", encoding="utf-8") as f:
+              json.dump(numbers[:100], f)
+          print(f"Prepared {len(numbers[:100])} distinct official registry organisation numbers.")
+          PY
+      - name: Run real 100-company batch
+        run: |
+          uv run python scripts/run_competition_batch.py \
+            --organisations smoke-organisations.json \
+            --output smoke-terminal.jsonl \
+            --profiles-output smoke-profiles.jsonl \
+            --report smoke-report.json \
+            --run-id github-smoke-${{ github.run_id }} \
+            --expected-count 100 \
+            --workers 4 \
+            --checkpoint-every 10
+      - name: Assert output contract, evidence metadata and report counts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          inputs = json.loads(Path("smoke-organisations.json").read_text())
+          terminals = [json.loads(line) for line in Path("smoke-terminal.jsonl").read_text().splitlines() if line.strip()]
+          profiles = [json.loads(line) for line in Path("smoke-profiles.jsonl").read_text().splitlines() if line.strip()]
+          report = json.loads(Path("smoke-report.json").read_text())
+          allowed = {"available","not_available","blocked","not_applicable","ambiguous","failed"}
+          input_set = set(inputs)
+          terminal_orgs = [str(row.get("organisation_number") or row.get("company_number") or "") for row in terminals]
+          profile_orgs = [str(row.get("organisation_number") or row.get("company_number") or "") for row in profiles]
+          assert len(inputs) == 100 and len(input_set) == 100, f"input count/uniqueness failed: {len(inputs)}"
+          assert len(terminals) == 100, f"terminal envelope count is {len(terminals)}, expected 100"
+          assert len(profiles) == 100, f"profile count is {len(profiles)}, expected 100"
+          assert len(set(terminal_orgs)) == 100 and set(terminal_orgs) == input_set, "terminal envelopes are missing, duplicated, or mismatched"
+          assert len(set(profile_orgs)) == 100 and set(profile_orgs) == input_set, "profiles are missing, duplicated, or mismatched"
+          for row in terminals:
+              state = row.get("terminal_state") or row.get("status")
+              assert state in allowed, f"invalid terminal state {state!r} for {row}"
+          print(json.dumps({"inputs":len(inputs),"terminal_envelopes":len(terminals),"profiles":len(profiles),"terminal_states":{state:sum(1 for row in terminals if (row.get('terminal_state') or row.get('status'))==state) for state in sorted(allowed)},"report_keys":sorted(report)}, indent=2))
+          PY
+      - name: Upload smoke-test report and outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signalpost-100-company-smoke-${{ github.run_id }}
+          path: |
+            smoke-report.json
+            smoke-terminal.jsonl
+            smoke-profiles.jsonl
+            smoke-organisations.json
+          if-no-files-found: warn
+          retention-days: 30
