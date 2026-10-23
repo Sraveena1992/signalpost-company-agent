@@ -215,11 +215,23 @@ def validate_envelopes(
         for item in envelopes if item.get("state") not in TERMINAL_STATES
     ]
     invalid_module_states = [
-        {"organisation_number": item.get("organisation_number"), "module": module, "state": state.get("state")}
+        {"organisation_number": item.get("organisation_number"), "module": module, "state": state.get("state") if isinstance(state, dict) else None}
         for item in envelopes
         for module, state in (item.get("modules") or {}).items()
         if not isinstance(state, dict) or state.get("state") not in TERMINAL_STATES
     ]
+    invalid_evidence_provenance = []
+    for item in envelopes:
+        profile = item.get("profile") or {}
+        for module, record in (profile.get("evidence") or {}).items():
+            if not isinstance(record, dict) or record.get("status") != "available":
+                continue
+            if not record.get("source_url") or not record.get("retrieved_at"):
+                invalid_evidence_provenance.append({
+                    "organisation_number": item.get("organisation_number"),
+                    "module": module,
+                    "missing": [key for key in ("source_url", "retrieved_at") if not record.get(key)] if isinstance(record, dict) else ["record"],
+                })
     checks = {
         "exact_expected_count": len(envelopes) == expected_count,
         "unique_organisation_numbers": len(orgs) == len(set(orgs)),
@@ -230,6 +242,7 @@ def validate_envelopes(
         ),
         "all_entity_states_contract_valid": not invalid_entity_states,
         "all_module_states_contract_valid": not invalid_module_states,
+        "available_evidence_has_source_and_retrieval_date": not invalid_evidence_provenance,
         "one_envelope_per_input": len(envelopes) == expected_count and len(orgs) == len(set(orgs)),
     }
     return {
@@ -237,6 +250,7 @@ def validate_envelopes(
         "checks": checks,
         "invalid_entity_states": invalid_entity_states,
         "invalid_module_states": invalid_module_states,
+        "invalid_evidence_provenance": invalid_evidence_provenance,
         "missing_organisations": missing_organisations,
         "unexpected_organisations": unexpected_organisations,
     }
