@@ -258,6 +258,25 @@ def validate_envelopes(
     }
 
 
+
+def attach_synthesis(profile: dict[str, Any], previous: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Attach a deterministic, source-linked overview and an honest refresh diff."""
+    from .refresh import diff_profile
+    from .research import answer_profile
+
+    summary = answer_profile(profile, "Give me a company overview")
+    changes = diff_profile(previous, profile) if previous is not None else []
+    summary["changes"] = changes
+    summary["change_status"] = (
+        "no_previous_snapshot" if previous is None
+        else "changes_detected" if changes
+        else "no_material_changes"
+    )
+    profile["changes"] = changes
+    profile["synthesis"] = summary
+    return profile
+
+
 def profile_complete_for_modules(profile: dict[str, Any], modules: Iterable[str]) -> bool:
     records = profile.get("evidence", {})
     return all(module in records and records[module].get("status") != "not_fetched" for module in modules)
