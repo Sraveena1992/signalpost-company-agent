@@ -4,7 +4,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/Web%20Demo-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/Tests-111%20passing-brightgreen)](#testing-and-validation)
+[![Tests](https://img.shields.io/badge/Tests-contract%20checked-brightgreen)](#testing-and-validation)
 [![Status](https://img.shields.io/badge/Status-Prototype-orange)](#scope-and-limitations)
 
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
@@ -128,25 +128,51 @@ For example, the API route is `/api/company/{orgnr}`, where `{orgnr}` is a nine-
 
 ## Batch runner
 
-The batch runner is available at [`scripts/run_competition_batch.py`](scripts/run_competition_batch.py).
+The batch runner is available at [`scripts/run_competition_batch.py`](scripts/run_competition_batch.py). It accepts the evaluator-provided batch file, infers its count by default (so batches can grow beyond 100), and emits one terminal envelope for each input.
 
-To see its supported options:
+### One-command batch run
+
+After installing locked dependencies and placing the supplied organisation-number file at `data/organisations.jsonl`, run:
 
 ```powershell
-uv run python scripts/run_competition_batch.py --help
+uv run python scripts/run_competition_batch.py --organisations data/organisations.jsonl --output artifacts/terminal-results.jsonl --profiles-output artifacts/profiles.jsonl --report artifacts/run-report.json --run-id signalpost-final
 ```
 
-Use the official challenge input and its prescribed run instructions for an evaluation run. Do not substitute a self-selected list when the evaluation requires a supplied batch.
+The optional `--bulk path/to/brreg-snapshot.csv` flag seeds profiles from a frozen official registry snapshot; without it, the runner starts from the live Brønnøysund API. The input file is evaluator-owned and must not be replaced with a hard-coded company list. For the required 100-company smoke test, supply exactly 100 company numbers in that file and keep the generated terminal results and run report as submission evidence.
+
+The public terminal-state vocabulary is exactly: `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, and `failed`. Internal fetch states are mapped to this vocabulary before output. The validator checks the expected count, unique IDs, exact input membership, and all entity/module states. A per-company exception is emitted as an explicit failed state rather than silently dropping that input.
 
 The project also includes batch utilities in [`src/norway_company_agent/batch.py`](src/norway_company_agent/batch.py) and regression tests in [`tests/test_poc.py`](tests/test_poc.py).
 
 ## Testing and validation
 
-The latest recorded successful GitHub Actions regression run completed with **111 tests passed and 7 subtests passed**:
+The automated regression suite includes unit tests for evidence provenance, identity gates, company research modules, refresh behaviour, and the Builderr terminal-state contract. Check the latest GitHub Actions run for the exact result of the current commit:
 
-https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/39902015868
+https://github.com/Sraveena1992/signalpost-company-agent/actions
 
-These automated tests exercise defined behaviours and regressions. They are **not** an official Builderr score, a fresh-company evaluation, or proof of qualification. Rerun the workflow after subsequent changes to confirm the current commit.
+A passing test suite is not a substitute for the required 100-company live smoke test or an official Builderr score.
+
+
+## Evaluation contract mapping
+
+| Builderr public terminal state | Signalpost mapping |
+|---|---|
+| `available` | Fact/evidence was retrieved and published |
+| `not_available` | Explicitly checked but no matching fact was found |
+| `blocked` | Source refused access or robots/policy prevented retrieval |
+| `not_applicable` | The question does not apply to this company |
+| `ambiguous` | Candidate/company identity could not be confirmed safely |
+| `failed` | A source, module, or per-company run failed |
+
+Each module state is mapped to this public vocabulary. Missing input companies, duplicate IDs, unexpected IDs, invalid states, and output-count mismatches are reported by the validator. The same source snapshot should not create duplicate observations or false changes; refresh comparisons require the exact same organisation number and dataset membership.
+
+## Models, APIs, cost, and licence notes
+
+- **Models:** no LLM/model API is used by the default competition batch command.
+- **APIs/sources:** official Brønnøysund Register Centre endpoints and company public websites where available.
+- **Declared direct third-party API/model cost:** USD $0.00 per default run because the default modules make no paid model/API calls. This excludes hosting, bandwidth, and general infrastructure and should be rechecked if paid connectors are added.
+- **Dependencies:** pinned by `uv.lock`; review each dependency's upstream licence before redistributing a packaged build. This repository does not claim that every transitive dependency has been separately legal-audited.
+- **Secrets:** the default batch runner requires no personal-account API credential. Never commit credentials or private keys.
 
 ## Data sources and evidence policy
 
