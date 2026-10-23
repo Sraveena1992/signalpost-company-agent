@@ -573,16 +573,17 @@ class CompletenessScoreTests(unittest.TestCase):
     def test_site_news_requires_exact_identity_and_a_captured_news_path(self):
         profile = {
             "organisation_number": "923609016",
+            "name": "Example AS",
             "evidence": {"website": {
                 "status": "available", "retrieved_at": "2026-08-23T00:00:00Z",
                 "value": {
                     "identity_assessment": {"publishable": True, "score": 1.0},
                     "pages": [{
                         "url": "https://example.test/aktuelt/new-contract",
-                        "title": "Company signs a new contract",
+                        "title": "Example signs a new contract",
                         "published_at": "2026-08-20",
                         "article_like": True,
-                        "main_text_excerpt": "The company announced a new contract. " * 8,
+                        "main_text_excerpt": ("Example announced a new contract. " * 8),
                         "content_sha256": "a" * 64,
                     }],
                 },
@@ -592,6 +593,9 @@ class CompletenessScoreTests(unittest.TestCase):
         self.assertEqual(item["signal_type"], "public_post")
         self.assertEqual(item["published_at"], "2026-08-20")
         self.assertTrue(publishable_observation(item))
+        profile["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = ("Another Company announced a new contract. " * 8)
+        self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = ("Example announced a new contract. " * 8)
         profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = ""
         self.assertIsNone(site_news_observation(profile))
         profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2026-08-20"
