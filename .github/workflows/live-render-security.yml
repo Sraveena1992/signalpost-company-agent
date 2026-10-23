@@ -45,9 +45,13 @@ jobs:
           assert body.get("status") == "ok", body
           print("Health endpoint: OK")
           PY
-          curl --fail --silent --show-error --max-time 30 -D /tmp/home.headers -o /tmp/home.html https://signalpost-company-agent.onrender.com/
+          home_status=$(curl --silent --show-error --max-time 30 -D /tmp/home.headers -o /tmp/home.html -w '%{http_code}' https://signalpost-company-agent.onrender.com/)
+          echo "Live homepage HTTP status: $home_status"
+          if [ "$home_status" != "200" ]; then head -c 4000 /tmp/home.html; echo; exit 1; fi
           curl --fail --silent --show-error --max-time 30 -D /tmp/docs.headers -o /tmp/docs.html https://signalpost-company-agent.onrender.com/docs
-          curl --fail --silent --show-error --max-time 30 -D /tmp/search.headers -o /tmp/search.json 'https://signalpost-company-agent.onrender.com/api/search?q=Equinor'
+          search_status=$(curl --silent --show-error --max-time 30 -D /tmp/search.headers -o /tmp/search.json -w '%{http_code}' 'https://signalpost-company-agent.onrender.com/api/search?q=Equinor')
+          echo "Live search HTTP status: $search_status"
+          if [ "$search_status" != "200" ]; then head -c 4000 /tmp/search.json; echo; exit 1; fi
           python - <<'PY'
           import json
           from pathlib import Path
