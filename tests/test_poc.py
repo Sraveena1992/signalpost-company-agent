@@ -1561,6 +1561,7 @@ class PublicLookupPrototypeTests(unittest.TestCase):
         self.assertIn('id="run-research"', body)
         self.assertIn("/api/research/", body)
         self.assertIn("Module evidence", body)
+        self.assertIn("source-linked facts across", body)
 
     def test_research_api_returns_real_pipeline_outputs(self):
         from app import research_api
