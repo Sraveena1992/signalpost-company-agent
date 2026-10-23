@@ -58,21 +58,32 @@ from scripts.discover_linkedin_company_profiles import (  # noqa: E402
 
 
 class PublicAppSecurityTests(unittest.TestCase):
+    def _run_security_middleware(self, path, content_type=None):
+        import asyncio
+        from types import SimpleNamespace
+        from app import add_security_headers
+
+        headers = {}
+        if content_type:
+            headers["content-type"] = content_type
+        response = SimpleNamespace(headers=headers)
+        request = SimpleNamespace(url=SimpleNamespace(path=path))
+
+        async def call_next(_request):
+            return response
+
+        return asyncio.run(add_security_headers(request, call_next))
+
     def test_security_headers_are_present(self):
-        from fastapi.testclient import TestClient
-        from app import app
-        response = TestClient(app).get("/healthz")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers.get("x-content-type-options"), "nosniff")
-        self.assertEqual(response.headers.get("x-frame-options"), "DENY")
-        self.assertEqual(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin")
-        self.assertIn("camera=()", response.headers.get("permissions-policy", ""))
+        response = self._run_security_middleware("/healthz")
+        self.assertEqual(response.headers.get("X-Content-Type-Options"), "nosniff")
+        self.assertEqual(response.headers.get("X-Frame-Options"), "DENY")
+        self.assertEqual(response.headers.get("Referrer-Policy"), "strict-origin-when-cross-origin")
+        self.assertIn("camera=()", response.headers.get("Permissions-Policy", ""))
 
     def test_homepage_has_restrictive_content_security_policy(self):
-        from fastapi.testclient import TestClient
-        from app import app
-        response = TestClient(app).get("/")
-        policy = response.headers.get("content-security-policy", "")
+        response = self._run_security_middleware("/", "text/html; charset=utf-8")
+        policy = response.headers.get("Content-Security-Policy", "")
         self.assertIn("default-src 'self'", policy)
         self.assertIn("object-src 'none'", policy)
         self.assertIn("frame-ancestors 'none'", policy)
