@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from norway_company_agent.batch import profile_complete_for_modules, profiles_from_bulk, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
+from norway_company_agent.batch import attach_synthesis, profile_complete_for_modules, profiles_from_bulk, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
 from norway_company_agent.evidence import evidence, utc_now  # noqa: E402
 from norway_company_agent.identity import apply_website_identity_gate  # noqa: E402
 from norway_company_agent.official import accounting_obligation_assessment, fetch_official_modules  # noqa: E402
@@ -35,6 +35,7 @@ def main() -> None:
     parser.add_argument("--output", required=True, help="Terminal envelope JSONL")
     parser.add_argument("--profiles-output", required=True, help="Evidence-rich profile JSONL")
     parser.add_argument("--report", required=True, help="Machine-readable run report")
+    parser.add_argument("--previous-profiles", help="Optional prior profiles JSONL for an idempotent refresh diff")
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--expected-count", type=int, help="Optional exact input count; default is the batch's actual count")
     parser.add_argument("--workers", type=int, default=8)
@@ -230,6 +231,26 @@ def main() -> None:
 
     completed_at = utc_now()
     ordered_profiles = [state[org] for org in orgs]
+    previous_by_org = {}
+    if args.previous_profiles:
+        previous_rows = [
+            json.loads(line)
+            for line in Path(args.previous_profiles).read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        previous_ids = [str(row.get("organisation_number") or "") for row in previous_rows]
+        if len(previous_ids) != len(set(previous_ids)):
+            raise SystemExit("Previous profile snapshot contains duplicate organisation numbers")
+        previous_by_org = {str(row["organisation_number"]): row for row in previous_rows}
+    for profile in ordered_profiles:
+        previous = previous_by_org.get(profile["organisation_number"])
+        attach_synthesis(profile, previous)
+    change_counts = {
+        "companies_with_changes": sum(bool(profile.get("changes")) for profile in ordered_profiles),
+        "companies_without_changes": sum(profile.get("synthesis", {}).get("change_status") == "no_material_changes" for profile in ordered_profiles),
+        "companies_without_previous_snapshot": sum(profile.get("synthesis", {}).get("change_status") == "no_previous_snapshot" for profile in ordered_profiles),
+        "changes": sum(len(profile.get("changes") or []) for profile in ordered_profiles),
+    }
     envelopes = [
         terminal_envelope(profile, run_id=args.run_id, modules=requested_modules, started_at=started_at, completed_at=completed_at)
         for profile in ordered_profiles
@@ -251,6 +272,7 @@ def main() -> None:
         "profiles_fetched_this_run": len(pending_profiles),
         "modules": requested_modules,
         "registry": registry_metadata,
+        "refresh": change_counts,
         "operations": operations,
         "third_party_cost_usd": 0.0,
         "cost_basis": "Default modules make no paid model/API calls; excludes hosting and general infrastructure.",
