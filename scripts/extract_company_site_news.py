@@ -18,10 +18,27 @@ def observation(profile: dict) -> dict | None:
     identity = value.get("identity_assessment") or {}
     if website.get("status") != "available" or not identity.get("publishable"):
         return None
-    pages = [
-        page for page in (value.get("pages") or [])
-        if NEWS_PATH.search(urlparse(str(page.get("url") or "")).path)
-    ]
+    generic_titles = {
+        "news", "press", "newsroom", "aktuelt", "nyheter", "blog", "blogg",
+        "contact", "kontakt", "about us", "om oss", "products", "produkter",
+        "services", "tjenester", "home", "homepage",
+    }
+    pages = []
+    for page in (value.get("pages") or []):
+        path = urlparse(str(page.get("url") or "")).path
+        title = str(page.get("title") or "").strip()
+        published_at = str(page.get("published_at") or "").strip()
+        excerpt = str(page.get("main_text_excerpt") or "").strip()
+        # A URL under /news/ is not proof of a news item. Require an explicit
+        # publication date, article markup, meaningful text, and a non-menu title.
+        if (
+            NEWS_PATH.search(path)
+            and published_at
+            and page.get("article_like") is True
+            and len(excerpt) >= 120
+            and title.casefold() not in generic_titles
+        ):
+            pages.append(page)
     if not pages:
         return None
     # Prefer an individual article over an archive page when the bounded crawl
@@ -42,6 +59,7 @@ def observation(profile: dict) -> dict | None:
         "signal_type": "public_post",
         "source_url": url,
         "retrieved_at": website.get("retrieved_at"),
+        "published_at": str(page.get("published_at") or ""),
         "content_sha256": digest,
         "exact_entity": True,
         "identity_proof": [{"type": "website_identity_gate", "score": identity.get("score"), "method": identity.get("method")}],
