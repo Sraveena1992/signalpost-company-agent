@@ -15,7 +15,7 @@ import uuid
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import Request as URLRequest, urlopen
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -76,7 +76,7 @@ async def add_security_headers(request, call_next):
 
 
 def _get_json(url: str) -> dict:
-    request = Request(
+    request = URLRequest(
         url,
         headers={
             "Accept": "application/vnd.brreg.enhetsregisteret.enhet.v2+json, application/json;q=0.9",
