@@ -27,7 +27,7 @@ from norway_company_agent.external_footprint import aggregate_footprint, publish
 from norway_company_agent.external_tasks import plan_external_tasks  # noqa: E402
 from norway_company_agent.external_control import development_score, run_company_control, strategy_order  # noqa: E402
 from norway_company_agent.identity import apply_website_identity_gate, assess_social_identity, assess_website_identity  # noqa: E402
-from norway_company_agent.website import _extraction_state, _priority_links, _social_links, assert_public_url, fetch_website, normalize_homepage, normalize_social_url, structured_social_links  # noqa: E402
+from norway_company_agent.website import _extraction_state, _priority_links, _published_date, _social_links, assert_public_url, fetch_website, normalize_homepage, normalize_social_url, structured_social_links  # noqa: E402
 from norway_company_agent.batch import evidence_terminal_state, profile_complete_for_modules, read_organisation_inputs, terminal_envelope, validate_envelopes  # noqa: E402
 from norway_company_agent.snapshots import SnapshotFetcher  # noqa: E402
 from bs4 import BeautifulSoup  # noqa: E402
@@ -577,13 +577,27 @@ class CompletenessScoreTests(unittest.TestCase):
                 "status": "available", "retrieved_at": "2026-08-23T00:00:00Z",
                 "value": {
                     "identity_assessment": {"publishable": True, "score": 1.0},
-                    "pages": [{"url": "https://example.test/aktuelt/new-contract", "title": "New contract", "content_sha256": "a" * 64}],
+                    "pages": [{
+                        "url": "https://example.test/aktuelt/new-contract",
+                        "title": "Company signs a new contract",
+                        "published_at": "2026-08-20",
+                        "article_like": True,
+                        "main_text_excerpt": "The company announced a new contract. " * 8,
+                        "content_sha256": "a" * 64,
+                    }],
                 },
             }},
         }
         item = site_news_observation(profile)
         self.assertEqual(item["signal_type"], "public_post")
+        self.assertEqual(item["published_at"], "2026-08-20")
         self.assertTrue(publishable_observation(item))
+        profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = ""
+        self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2026-08-20"
+        profile["evidence"]["website"]["value"]["pages"][0]["article_like"] = False
+        self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["article_like"] = True
         profile["evidence"]["website"]["value"]["pages"][0]["url"] = "https://example.test/contact"
         self.assertIsNone(site_news_observation(profile))
 
@@ -1339,8 +1353,10 @@ class WebsiteIdentityTests(unittest.TestCase):
     def test_social_handle_requires_exact_entity_name_evidence(self):
         aon = {"name": "Aon Norway AS"}
         fish = {"name": "Norsk Fiskeeksport AS"}
+        fuzzy = {"name": "Nordic Door Group AS"}
         self.assertFalse(assess_social_identity(aon, {"platform": "linkedin", "url": "https://linkedin.com/company/aon"})["publishable"])
         self.assertTrue(assess_social_identity(fish, {"platform": "linkedin", "url": "https://linkedin.com/company/norsk-fiskeeksport"})["publishable"])
+        self.assertFalse(assess_social_identity(fuzzy, {"platform": "linkedin", "url": "https://linkedin.com/company/nordic-door"})["publishable"])
 
 
 class VerifiedSiteSeedTests(unittest.TestCase):
