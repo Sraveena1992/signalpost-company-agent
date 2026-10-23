@@ -19,7 +19,7 @@
 | Batch processing | CLI runner with expected-count validation |
 | Evidence handling | Structured evidence and source metadata |
 | Company identity | Conservative identity checks |
-| Research modules | Registry, accounting obligations, financials, roles, group, locations and website research |
+| Research modules | Registry, accounting obligations, financials, filing history, roles, group, locations, website identity and company-owned site activity |
 | Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
 | Public web interface | Live single-company official-registry lookup prototype |
 | API | JSON company lookup and health endpoint |
@@ -34,7 +34,7 @@
 
 The public interface accepts a nine-digit Norwegian organisation number and requests the company record from the official Brønnøysund Register API. It displays available registry fields and links to the original record.
 
-The public web demo is intentionally a **single-company registry lookup**. It is not a hosted UI for the full batch research pipeline and does not claim to verify every company fact, social account, news item, or financial result.
+The public web demo is intentionally a **single-company registry lookup**. It is not a hosted UI for the full batch research pipeline and does not claim to verify every company fact, social account, news item, job posting, or financial result.
 
 A successful health response confirms service responsiveness only; it does not establish research accuracy or an official competition score. Public hosting may be subject to cold starts or temporary availability issues.
 
@@ -81,7 +81,7 @@ Structured company profiles
 Batch validation and reports
 ```
 
-The public web prototype is a separate, lightweight entry point for live registry lookups. It should not be confused with the complete batch research workflow.
+The public web prototype is a separate, lightweight entry point for live registry lookups. It should not be confused with the complete batch research workflow. The default batch includes company-owned website activity when the bounded crawl yields dated, identity-gated evidence. A permitted, reproducible external job-posting connector is not yet integrated into the default batch runner; do not claim full jobs coverage until that connector and its source rights are verified.
 
 ## Quick start
 
