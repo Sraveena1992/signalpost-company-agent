@@ -23,7 +23,7 @@ jobs:
           fail_action: false
       - name: Upload ZAP baseline report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: signalpost-zap-baseline
           path: report_html.html
