@@ -1549,6 +1549,40 @@ class PublicLookupPrototypeTests(unittest.TestCase):
         self.assertNotIn("html.escape(q", body)
         self.assertIn("data:image/svg+xml", body)
 
+    def test_homepage_exposes_full_evidence_research_action(self):
+        from app import home
+        with patch("app.lookup_company", return_value={
+            "name": "VIK MEDIA HOLDING AS",
+            "organisation_number": "912900584",
+            "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/912900584",
+        }):
+            response = home(orgnr="912900584", q="")
+        body = response.body.decode("utf-8")
+        self.assertIn('id="run-research"', body)
+        self.assertIn("/api/research/", body)
+        self.assertIn("Module evidence", body)
+
+    def test_research_api_returns_real_pipeline_outputs(self):
+        from app import research_api
+
+        def fake_run(command, **kwargs):
+            def arg(name):
+                return Path(command[command.index(name) + 1])
+            arg("--output").write_text(json.dumps({"organisation_number": "912900584", "terminal_state": "available"}) + "\\n", encoding="utf-8")
+            arg("--profiles-output").write_text(json.dumps({"organisation_number": "912900584", "name": "VIK MEDIA HOLDING AS", "evidence": {}, "synthesis": {"facts": [], "unsupported_or_uncertain": []}}) + "\\n", encoding="utf-8")
+            arg("--report").write_text(json.dumps({"processed": 1}), encoding="utf-8")
+            return type("Completed", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+        with patch("app.lookup_company", return_value={
+            "name": "VIK MEDIA HOLDING AS",
+            "organisation_number": "912900584",
+            "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/912900584",
+        }), patch("app.subprocess.run", side_effect=fake_run):
+            result = research_api("912900584")
+        self.assertEqual(result["profile"]["name"], "VIK MEDIA HOLDING AS")
+        self.assertEqual(result["terminal"]["terminal_state"], "available")
+        self.assertEqual(result["report"]["processed"], 1)
+
     def test_homepage_renders_company_name_matches(self):
         from app import home
         with patch("app.search_companies", return_value=[{
