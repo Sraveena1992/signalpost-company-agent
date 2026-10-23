@@ -5,11 +5,13 @@ requires-python = ">=3.12"
 dependencies = [
   "beautifulsoup4>=4.14,<5",
   "extruct>=0.18,<1",
+  "fastapi>=0.151.0",
   "lxml>=6,<7",
   "pydantic>=2.12,<3",
   "pypdf>=6,<7",
   "tldextract>=5.3,<6",
   "trafilatura>=2.0,<3",
+  "uvicorn[standard]>=0.54.0",
 ]
 
 [project.optional-dependencies]

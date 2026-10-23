@@ -5,11 +5,19 @@ import argparse
 import hashlib
 import json
 import re
+import unicodedata
 from pathlib import Path
 from urllib.parse import urlparse
 
 
 NEWS_PATH = re.compile(r"/(?:news|press|aktuelt|nyheter|artikler|blog)(?:/|$)", re.I)
+GENERIC_TOKENS = {"as", "asa", "ans", "da", "enk", "iks", "sa", "sam", "nuf", "ab", "ltd", "limited", "inc", "the", "og", "and"}
+
+
+def _tokens(value: str) -> list[str]:
+    value = value.translate(str.maketrans({"ø": "o", "Ø": "O", "å": "a", "Å": "A", "æ": "ae", "Æ": "AE"}))
+    value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode().casefold()
+    return [token for token in re.findall(r"[a-z0-9]+", value) if len(token) > 1 and token not in GENERIC_TOKENS]
 
 
 def observation(profile: dict) -> dict | None:
@@ -18,10 +26,33 @@ def observation(profile: dict) -> dict | None:
     identity = value.get("identity_assessment") or {}
     if website.get("status") != "available" or not identity.get("publishable"):
         return None
-    pages = [
-        page for page in (value.get("pages") or [])
-        if NEWS_PATH.search(urlparse(str(page.get("url") or "")).path)
-    ]
+    generic_titles = {
+        "news", "press", "newsroom", "aktuelt", "nyheter", "blog", "blogg",
+        "contact", "kontakt", "about us", "om oss", "products", "produkter",
+        "services", "tjenester", "home", "homepage",
+    }
+    pages = []
+    company_tokens = set(_tokens(str(profile.get("name") or "")))
+    if not company_tokens:
+        return None
+    for page in (value.get("pages") or []):
+        path = urlparse(str(page.get("url") or "")).path
+        title = str(page.get("title") or "").strip()
+        published_at = str(page.get("published_at") or "").strip()
+        excerpt = str(page.get("main_text_excerpt") or "").strip()
+        article_tokens = set(_tokens(title + " " + excerpt))
+        # A URL under /news/ is not proof of a news item. Require an explicit
+        # publication date, article markup, meaningful text, a non-menu title,
+        # and exact legal-name token coverage in the article itself.
+        if (
+            NEWS_PATH.search(path)
+            and published_at
+            and page.get("article_like") is True
+            and len(excerpt) >= 120
+            and title.casefold() not in generic_titles
+            and company_tokens.issubset(article_tokens)
+        ):
+            pages.append(page)
     if not pages:
         return None
     # Prefer an individual article over an archive page when the bounded crawl
@@ -42,6 +73,7 @@ def observation(profile: dict) -> dict | None:
         "signal_type": "public_post",
         "source_url": url,
         "retrieved_at": website.get("retrieved_at"),
+        "published_at": str(page.get("published_at") or ""),
         "content_sha256": digest,
         "exact_entity": True,
         "identity_proof": [{"type": "website_identity_gate", "score": identity.get("score"), "method": identity.get("method")}],
