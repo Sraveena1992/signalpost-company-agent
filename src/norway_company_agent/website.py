@@ -206,6 +206,49 @@ def _priority_links(base_url: str, soup: BeautifulSoup, limit: int = 4) -> list[
     return [url for url, _ in sorted(candidates.items(), key=lambda item: (item[1], item[0]))[:limit]]
 
 
+def _published_date(soup: BeautifulSoup) -> str | None:
+    """Return an explicit publication date, never a crawl/feed updated timestamp."""
+    for selector, attribute in (
+        ('meta[property="article:published_time"]', "content"),
+        ('meta[property="og:published_time"]', "content"),
+        ('meta[name="datePublished"]', "content"),
+        ('meta[itemprop="datePublished"]', "content"),
+        ('meta[name="publishdate"]', "content"),
+        ('meta[name="date"]', "content"),
+        ('meta[name="DC.date.issued"]', "content"),
+        ("time[datetime]", "datetime"),
+    ):
+        node = soup.select_one(selector)
+        raw = str(node.get(attribute) or "").strip() if node else ""
+        if re.search(r"\\b(?:19|20)\\d{2}[-/]\\d{1,2}[-/]\\d{1,2}\\b", raw) or re.fullmatch(r"(?:19|20)\\d{2}", raw):
+            return raw[:80]
+    # JSON-LD Article/NewsArticle datePublished is acceptable; dateModified is not.
+    def find_published(node: Any) -> str | None:
+        if isinstance(node, dict):
+            raw = node.get("datePublished")
+            if isinstance(raw, str) and re.search(r"\\b(?:19|20)\\d{2}(?:[-/]\\d{1,2}(?:[-/]\\d{1,2})?)?", raw):
+                return raw[:80]
+            for child in node.values():
+                found = find_published(child)
+                if found:
+                    return found
+        elif isinstance(node, list):
+            for child in node:
+                found = find_published(child)
+                if found:
+                    return found
+        return None
+    for script in soup.select('script[type="application/ld+json"]'):
+        try:
+            import json
+            found = find_published(json.loads(script.string or script.get_text()))
+            if found:
+                return found
+        except (ValueError, TypeError):
+            continue
+    return None
+
+
 def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max_bytes: int) -> tuple[dict[str, Any] | None, list[dict[str, str]], int, int, int, str | None]:
     if not _robots_allowed(url, timeout):
         return None, [], 1, 0, 0, "robots.txt disallows page"
@@ -223,10 +266,14 @@ def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max
         page_html = raw.decode("utf-8", errors="replace")
         page_soup = BeautifulSoup(page_html, "lxml")
         page_text = trafilatura.extract(page_html, url=final_url, include_links=False, include_tables=False, favor_precision=True) or ""
+        article_meta = page_soup.select_one('meta[property="og:type"], meta[name="type"]')
+        article_type = str(article_meta.get("content") or "").casefold() if article_meta else ""
         page = {
             "url": final_url,
             "title": page_soup.title.get_text(" ", strip=True)[:500] if page_soup.title else "",
             "main_text_excerpt": page_text[:5000],
+            "published_at": _published_date(page_soup),
+            "article_like": article_type in {"article", "newsarticle", "blogposting"} or bool(page_soup.select_one("article")),
             "content_sha256": __import__("hashlib").sha256(raw).hexdigest(),
         }
         return page, _social_links(final_url, page_soup), 2, len(raw), elapsed, None
