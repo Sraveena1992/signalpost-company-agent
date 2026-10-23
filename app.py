@@ -78,7 +78,10 @@ async def add_security_headers(request, call_next):
 def _get_json(url: str) -> dict:
     request = Request(
         url,
-        headers={"Accept": "application/json", "User-Agent": "SignalpostCompanyAgent/1.1"},
+        headers={
+            "Accept": "application/vnd.brreg.enhetsregisteret.enhet.v2+json, application/json;q=0.9",
+            "User-Agent": "SignalpostCompanyAgent/1.2",
+        },
     )
     try:
         with urlopen(request, timeout=12) as response:
