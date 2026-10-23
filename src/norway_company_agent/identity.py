@@ -43,15 +43,10 @@ def assess_website_identity(profile: dict[str, Any]) -> dict[str, Any]:
         value.get("title"), value.get("description"), value.get("identity_text_excerpt"), hostname, *structured_names,
         rendered.get("title"),
     ]
-    candidate_parts = [
-        *homepage_identity_parts, value.get("main_text_excerpt"),
-        *[page.get("title") for page in value.get("pages", [])],
-        *[page.get("main_text_excerpt") for page in value.get("pages", [])],
-        *[page.get("identity_text_excerpt") for page in value.get("pages", [])],
-    ]
-    candidate_parts.append(rendered.get("main_text_excerpt"))
-    candidate_text = " ".join(str(part or "") for part in candidate_parts)
+    # Ownership must be established from the homepage, not from a subsidiary
+    # mention on a parent group's contact, locations, or portfolio page.
     homepage_candidate_text = " ".join(str(part or "") for part in [*homepage_identity_parts, value.get("main_text_excerpt"), rendered.get("main_text_excerpt")])
+    candidate_text = homepage_candidate_text
     normalized_candidate_text = " ".join(_tokens(candidate_text))
     candidate_tokens = set(_tokens(candidate_text))
     org_digits = re.sub(r"\D", "", str(profile.get("organisation_number") or ""))
@@ -120,9 +115,6 @@ def assess_social_identity(profile: dict[str, Any], link: dict[str, str]) -> dic
     elif len(core) == 1 and matched:
         score = 0.95
         reason = "single distinctive legal-name token appears in the social handle"
-    elif ratio >= 0.75 and len(set(matched)) >= 2:
-        score = 0.9
-        reason = "most legal-name tokens appear in the social handle"
     else:
         score = 0.3
         reason = "social handle lacks strong exact-entity name evidence"
