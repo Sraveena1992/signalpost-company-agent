@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import tempfile
 import uuid
 from pathlib import Path
@@ -25,6 +26,27 @@ app = FastAPI(
 ROOT = Path(__file__).resolve().parent
 REGISTRY_URL = "https://data.brreg.no/enhetsregisteret/api/enheter/"
 REGISTRY_SEARCH_URL = REGISTRY_URL
+# Bound expensive on-demand research so a burst of requests cannot spawn unlimited workers.
+_RESEARCH_SLOTS = threading.BoundedSemaphore(value=2)
+
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+    if request.url.path == "/" and response.headers.get("content-type", "").startswith("text/html"):
+        response.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'self' data:; script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+            "connect-src 'self'; object-src 'none'; base-uri 'none'; "
+            "frame-ancestors 'none'; form-action 'self'",
+        )
+    return response
 
 
 def _get_json(url: str) -> dict:
@@ -148,10 +170,15 @@ def research_api(orgnr: str):
             "--workers", "1",
             "--checkpoint-every", "1",
         ]
+        if not _RESEARCH_SLOTS.acquire(blocking=False):
+            return JSONResponse(status_code=429, content={"error": "Research capacity is busy. Please retry in a minute."})
         try:
-            completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=150, check=False, env={**os.environ, "PYTHONUNBUFFERED": "1"})
-        except subprocess.TimeoutExpired:
-            return JSONResponse(status_code=504, content={"error": "Research exceeded the 150-second limit. Try again later."})
+            try:
+                completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=150, check=False, env={**os.environ, "PYTHONUNBUFFERED": "1"})
+            except subprocess.TimeoutExpired:
+                return JSONResponse(status_code=504, content={"error": "Research exceeded the 150-second limit. Try again later."})
+        finally:
+            _RESEARCH_SLOTS.release()
         if completed.returncode != 0:
             return JSONResponse(status_code=502, content={"error": "The research pipeline did not complete successfully.", "run_id": run_id, "diagnostic": (completed.stderr or completed.stdout or "No diagnostic output")[-1200:]})
         try:
@@ -248,13 +275,13 @@ def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="
 <meta name="theme-color" content="#101827">
 <meta name="description" content="Search Norwegian organisations and verify company details against the official Brønnøysund Register.">
 <title>Signalpost — Company Intelligence</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23101827'/%3E%3Cpath d='M15 44V20h8l18 15V20h8v24h-8L23 29v15z' fill='%237ce8c2'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23101827'/%3E%3Cpath d='M15 44V20h8l18 15V20h8v24h-8L23 29v15z' fill='%2367dec7'/%3E%3C/svg%3E">
 <style>
-:root{color-scheme:dark;--bg:#0b1120;--panel:#131e31;--panel2:#17243a;--line:#2a3b53;--muted:#a7b6cc;--ink:#f3f7ff;--mint:#7ce8c2;--blue:#8ab9ff}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% -5%,#17444a 0,transparent 38%),radial-gradient(ellipse at 100% 20%,#1b2a4b 0,transparent 32%),var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #ffffff12;padding:8px 0 20px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}.logo{width:44px;height:44px;display:grid;place-items:center;background:#132b34;border:1px solid #346357;border-radius:14px;flex-shrink:0}.brand-name{font-weight:850;letter-spacing:2px;font-size:15px}.brand-sub{display:block;font-size:11px;color:var(--muted);letter-spacing:.8px}.status{font-size:11px;letter-spacing:1px;font-weight:800;color:var(--mint);border:1px solid #2b6556;background:#102b29;border-radius:999px;padding:6px 10px}
+:root{color-scheme:dark;--bg:#101827;--panel:#192638;--panel2:#223349;--line:#3b4c62;--muted:#bdc9d8;--ink:#f7f8fb;--mint:#67dec7;--blue:#f2bd78}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% -5%,#173e43 0,transparent 38%),radial-gradient(ellipse at 100% 20%,#29334d 0,transparent 32%),var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #ffffff12;padding:8px 0 20px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}.logo{width:44px;height:44px;display:grid;place-items:center;background:#1c3a40;border:1px solid #3d8176;border-radius:14px;flex-shrink:0}.brand-name{font-weight:850;letter-spacing:2px;font-size:15px}.brand-sub{display:block;font-size:11px;color:var(--muted);letter-spacing:.8px}.status{font-size:11px;letter-spacing:1px;font-weight:800;color:var(--mint);border:1px solid #357c70;background:#153733;border-radius:999px;padding:6px 10px}
 .hero{padding:55px 0 28px}.kicker,.section-kicker{font-size:11px;letter-spacing:2px;font-weight:850;color:var(--mint)}h1{font-size:clamp(38px,7vw,68px);line-height:1.02;letter-spacing:-2.7px;margin:15px 0 20px;max-width:780px}.hero p{color:var(--muted);max-width:660px;font-size:17px}.hero strong{color:var(--ink)}
-.panel,.result{border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,#17253aee,#111b2dee);padding:26px;margin:20px 0;box-shadow:0 18px 55px #00000018}.search-label{display:block;font-weight:750;margin-bottom:12px;font-size:14px}.search-row{display:flex;gap:10px;flex-wrap:wrap}.search-input{flex:1;min-width:220px;width:100%;padding:15px 16px;border:1px solid #40536d;border-radius:12px;background:#0b1424;color:white;font:inherit;outline:none}.search-input:focus{border-color:var(--mint);box-shadow:0 0 0 3px #7ce8c21b}.button{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:13px 18px;border:1px solid transparent;border-radius:12px;background:var(--mint);color:#08211a;text-decoration:none;font-weight:850;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}.button:hover{filter:brightness(1.06);transform:translateY(-1px)}.button.secondary{background:#1b2b42;border-color:#3b506c;color:var(--ink)}.button.small{padding:10px 13px;font-size:13px}.hint,.muted{font-size:13px;color:var(--muted)}.hint{margin:13px 0 0}.result h2{font-size:clamp(23px,4vw,32px);line-height:1.2;letter-spacing:-.8px;margin:10px 0 16px;overflow-wrap:anywhere}.result table{width:100%;border-collapse:collapse;margin:20px 0}.result th,.result td{text-align:left;padding:13px 8px;border-bottom:1px solid #ffffff12;vertical-align:top;overflow-wrap:anywhere}.result th{color:var(--muted);width:34%;font-weight:550}.result td{font-weight:600}.source-link{color:var(--mint);font-weight:750;text-decoration:none}.result-actions{margin-top:22px;padding-top:18px;border-top:1px solid #ffffff12}.error{padding:20px;border:1px solid #9b5a6c;background:#351f2c;border-radius:16px;margin:20px 0}.error p{color:#e9c7d0}.match{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid #ffffff14}.match:last-of-type{border-bottom:0}.match h3{margin:3px 0;font-size:19px;overflow-wrap:anywhere}.match-type{font-size:11px;color:var(--mint);text-transform:uppercase;letter-spacing:1px;font-weight:800}.match p{margin:3px 0;overflow-wrap:anywhere}.footer{border-top:1px solid #ffffff14;margin-top:35px;padding-top:22px;color:var(--muted);font-size:12px}.footer a{color:var(--mint)}.purpose{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.purpose article{padding:17px;border:1px solid #ffffff12;border-radius:15px;background:#ffffff04}.purpose b{display:block;font-size:14px;margin-bottom:5px}.purpose p{font-size:13px;color:var(--muted);margin:0}.purpose-icon{font-size:20px;margin-bottom:8px}
+.panel,.result{border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,#17253aee,#111b2dee);padding:26px;margin:20px 0;box-shadow:0 18px 55px #00000018}.search-label{display:block;font-weight:750;margin-bottom:12px;font-size:14px}.search-row{display:flex;gap:10px;flex-wrap:wrap}.search-input{flex:1;min-width:220px;width:100%;padding:15px 16px;border:1px solid #53657d;border-radius:12px;background:#121e2e;color:white;font:inherit;outline:none}.search-input:focus{border-color:var(--mint);box-shadow:0 0 0 3px #67dec71b}.button{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:13px 18px;border:1px solid transparent;border-radius:12px;background:var(--mint);color:#09231f;text-decoration:none;font-weight:850;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}.button:hover{filter:brightness(1.06);transform:translateY(-1px)}.button.secondary{background:#29384d;border-color:#4b5e76;color:var(--ink)}.button.small{padding:10px 13px;font-size:13px}.hint,.muted{font-size:13px;color:var(--muted)}.hint{margin:13px 0 0}.result h2{font-size:clamp(23px,4vw,32px);line-height:1.2;letter-spacing:-.8px;margin:10px 0 16px;overflow-wrap:anywhere}.result table{width:100%;border-collapse:collapse;margin:20px 0}.result th,.result td{text-align:left;padding:13px 8px;border-bottom:1px solid #ffffff12;vertical-align:top;overflow-wrap:anywhere}.result th{color:var(--muted);width:34%;font-weight:550}.result td{font-weight:600}.source-link{color:var(--mint);font-weight:750;text-decoration:none}.result-actions{margin-top:22px;padding-top:18px;border-top:1px solid #ffffff12}.error{padding:20px;border:1px solid #9b5a6c;background:#351f2c;border-radius:16px;margin:20px 0}.error p{color:#e9c7d0}.match{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid #ffffff14}.match:last-of-type{border-bottom:0}.match h3{margin:3px 0;font-size:19px;overflow-wrap:anywhere}.match-type{font-size:11px;color:var(--mint);text-transform:uppercase;letter-spacing:1px;font-weight:800}.match p{margin:3px 0;overflow-wrap:anywhere}.footer{border-top:1px solid #ffffff14;margin-top:35px;padding-top:22px;color:var(--muted);font-size:12px}.footer a{color:var(--mint)}.purpose{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.purpose article{padding:17px;border:1px solid #ffffff12;border-radius:15px;background:#ffffff04}.purpose b{display:block;font-size:14px;margin-bottom:5px}.purpose p{font-size:13px;color:var(--muted);margin:0}.purpose-icon{font-size:20px;margin-bottom:8px}
 /* Keep evidence output inside its card/viewport, including long source URLs and nested JSON. */
 .result{min-width:0;max-width:100%;overflow:hidden}
 .result table{width:100%;max-width:100%;table-layout:fixed;display:block;overflow-x:auto}
@@ -269,7 +296,7 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 </style>
 </head>
 <body><main>
-<nav class="topbar"><a class="brand" href="/" aria-label="Signalpost home"><span class="logo"><svg width="27" height="27" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 24V8h5l12 10V8h5v16h-5L10 14v10z" fill="#7ce8c2"/><path d="M4 28h24" stroke="#8ab9ff" stroke-width="2" stroke-linecap="round"/></svg></span><span><span class="brand-name">SIGNALPOST</span><span class="brand-sub">COMPANY INTELLIGENCE</span></span></a><span class="status">● LIVE PROTOTYPE</span></nav>
+<nav class="topbar"><a class="brand" href="/" aria-label="Signalpost home"><span class="logo"><svg width="27" height="27" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 24V8h5l12 10V8h5v16h-5L10 14v10z" fill="#67dec7"/><path d="M4 28h24" stroke="#f2bd78" stroke-width="2" stroke-linecap="round"/></svg></span><span><span class="brand-name">SIGNALPOST</span><span class="brand-sub">COMPANY INTELLIGENCE</span></span></a><span class="status">● LIVE PROTOTYPE</span></nav>
 <header class="hero"><div class="kicker">NORWEGIAN COMPANY RESEARCH</div><h1>Know the company.<br>Verify the evidence.</h1><p>Find a registered Norwegian organisation by <strong>company name or organisation number</strong>. Start with the official register, then follow the source for yourself.</p></header>
 <section class="panel"><form method="get" action="/" id="search-form"><label class="search-label" for="search-query">What company are you looking for?</label><div class="search-row"><input class="search-input" id="search-query" name="q" value="__SEARCH_VALUE__" placeholder="Company name or 9-digit organisation number" autocomplete="off" aria-describedby="search-hint" required><button class="button" type="submit">Search registry ↗</button></div><p class="hint" id="search-hint">Tip: enter a company name if you don’t know its organisation number. Search uses the official Brønnøysund Register.</p></form></section>
 """ + result_html + """
