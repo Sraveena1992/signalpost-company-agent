@@ -593,8 +593,10 @@ class CompletenessScoreTests(unittest.TestCase):
         self.assertEqual(item["signal_type"], "public_post")
         self.assertEqual(item["published_at"], "2026-08-20")
         self.assertTrue(publishable_observation(item))
+        profile["evidence"]["website"]["value"]["pages"][0]["title"] = "Another company signs a new contract"
         profile["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = ("Another Company announced a new contract. " * 8)
         self.assertIsNone(site_news_observation(profile))
+        profile["evidence"]["website"]["value"]["pages"][0]["title"] = "Example signs a new contract"
         profile["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = ("Example announced a new contract. " * 8)
         profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = ""
         self.assertIsNone(site_news_observation(profile))
