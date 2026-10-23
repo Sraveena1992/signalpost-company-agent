@@ -1455,7 +1455,7 @@ class PublicLookupPrototypeTests(unittest.TestCase):
 
     def test_homepage_contains_brand_and_resettable_search(self):
         from app import home
-        response = home()
+        response = home(orgnr="", q="")
         self.assertIn("SIGNALPOST", response.body.decode("utf-8"))
         self.assertIn('name="q"', response.body.decode("utf-8"))
         self.assertIn("New search", response.body.decode("utf-8"))
@@ -1470,7 +1470,7 @@ class PublicLookupPrototypeTests(unittest.TestCase):
             "address": "KLEPP STASJON",
             "industry": "Consulting",
         }]):
-            response = home(q="VIK MEDIA")
+            response = home(orgnr="", q="VIK MEDIA")
         body = response.body.decode("utf-8")
         self.assertIn("VIK MEDIA HOLDING AS", body)
         self.assertIn("912900584", body)
