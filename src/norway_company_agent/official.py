@@ -148,7 +148,15 @@ def normalize_roles(body: Any) -> dict[str, Any]:
             person = item.get("person") or {}
             name = person.get("navn") or {}
             entity = item.get("enhet") or {}
-            display_name = " ".join(filter(None, [name.get("fornavn"), name.get("mellomnavn"), name.get("etternavn")])) or entity.get("navn")
+            entity_name = entity.get("navn")
+            if isinstance(entity_name, list):
+                entity_name = " ".join(str(part).strip() for part in entity_name if part)
+
+            display_name = " ".join(filter(None, [
+                name.get("fornavn"),
+                name.get("mellomnavn"),
+                name.get("etternavn"),
+            ])) or entity_name
             roles.append({
                 "name": display_name or None,
                 "organisation_number": entity.get("organisasjonsnummer"),

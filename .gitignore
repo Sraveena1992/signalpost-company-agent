@@ -11,3 +11,5 @@ out/*
 entry-companies.jsonl
 
 data/
+.smoke-data/
+artifacts/

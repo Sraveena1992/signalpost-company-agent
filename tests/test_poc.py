@@ -1287,6 +1287,24 @@ class OfficialNormalizationTests(unittest.TestCase):
         self.assertEqual(record["name"], "Ada Nord")
         self.assertNotIn("fodselsdato", json.dumps(record))
 
+    def test_public_roles_normalize_organisation_name(self):
+        body = {
+            "rollegrupper": [{
+                "type": {"kode": "REGN", "beskrivelse": "Regnskapsfører"},
+                "roller": [{
+                    "type": {"kode": "REGN", "beskrivelse": "Regnskapsfører"},
+                    "enhet": {
+                        "navn": ["FALKEBLIKK 2 AS"],
+                        "organisasjonsnummer": "932319020",
+                    },
+                }],
+            }],
+        }
+
+        record = normalize_roles(body)["roles"][0]
+
+        self.assertEqual(record["name"], "FALKEBLIKK 2 AS")
+        self.assertEqual(record["organisation_number"], "932319020")
 
 class ResearchAgentTests(unittest.TestCase):
     @staticmethod
