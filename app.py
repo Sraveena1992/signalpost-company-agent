@@ -353,7 +353,7 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 
 /* Premium light theme: calmer surfaces, stronger contrast, and less visual weight. */
 :root{color-scheme:light;--bg:#f3f6fb;--panel:#ffffff;--panel2:#f8fafc;--line:#dce4ee;--muted:#58677c;--ink:#152238;--mint:#087f78;--blue:#b77927}
-body{background:radial-gradient(ellipse at 8% 0%,#d9f2ee 0,transparent 34%),radial-gradient(ellipse at 100% 8%,#e6edff 0,transparent 34%),var(--bg);color:var(--ink)}
+body{background:radial-gradient(ellipse 55% 58% at -8% 0%,rgba(12,163,174,.58) 0%,transparent 78%),radial-gradient(ellipse 58% 62% at 108% 0%,rgba(103,83,218,.55) 0%,transparent 76%),radial-gradient(ellipse 64% 55% at 52% 112%,rgba(46,119,213,.35) 0%,transparent 78%),linear-gradient(135deg,#d7f0f3 0%,#d9e2f6 48%,#e1dafa 100%);background-attachment:fixed;color:var(--ink)}
 .topbar{border-bottom:1px solid #dbe4ee}
 .logo{background:#e0f5f1;border-color:#a8dcd4}
 .status{color:#087f78;border-color:#b7e3dc;background:#e5f7f3}
