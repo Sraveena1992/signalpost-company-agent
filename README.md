@@ -58,7 +58,7 @@ The batch workflow checks expected output counts and company membership, alongsi
 
 ### 5. Present results
 
-The lightweight public web prototype provides a live official-registry lookup for one Norwegian organisation number. The broader research pipeline is run through the CLI and supporting scripts, not through the public web interface.
+The public web prototype provides official-registry search and on-demand single-company evidence research. The reproducible multi-company workflow remains available through the CLI. Public research requests may time out after 150 seconds.
 
 ## Architecture
 
@@ -210,3 +210,50 @@ Do not commit private API keys, credentials, or large local registry downloads. 
 
 **Maintainer:** Raveena Sharma  
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
+
+## Final submission verification — 29 October 2026
+
+**Submission branch:** `fix/exact-batch-membership`
+
+**Latest locally verified regression run:**
+`uv run --frozen python -m pytest -q`
+
+Result: **131 passed, 7 subtests passed, 11 third-party deprecation warnings**.
+
+The GitHub Actions run linked above is earlier historical evidence and may show a lower test count.
+
+### Public interface and API
+
+The public dashboard supports official-registry company search and on-demand single-company evidence research, including Overview, Financials, Leadership, Locations, Website, and Evidence & audit views.
+
+Additional API endpoints:
+
+- `GET /api/search?q=...` — search for registered companies.
+- `GET /api/research/{orgnr}` — run the evidence research pipeline for one company.
+
+The public research endpoint invokes the actual batch runner but has a **150-second subprocess limit**. Some requests have exceeded this limit and returned HTTP 504. Successful dashboard rendering does not establish that all on-demand research requests will complete.
+
+The hosted interface is not a substitute for the evaluator's reproducible CLI batch run.
+
+### Local 100-company smoke test
+
+**Run ID:** `smoke-100-20261024T024318Z`
+
+- Input organisations: 100
+- Emitted terminal envelopes: 100
+- Profiles fetched: 100
+- Validation: passed
+- Source requests: 672
+- Reported direct paid API/model cost: USD 0.00, excluding hosting and infrastructure
+
+Evidence: [100-company smoke report](out/smoke-report.json).
+
+The smoke test validates output contracts, exact membership and provenance requirements. It does not establish 100% factual correctness, complete coverage, or an official Builderr evaluation score.
+
+### Known limitations
+
+- On-demand public research can exceed the 150-second limit.
+- External job-posting coverage is not integrated into the default batch.
+- Website identity assessments can require human review; company-controlled content is not automatically verified.
+- Registry and third-party source availability can affect completeness.
+- Default-run paid API/model cost excludes hosting and infrastructure.
