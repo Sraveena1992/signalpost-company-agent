@@ -351,36 +351,36 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 @media(max-width:640px){.evidence-grid{grid-template-columns:minmax(0,1fr)}.result table{font-size:12px}.result th,.result td{padding:9px 6px}}
 @media(max-width:640px){main{padding:18px 14px 40px}.hero{padding:39px 0 20px}h1{letter-spacing:-1.7px}.panel,.result{padding:18px;border-radius:17px}.search-row .button{width:100%}.match{align-items:flex-start;flex-direction:column;gap:12px}.match .button{width:100%}.result th{width:40%;padding-right:10px}.result th,.result td{font-size:13px;padding:11px 5px}.purpose{grid-template-columns:1fr}.status{font-size:9px}.topbar{align-items:flex-start}}
 
-/* Premium pearl landing: warm ivory, champagne and subtle rose highlights. */
-:root{color-scheme:light;--bg:#f3ece4;--panel:#ffffff;--panel2:#fcfaf7;--line:#e4d9cf;--muted:#665c5b;--ink:#2a1518;--mint:#6b2b33;--blue:#8a4a3b}
-body{background:radial-gradient(ellipse 50% 48% at 0% 0%,rgba(201,182,162,.33),transparent 78%),radial-gradient(ellipse 48% 50% at 100% 8%,rgba(138,74,59,.12),transparent 80%),radial-gradient(ellipse 60% 40% at 55% 100%,rgba(201,182,162,.19),transparent 82%),linear-gradient(135deg,#fffdfa 0%,#f3ece4 54%,#f8f1ec 100%);background-attachment:fixed;color:#2a1518}
-.topbar{border-bottom:1px solid #dfd2c6}
-.brand,.brand-name,.hero h1{color:#2a1518}
-.brand-sub,.hero p{color:#665c5b}
-.hero strong{color:#6b2b33}
-.kicker,.section-kicker,.match-type{color:#8a4a3b}
-.logo{background:#f3ece4;border-color:#c9b6a2}
-.status{color:#6b2b33;border-color:#e0c7c3;background:#f9efed}
-.panel,.result{background:rgba(255,255,255,.96);color:#2a1518;border:1px solid #e4d9cf;box-shadow:0 14px 38px rgba(80,44,43,.09)}
-.panel h2,.panel h3,.panel h4,.panel b,.panel strong,.panel label,.panel .search-label,.result h2,.result h3,.result b,.result strong,.result label{color:#2a1518}
-.panel .hint,.panel .muted,.panel p,.result .hint,.result .muted,.result p{color:#665c5b}
-.search-input{background:#fcfaf7;border-color:#d9c8ba;color:#2a1518}
-.search-input::placeholder{color:#8a7a75}
-.search-input:focus{border-color:#8a4a3b;box-shadow:0 0 0 3px rgba(138,74,59,.12)}
-.button{background:#6b2b33;color:#ffffff;font-weight:750}
-.button:hover{filter:brightness(1.1)}
-.button.secondary{background:#fff;border-color:#d9c8ba;color:#6b2b33}
-.result th,.result td{border-bottom-color:#ece3dc}
-.result-actions{border-top-color:#e4d9cf}
-.purpose article{background:#fcfaf7;border-color:#ece3dc;color:#2a1518}
-.purpose article b,.purpose article .purpose-icon{color:#6b2b33}
-.purpose article p{color:#665c5b}
+/* Fintech premium: cool porcelain, refined indigo, emerald signals. */
+:root{color-scheme:light;--bg:#eef3fa;--panel:#ffffff;--panel2:#f7f9fd;--line:#dce4ef;--muted:#52627a;--ink:#17243c;--mint:#087f78;--blue:#3557a8}
+body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),transparent 78%),radial-gradient(ellipse 54% 52% at 100% 3%,rgba(101,111,210,.20),transparent 78%),radial-gradient(ellipse 64% 42% at 50% 100%,rgba(73,188,165,.12),transparent 80%),linear-gradient(125deg,#f8fbff 0%,#edf3fb 52%,#f3f5ff 100%);background-attachment:fixed;color:#17243c}
+.topbar{border-bottom:1px solid #d8e2ef}
+.brand,.brand-name,.hero h1{color:#17243c}
+.brand-sub,.hero p{color:#52627a}
+.hero strong{color:#253e72}
+.kicker,.section-kicker,.match-type{color:#087f78}
+.logo{background:#e1f5f1;border-color:#b5e1d9}
+.status{color:#087f78;border-color:#b5e1d9;background:#e8f7f4}
+.panel,.result{background:rgba(255,255,255,.97);color:#17243c;border:1px solid #dce4ef;box-shadow:0 16px 42px rgba(28,55,95,.10)}
+.panel h2,.panel h3,.panel h4,.panel b,.panel strong,.panel label,.panel .search-label,.result h2,.result h3,.result b,.result strong,.result label{color:#17243c}
+.panel .hint,.panel .muted,.panel p,.result .hint,.result .muted,.result p{color:#52627a}
+.search-input{background:#f8fafd;border-color:#cbd8e7;color:#17243c}
+.search-input::placeholder{color:#74849b}
+.search-input:focus{border-color:#087f78;box-shadow:0 0 0 3px rgba(8,127,120,.14)}
+.button{background:linear-gradient(110deg,#087f78,#146f91);color:#ffffff;font-weight:750}
+.button:hover{filter:brightness(1.07)}
+.button.secondary{background:#fff;border-color:#cbd8e7;color:#253e72}
+.result th,.result td{border-bottom-color:#e7edf5}
+.result-actions{border-top-color:#dce4ef}
+.purpose article{background:#f7f9fd;border-color:#e1e8f2;color:#17243c}
+.purpose article b,.purpose article .purpose-icon{color:#146f91}
+.purpose article p{color:#52627a}
 .error{background:#fff1f2;border-color:#fecdd3;color:#881337}
 .error p{color:#9f1239}
-.source-link,.panel a,.result .facts-table .source-link{color:#7a3034}
-.footer{color:#665c5b;border-top-color:#dfd2c6}
-.footer a{color:#7a3034}
-@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 18px 44px rgba(80,44,43,.13);border-color:#d8c4b5}}
+.source-link,.panel a,.result .facts-table .source-link{color:#087f78}
+.footer{color:#52627a;border-top-color:#d8e2ef}
+.footer a{color:#087f78}
+@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 20px 48px rgba(28,55,95,.15);border-color:#c8d7e8}}
 </style>
 </head>
 <body><main>
