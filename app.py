@@ -351,49 +351,37 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 @media(max-width:640px){.evidence-grid{grid-template-columns:minmax(0,1fr)}.result table{font-size:12px}.result th,.result td{padding:9px 6px}}
 @media(max-width:640px){main{padding:18px 14px 40px}.hero{padding:39px 0 20px}h1{letter-spacing:-1.7px}.panel,.result{padding:18px;border-radius:17px}.search-row .button{width:100%}.match{align-items:flex-start;flex-direction:column;gap:12px}.match .button{width:100%}.result th{width:40%;padding-right:10px}.result th,.result td{font-size:13px;padding:11px 5px}.purpose{grid-template-columns:1fr}.status{font-size:9px}.topbar{align-items:flex-start}}
 
-/* Premium light theme: calmer surfaces, stronger contrast, and less visual weight. */
-:root{color-scheme:light;--bg:#f3f6fb;--panel:#ffffff;--panel2:#f8fafc;--line:#dce4ee;--muted:#58677c;--ink:#152238;--mint:#087f78;--blue:#b77927}
-body{background:radial-gradient(ellipse 65% 58% at 8% 0%,rgba(138,74,59,.78),transparent 75%),radial-gradient(ellipse 65% 65% at 100% 12%,rgba(107,43,51,.84),transparent 75%),radial-gradient(ellipse 60% 50% at 50% 100%,rgba(201,182,162,.28),transparent 80%),linear-gradient(135deg,#2a1518 0%,#6b2b33 48%,#2a1518 100%);background-attachment:fixed;color:#f3ece4}
-.topbar{border-bottom:1px solid #dbe4ee}
-.logo{background:#e0f5f1;border-color:#a8dcd4}
-.status{color:#087f78;border-color:#b7e3dc;background:#e5f7f3}
-.kicker,.section-kicker,.match-type{color:#087f78}
-.hero p,.brand-sub,.hint,.muted{color:#58677c}
-.hero strong{color:#152238}
-.panel,.result{background:rgba(255,255,255,.92);border-color:#dce4ee;box-shadow:0 12px 32px rgba(24,44,76,.07)}
-.search-input{background:#f8fafc;border-color:#cbd6e3;color:#152238}
-.search-input::placeholder{color:#748197}
-.search-input:focus{border-color:#0b958b;box-shadow:0 0 0 3px rgba(11,149,139,.13)}
-.button{background:#0b958b;color:#fff;font-weight:750}
-.button:hover{filter:brightness(.97)}
-.button.secondary{background:#fff;border-color:#cbd6e3;color:#25364f}
-.result th,.result td{border-bottom-color:#e6ebf2}
-.result-actions,.footer{border-top-color:#e2e8f0}
-.purpose article{background:#f8fafc;border-color:#e2e8f0}
+/* Luxury burgundy and champagne landing system: intentional contrast. */
+:root{color-scheme:light;--bg:#2a1518;--panel:#f3ece4;--panel2:#f8f3ed;--line:#d8c5b4;--muted:#69534d;--ink:#2a1518;--mint:#6b2b33;--blue:#8a4a3b}
+body{background:radial-gradient(ellipse 48% 62% at -8% 12%,rgba(138,74,59,.72) 0%,transparent 72%),radial-gradient(ellipse 46% 56% at 110% 5%,rgba(107,43,51,.72) 0%,transparent 72%),radial-gradient(ellipse 75% 38% at 50% 102%,rgba(201,182,162,.48) 0%,transparent 74%),linear-gradient(120deg,#2a1518 0%,#3b2025 38%,#6b2b33 70%,#2a1518 100%);background-attachment:fixed;color:#f3ece4}
+.topbar{border-bottom:1px solid rgba(243,236,228,.28)}
+.brand,.brand-name,.hero h1{color:#f3ece4}
+.brand-sub,.hero p{color:#e6d7ca}
+.hero strong{color:#fffaf5}
+.kicker{color:#e7bca5}
+.logo{background:#6b2b33;border-color:#c9b6a2}
+.status{color:#f3ece4;border-color:#c9b6a2;background:rgba(42,21,24,.65)}
+.panel,.result{background:#f3ece4;color:#2a1518;border:1px solid #c9b6a2;box-shadow:0 20px 52px rgba(17,6,9,.32)}
+.panel h2,.panel h3,.panel h4,.panel b,.panel strong,.panel label,.panel .search-label,.result h2,.result h3,.result b,.result strong,.result label{color:#2a1518}
+.section-kicker,.match-type{color:#6b2b33}
+.panel .hint,.panel .muted,.panel p,.result .hint,.result .muted,.result p{color:#69534d}
+.search-input{background:#fffaf5;border-color:#c9b6a2;color:#2a1518}
+.search-input::placeholder{color:#806d63}
+.search-input:focus{border-color:#8a4a3b;box-shadow:0 0 0 3px rgba(138,74,59,.18)}
+.button{background:#6b2b33;color:#fffaf5;font-weight:750}
+.button:hover{filter:brightness(1.12)}
+.button.secondary{background:#fffaf5;border-color:#c9b6a2;color:#6b2b33}
+.result th,.result td{border-bottom-color:#dfd0c2}
+.result-actions{border-top-color:#d8c5b4}
+.purpose article{background:#fffaf5;border-color:#dfd0c2;color:#2a1518}
+.purpose article b,.purpose article .purpose-icon{color:#6b2b33}
+.purpose article p{color:#69534d}
 .error{background:#fff1f2;border-color:#fecdd3;color:#881337}
 .error p{color:#9f1239}
-.source-link,.footer a{color:#087f78}
-.result .facts-table .source-link{color:#087f78}
-@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 16px 38px rgba(24,44,76,.09);border-color:#c8d5e4}}
-/* Forest & burgundy landing canvas: keep light research cards readable. */
-.topbar{border-bottom-color:rgba(255,255,255,.23)}
-.brand,.brand-name,.hero h1{color:#fffdf7}
-.brand-sub,.hero p,.footer{color:#e1ebe2}
-.hero strong{color:#ffffff}
-.kicker{color:#b9f1d4}
-.footer{border-top-color:rgba(255,255,255,.22)}
-.footer a{color:#b9f1d4}
-.status{background:rgba(1,61,27,.82);border-color:rgba(185,241,212,.50);color:#d8ffe9}
-.logo{background:#013d1b;border-color:#4c9471}
-
-/* Warm burgundy landing: readable hero and navigation. */
-.topbar{border-bottom-color:rgba(243,236,228,.25)}
-.topbar .brand,.topbar .brand-name,.hero h1{color:#f3ece4}
-.topbar .brand-sub,.hero p{color:#e5d4c5}
-.hero strong{color:#fff8f0}
-.hero .kicker{color:#f0c3ad}
-.footer{color:#e5d4c5;border-top-color:rgba(243,236,228,.22)}
-.footer a{color:#f0c3ad}
+.source-link,.panel a,.result .facts-table .source-link{color:#7a3034}
+.footer{color:#e6d7ca;border-top-color:rgba(243,236,228,.28)}
+.footer a{color:#f0c8ae}
+@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 24px 58px rgba(17,6,9,.39);border-color:#b89680}}
 </style>
 </head>
 <body><main>
