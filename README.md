@@ -2,10 +2,11 @@
 
 **Evidence-first Norwegian company research, built for verifiable facts and reproducible batch evaluation.**
 
-[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/Web%20Demo-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/Tests-contract%20checked-brightgreen)](#testing-and-validation)
-[![Status](https://img.shields.io/badge/Status-Prototype-orange)](#scope-and-limitations)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-087F78?logo=render&logoColor=white)](https://signalpost-company-agent.onrender.com/)
+[![API Docs](https://img.shields.io/badge/API-Documentation-2563EB?logo=fastapi&logoColor=white)](https://signalpost-company-agent.onrender.com/docs)
+[![Source](https://img.shields.io/badge/GitHub-Source_Code-24292F?logo=github&logoColor=white)](https://github.com/Sraveena1992/signalpost-company-agent/tree/fix/exact-batch-membership)
+[![Tests](https://img.shields.io/badge/Tests-Validation-20885B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/fix/exact-batch-membership/README.md#testing-and-validation)
+[![Smoke Report](https://img.shields.io/badge/100_Companies-Smoke_Report-8A4A3B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/fix/exact-batch-membership/out/smoke-report.json)
 
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
 
