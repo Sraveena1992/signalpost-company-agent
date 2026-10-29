@@ -29,7 +29,44 @@
     const leadership = table(['Name','Role','Group','Last changed','Inactive'],roles.map(r=>[r.name,r.role||r.role_code,r.group||r.group_code,r.last_changed,r.inactive === true?'Yes':r.inactive === false?'No':null].map(cell)));
     const pretty = x => { if(x == null) return null; if(typeof x !== 'object') return String(x); if(Array.isArray(x)) return x.map(pretty).filter(Boolean).join(', '); const keys=['adresse','address','postnummer','poststed','kommune','land','beskrivelse','kode']; const vals=keys.map(k=>x[k]).filter(v=>v!=null&&v!=='').map(pretty); return vals.join(', ') || Object.values(x).filter(v=>v!=null&&typeof v!=='object').join(', ') || 'Not reported'; };
     const locations = table(['Name','Organisation','Address','Industry','Employees'],loc.map(r=>[r.name,r.organisation_number,pretty(r.address),pretty(r.industry),r.employees].map(cell)));
-    const website = e.website?.value ? `<pre class="sp-json">${esc(JSON.stringify(e.website.value,null,2))}</pre>` : `<p class="sp-empty">No verified website research record returned. ${esc(e.website?.note||'')}</p>`;
+    const website = (() => {
+      const w = e.website?.value;
+      if (!w || typeof w !== 'object') {
+        return `<p class="sp-empty">No website research record returned. ${esc(e.website?.note || '')}</p>`;
+      }
+
+      const pages = list(w.pages);
+      const assessment = w.identity_assessment || {};
+      const errors = list(w.crawl_errors);
+
+      return `
+        <div class="sp-records">
+          <div class="sp-record">
+            <div class="sp-field"><span class="sp-field-label">Company website</span><span class="sp-field-value">${link(w.final_url || w.requested_url, w.registered_domain || 'Open website')}</span></div>
+            <div class="sp-field"><span class="sp-field-label">Website title</span><span class="sp-field-value">${fmt(w.title)}</span></div>
+            <div class="sp-field"><span class="sp-field-label">Pages extracted</span><span class="sp-field-value">${pages.length}</span></div>
+            <div class="sp-field"><span class="sp-field-label">Reported crawl errors</span><span class="sp-field-value">${errors.length}</span></div>
+            <div class="sp-field"><span class="sp-field-label">Identity assessment</span><span class="sp-field-value">${fmt(assessment.status)}</span></div>
+            <div class="sp-field"><span class="sp-field-label">Identity score</span><span class="sp-field-value">${fmt(assessment.score)}</span></div>
+            <div class="sp-field"><span class="sp-field-label">Automatic identity publication</span><span class="sp-field-value">${assessment.publishable === true ? 'Approved' : 'Not approved'}</span></div>
+          </div>
+
+          ${pages.map((page, i) => `
+            <div class="sp-record">
+              <div class="sp-field"><span class="sp-field-label">Extracted page ${i + 1}</span><span class="sp-field-value">${fmt(page.title)}</span></div>
+              <div class="sp-field"><span class="sp-field-label">Original source</span><span class="sp-field-value">${link(page.url, 'Open source page')}</span></div>
+              <div class="sp-field"><span class="sp-field-label">Content excerpt</span><span class="sp-field-value">${esc(String(page.main_text_excerpt || 'No excerpt').slice(0, 350))}</span></div>
+            </div>
+          `).join('')}
+        </div>
+
+        <p class="sp-disclaimer">Website content is company-controlled evidence, not independently verified registry data. Identity assessment must be respected.</p>
+
+        <details>
+          <summary>View technical evidence (JSON)</summary>
+          <pre class="sp-json">${esc(JSON.stringify(w, null, 2))}</pre>
+        </details>`;
+    })();
     const audit = table(['Evidence module','Status','Source','Retrieved'],Object.entries(e).map(([key,v])=>[esc(key.replaceAll('_',' ')),cell(status(v?.status)),link(v?.source_url),cell(v?.retrieved_at)]));
     const sections = [
       ['Overview',e.registry,overview],['Financials',e.financials,financials],['Leadership',e.roles,leadership],['Locations',e.locations,locations],['Website',e.website,website],['Evidence & audit',null,audit]
