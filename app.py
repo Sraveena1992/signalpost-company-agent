@@ -351,37 +351,36 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 @media(max-width:640px){.evidence-grid{grid-template-columns:minmax(0,1fr)}.result table{font-size:12px}.result th,.result td{padding:9px 6px}}
 @media(max-width:640px){main{padding:18px 14px 40px}.hero{padding:39px 0 20px}h1{letter-spacing:-1.7px}.panel,.result{padding:18px;border-radius:17px}.search-row .button{width:100%}.match{align-items:flex-start;flex-direction:column;gap:12px}.match .button{width:100%}.result th{width:40%;padding-right:10px}.result th,.result td{font-size:13px;padding:11px 5px}.purpose{grid-template-columns:1fr}.status{font-size:9px}.topbar{align-items:flex-start}}
 
-/* Luxury burgundy and champagne landing system: intentional contrast. */
-:root{color-scheme:light;--bg:#2a1518;--panel:#f3ece4;--panel2:#f8f3ed;--line:#d8c5b4;--muted:#69534d;--ink:#2a1518;--mint:#6b2b33;--blue:#8a4a3b}
-body{background:radial-gradient(ellipse 48% 62% at -8% 12%,rgba(138,74,59,.72) 0%,transparent 72%),radial-gradient(ellipse 46% 56% at 110% 5%,rgba(107,43,51,.72) 0%,transparent 72%),radial-gradient(ellipse 75% 38% at 50% 102%,rgba(201,182,162,.48) 0%,transparent 74%),linear-gradient(120deg,#2a1518 0%,#3b2025 38%,#6b2b33 70%,#2a1518 100%);background-attachment:fixed;color:#f3ece4}
-.topbar{border-bottom:1px solid rgba(243,236,228,.28)}
-.brand,.brand-name,.hero h1{color:#f3ece4}
-.brand-sub,.hero p{color:#e6d7ca}
-.hero strong{color:#fffaf5}
-.kicker{color:#e7bca5}
-.logo{background:#6b2b33;border-color:#c9b6a2}
-.status{color:#f3ece4;border-color:#c9b6a2;background:rgba(42,21,24,.65)}
-.panel,.result{background:#f3ece4;color:#2a1518;border:1px solid #c9b6a2;box-shadow:0 20px 52px rgba(17,6,9,.32)}
+/* Premium pearl landing: warm ivory, champagne and subtle rose highlights. */
+:root{color-scheme:light;--bg:#f3ece4;--panel:#ffffff;--panel2:#fcfaf7;--line:#e4d9cf;--muted:#665c5b;--ink:#2a1518;--mint:#6b2b33;--blue:#8a4a3b}
+body{background:radial-gradient(ellipse 50% 48% at 0% 0%,rgba(201,182,162,.33),transparent 78%),radial-gradient(ellipse 48% 50% at 100% 8%,rgba(138,74,59,.12),transparent 80%),radial-gradient(ellipse 60% 40% at 55% 100%,rgba(201,182,162,.19),transparent 82%),linear-gradient(135deg,#fffdfa 0%,#f3ece4 54%,#f8f1ec 100%);background-attachment:fixed;color:#2a1518}
+.topbar{border-bottom:1px solid #dfd2c6}
+.brand,.brand-name,.hero h1{color:#2a1518}
+.brand-sub,.hero p{color:#665c5b}
+.hero strong{color:#6b2b33}
+.kicker,.section-kicker,.match-type{color:#8a4a3b}
+.logo{background:#f3ece4;border-color:#c9b6a2}
+.status{color:#6b2b33;border-color:#e0c7c3;background:#f9efed}
+.panel,.result{background:rgba(255,255,255,.96);color:#2a1518;border:1px solid #e4d9cf;box-shadow:0 14px 38px rgba(80,44,43,.09)}
 .panel h2,.panel h3,.panel h4,.panel b,.panel strong,.panel label,.panel .search-label,.result h2,.result h3,.result b,.result strong,.result label{color:#2a1518}
-.section-kicker,.match-type{color:#6b2b33}
-.panel .hint,.panel .muted,.panel p,.result .hint,.result .muted,.result p{color:#69534d}
-.search-input{background:#fffaf5;border-color:#c9b6a2;color:#2a1518}
-.search-input::placeholder{color:#806d63}
-.search-input:focus{border-color:#8a4a3b;box-shadow:0 0 0 3px rgba(138,74,59,.18)}
-.button{background:#6b2b33;color:#fffaf5;font-weight:750}
-.button:hover{filter:brightness(1.12)}
-.button.secondary{background:#fffaf5;border-color:#c9b6a2;color:#6b2b33}
-.result th,.result td{border-bottom-color:#dfd0c2}
-.result-actions{border-top-color:#d8c5b4}
-.purpose article{background:#fffaf5;border-color:#dfd0c2;color:#2a1518}
+.panel .hint,.panel .muted,.panel p,.result .hint,.result .muted,.result p{color:#665c5b}
+.search-input{background:#fcfaf7;border-color:#d9c8ba;color:#2a1518}
+.search-input::placeholder{color:#8a7a75}
+.search-input:focus{border-color:#8a4a3b;box-shadow:0 0 0 3px rgba(138,74,59,.12)}
+.button{background:#6b2b33;color:#ffffff;font-weight:750}
+.button:hover{filter:brightness(1.1)}
+.button.secondary{background:#fff;border-color:#d9c8ba;color:#6b2b33}
+.result th,.result td{border-bottom-color:#ece3dc}
+.result-actions{border-top-color:#e4d9cf}
+.purpose article{background:#fcfaf7;border-color:#ece3dc;color:#2a1518}
 .purpose article b,.purpose article .purpose-icon{color:#6b2b33}
-.purpose article p{color:#69534d}
+.purpose article p{color:#665c5b}
 .error{background:#fff1f2;border-color:#fecdd3;color:#881337}
 .error p{color:#9f1239}
 .source-link,.panel a,.result .facts-table .source-link{color:#7a3034}
-.footer{color:#e6d7ca;border-top-color:rgba(243,236,228,.28)}
-.footer a{color:#f0c8ae}
-@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 24px 58px rgba(17,6,9,.39);border-color:#b89680}}
+.footer{color:#665c5b;border-top-color:#dfd2c6}
+.footer a{color:#7a3034}
+@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 18px 44px rgba(80,44,43,.13);border-color:#d8c4b5}}
 </style>
 </head>
 <body><main>
