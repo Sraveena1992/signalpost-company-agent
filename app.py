@@ -353,7 +353,7 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 
 /* Premium light theme: calmer surfaces, stronger contrast, and less visual weight. */
 :root{color-scheme:light;--bg:#f3f6fb;--panel:#ffffff;--panel2:#f8fafc;--line:#dce4ee;--muted:#58677c;--ink:#152238;--mint:#087f78;--blue:#b77927}
-body{background:radial-gradient(ellipse 55% 58% at -8% 0%,rgba(12,163,174,.58) 0%,transparent 78%),radial-gradient(ellipse 58% 62% at 108% 0%,rgba(103,83,218,.55) 0%,transparent 76%),radial-gradient(ellipse 64% 55% at 52% 112%,rgba(46,119,213,.35) 0%,transparent 78%),linear-gradient(135deg,#d7f0f3 0%,#d9e2f6 48%,#e1dafa 100%);background-attachment:fixed;color:var(--ink)}
+body{background:radial-gradient(ellipse 58% 62% at -8% -10%,rgba(111,29,27,.88) 0%,transparent 76%),radial-gradient(ellipse 60% 68% at 110% 0%,rgba(0,74,76,.56) 0%,transparent 78%),radial-gradient(ellipse 65% 62% at 50% 115%,rgba(1,76,44,.72) 0%,transparent 78%),linear-gradient(132deg,#192416 0%,#013d1b 48%,#192416 100%);background-attachment:fixed;color:var(--ink)}
 .topbar{border-bottom:1px solid #dbe4ee}
 .logo{background:#e0f5f1;border-color:#a8dcd4}
 .status{color:#087f78;border-color:#b7e3dc;background:#e5f7f3}
@@ -375,6 +375,16 @@ body{background:radial-gradient(ellipse 55% 58% at -8% 0%,rgba(12,163,174,.58) 0
 .source-link,.footer a{color:#087f78}
 .result .facts-table .source-link{color:#087f78}
 @media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 16px 38px rgba(24,44,76,.09);border-color:#c8d5e4}}
+/* Forest & burgundy landing canvas: keep light research cards readable. */
+.topbar{border-bottom-color:rgba(255,255,255,.23)}
+.brand,.brand-name,.hero h1{color:#fffdf7}
+.brand-sub,.hero p,.footer{color:#e1ebe2}
+.hero strong{color:#ffffff}
+.kicker{color:#b9f1d4}
+.footer{border-top-color:rgba(255,255,255,.22)}
+.footer a{color:#b9f1d4}
+.status{background:rgba(1,61,27,.82);border-color:rgba(185,241,212,.50);color:#d8ffe9}
+.logo{background:#013d1b;border-color:#4c9471}
 </style>
 </head>
 <body><main>
