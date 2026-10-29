@@ -19,6 +19,7 @@ from urllib.request import Request as URLRequest, urlopen
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(
     title="Signalpost Company Intelligence",
@@ -150,6 +151,8 @@ def search_companies(query: str, size: int = 10) -> list[dict]:
         })
     return results
 
+
+app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
 
 @app.get("/healthz")
 def healthz():
@@ -408,6 +411,6 @@ output.innerHTML='<section class="result"><div class="section-kicker">EVIDENCE R
 finally{button.disabled=false;button.textContent='Run evidence research ↗';}
 });
 })();
-</script></body></html>"""
+</script><script src="/static/signalpost_dashboard.js" defer></script></body></html>"""
     html_page = html_page.replace("__SEARCH_VALUE__", html.escape(q, quote=True))
     return HTMLResponse(html_page)
