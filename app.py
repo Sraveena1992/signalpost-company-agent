@@ -353,7 +353,7 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 
 /* Premium light theme: calmer surfaces, stronger contrast, and less visual weight. */
 :root{color-scheme:light;--bg:#f3f6fb;--panel:#ffffff;--panel2:#f8fafc;--line:#dce4ee;--muted:#58677c;--ink:#152238;--mint:#087f78;--blue:#b77927}
-body{background:radial-gradient(ellipse 58% 62% at -8% -10%,rgba(111,29,27,.88) 0%,transparent 76%),radial-gradient(ellipse 60% 68% at 110% 0%,rgba(0,74,76,.56) 0%,transparent 78%),radial-gradient(ellipse 65% 62% at 50% 115%,rgba(1,76,44,.72) 0%,transparent 78%),linear-gradient(132deg,#192416 0%,#013d1b 48%,#192416 100%);background-attachment:fixed;color:var(--ink)}
+body{background:radial-gradient(ellipse 65% 58% at 8% 0%,rgba(138,74,59,.78),transparent 75%),radial-gradient(ellipse 65% 65% at 100% 12%,rgba(107,43,51,.84),transparent 75%),radial-gradient(ellipse 60% 50% at 50% 100%,rgba(201,182,162,.28),transparent 80%),linear-gradient(135deg,#2a1518 0%,#6b2b33 48%,#2a1518 100%);background-attachment:fixed;color:#f3ece4}
 .topbar{border-bottom:1px solid #dbe4ee}
 .logo{background:#e0f5f1;border-color:#a8dcd4}
 .status{color:#087f78;border-color:#b7e3dc;background:#e5f7f3}
@@ -385,6 +385,15 @@ body{background:radial-gradient(ellipse 58% 62% at -8% -10%,rgba(111,29,27,.88) 
 .footer a{color:#b9f1d4}
 .status{background:rgba(1,61,27,.82);border-color:rgba(185,241,212,.50);color:#d8ffe9}
 .logo{background:#013d1b;border-color:#4c9471}
+
+/* Warm burgundy landing: readable hero and navigation. */
+.topbar{border-bottom-color:rgba(243,236,228,.25)}
+.topbar .brand,.topbar .brand-name,.hero h1{color:#f3ece4}
+.topbar .brand-sub,.hero p{color:#e5d4c5}
+.hero strong{color:#fff8f0}
+.hero .kicker{color:#f0c3ad}
+.footer{color:#e5d4c5;border-top-color:rgba(243,236,228,.22)}
+.footer a{color:#f0c3ad}
 </style>
 </head>
 <body><main>
