@@ -53,7 +53,7 @@ def site_observations(profile: dict) -> list[dict]:
         path = urlparse(url).path.lower().rstrip("/")
         if path in {"", "/"}:
             continue
-        if any(token in path for token in ("/news/", "/press/", "/aktuelt/", "/nyheter/", "/artikler/", "/blog/")):
+        if page.get("article_like") is True and any(token in path for token in ("/news/", "/press/", "/aktuelt/", "/nyheter/", "/artikler/", "/blog/")):
             # Category pages alone do not prove an individual article.
             page_hash = str(page["content_sha256"])
             observations.append({
