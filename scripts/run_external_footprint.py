@@ -30,42 +30,38 @@ def site_observations(profile: dict) -> list[dict]:
         return []
 
     observations: list[dict] = []
-    social_links = value.get("social_links") or []
-    if social_links:
-        observations.append({
-            "id": f"company-site-socials-{org}-{digest[:16]}",
-            "organisation_number": org,
-            "platform": "company_site",
-            "signal_type": "profile_handle",
-            "source_url": value.get("final_url") or website.get("source_url"),
-            "retrieved_at": retrieved,
-            "content_sha256": digest,
-            "exact_entity": True,
-            "identity_proof": list(identity.get("promotion_proof") or []),
-            "acquisition_mode": "permitted_public_page",
-            "rights_status": "approved",
-            "source_class": "company_site",
-            "evidence_span": f"Verified company-owned site links {len(social_links)} public profile handle(s).",
-            "metrics": {"verified_social_links": len(social_links)},
-            "strategy": "company_site_social_crosslinks",
-        })
+    # Only publish item-level observations when the exact fetched company-owned
+    # page is available. A generic homepage is not proof of a specific item.
+    from urllib.parse import urlparse
 
-    news_pages = []
-    for page in value.get("pages") or []:
+    def company_page(page: dict) -> bool:
         url = str(page.get("url") or "")
-        path = url.split("?", 1)[0].lower()
-        if any(token in path for token in ("/news", "/press", "/aktuelt", "/nyheter", "/artikler", "/blog")):
-            news_pages.append(page)
-    if news_pages:
-        page = sorted(news_pages, key=lambda p: str(p.get("url") or ""))[-1]
-        page_hash = str(page.get("content_sha256") or digest)
-        if len(page_hash) == 64:
+        parsed = urlparse(url)
+        home = urlparse(str(value.get("final_url") or ""))
+        return (
+            parsed.scheme in {"http", "https"}
+            and bool(parsed.hostname)
+            and parsed.hostname == home.hostname
+            and bool(page.get("content_sha256"))
+            and len(str(page.get("content_sha256"))) == 64
+        )
+
+    for page in value.get("pages") or []:
+        if not isinstance(page, dict) or not company_page(page):
+            continue
+        url = str(page["url"])
+        path = urlparse(url).path.lower().rstrip("/")
+        if path in {"", "/"}:
+            continue
+        if any(token in path for token in ("/news/", "/press/", "/aktuelt/", "/nyheter/", "/artikler/", "/blog/")):
+            # Category pages alone do not prove an individual article.
+            page_hash = str(page["content_sha256"])
             observations.append({
                 "id": f"company-site-news-{org}-{page_hash[:16]}",
                 "organisation_number": org,
                 "platform": "company_site",
                 "signal_type": "public_post",
-                "source_url": page.get("url"),
+                "source_url": url,
                 "retrieved_at": retrieved,
                 "content_sha256": page_hash,
                 "exact_entity": True,
@@ -73,10 +69,15 @@ def site_observations(profile: dict) -> list[dict]:
                 "acquisition_mode": "permitted_public_page",
                 "rights_status": "approved",
                 "source_class": "company_site",
-                "evidence_span": str(page.get("title") or page.get("main_text_excerpt") or "Company-owned activity page")[:1200],
-                "metrics": {"activity_page": page.get("url")},
+                "evidence_span": str(page.get("title") or page.get("main_text_excerpt") or "")[:1200],
+                "metrics": {"activity_page": url},
                 "strategy": "company_site_activity",
             })
+
+    # Social handles are intentionally not promoted here: the website crawler
+    # currently merges links from multiple pages without recording which exact
+    # company page contained each handle. Do not invent item-level provenance.
+    # Job postings are likewise not emitted without a fetched posting URL.
 
     return observations
 
