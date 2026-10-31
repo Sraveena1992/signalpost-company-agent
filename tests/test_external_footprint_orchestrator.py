@@ -31,6 +31,7 @@ class ExternalFootprintOrchestratorTests(unittest.TestCase):
                         "pages": [{
                             "url": "https://example.no/news/latest",
                             "title": "Latest company update",
+                            "article_like": True,
                             "content_sha256": "b" * 64,
                         }],
                     },
