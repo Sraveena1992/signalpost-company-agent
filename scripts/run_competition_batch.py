@@ -179,6 +179,17 @@ def main() -> None:
                             note="Search candidate independently verified against registry identity.",
                         )
                         tavily_usage["verified"] += 1
+                if "website_discovery" not in profile["evidence"]:
+                    profile["evidence"]["website_discovery"] = evidence(
+                        "website_discovery", "not_found",
+                        "tavily_search_then_independent_crawl",
+                        "https://api.tavily.com/search",
+                        value={
+                            "search_results": discovery.get("search_results"),
+                            "candidate_attempts": len(discovery.get("attempts") or []),
+                        },
+                        note="No candidate passed independent company website identity verification.",
+                    )
             except Exception as exc:
                 tavily_usage["errors"] += 1
                 profile["evidence"]["website_discovery"] = evidence(
