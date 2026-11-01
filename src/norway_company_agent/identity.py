@@ -124,6 +124,7 @@ def assess_social_identity(profile: dict[str, Any], link: dict[str, str]) -> dic
         "publishable": score >= 0.9,
         "matched_tokens": matched,
         "reason": reason,
+        "ownership_verified": False,
         "method": "deterministic_social_handle_identity_v1",
     }
 
