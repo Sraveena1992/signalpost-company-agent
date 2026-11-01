@@ -63,9 +63,19 @@ def assess_website_identity(profile: dict[str, Any]) -> dict[str, Any]:
     normalized_raw = unicodedata.normalize("NFKD", candidate_text).encode("ascii", "ignore").decode().casefold()
     homepage_token_sets = [set(_tokens(part)) for part in homepage_identity_parts if part]
     exact_homepage_name = bool(core and any(set(core).issubset(tokens) for tokens in homepage_token_sets))
+    # Structured publisher identity can reveal that an article mentioning a
+    # subsidiary is hosted on a different legal entity's website.
+    structured_org_names = [name for name in structured_names if _tokens(name)]
+    conflicting_structured_owner = bool(
+        structured_org_names
+        and not any(set(core).issubset(set(_tokens(name))) for name in structured_org_names)
+    )
     substantive_homepage = len(str(value.get("main_text_excerpt") or "").strip()) >= 100
     is_business_sports_club = bool(re.search(r"(?:^|\s)B\.?\s*I\.?\s*L\.?(?:\s|$)", str(profile.get("name") or ""), re.I))
-    if any(marker in normalized_raw for marker in parked_markers):
+    if conflicting_structured_owner and not (org_digits and len(org_digits) >= 9 and org_digits in compact_identity_text):
+        score = 0.3
+        reasons.append("structured publisher organisation differs from the target legal entity; article mention is not ownership proof")
+    elif any(marker in normalized_raw for marker in parked_markers):
         score = 0.1
         reasons.append("captured page is a parked, for-sale, or generic hosting placeholder")
     elif is_business_sports_club and "bedriftsidrett" not in normalized_candidate_text and "b i l" not in normalized_candidate_text:
@@ -124,6 +134,7 @@ def assess_social_identity(profile: dict[str, Any], link: dict[str, str]) -> dic
         "publishable": score >= 0.9,
         "matched_tokens": matched,
         "reason": reason,
+        "ownership_verified": False,
         "method": "deterministic_social_handle_identity_v1",
     }
 

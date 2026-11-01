@@ -15,10 +15,11 @@ import uuid
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import Request as URLRequest, urlopen
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(
     title="Signalpost Company Intelligence",
@@ -76,9 +77,12 @@ async def add_security_headers(request, call_next):
 
 
 def _get_json(url: str) -> dict:
-    request = Request(
+    request = URLRequest(
         url,
-        headers={"Accept": "application/json", "User-Agent": "SignalpostCompanyAgent/1.1"},
+        headers={
+            "Accept": "application/vnd.brreg.enhetsregisteret.enhet.v2+json, application/json;q=0.9",
+            "User-Agent": "SignalpostCompanyAgent/1.2",
+        },
     )
     try:
         with urlopen(request, timeout=12) as response:
@@ -147,6 +151,8 @@ def search_companies(query: str, size: int = 10) -> list[dict]:
         })
     return results
 
+
+app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
 
 @app.get("/healthz")
 def healthz():
@@ -284,10 +290,14 @@ def _search_results(query: str, results: list[dict]) -> str:
 
 
 @app.get("/", response_class=HTMLResponse)
-def home(orgnr: str = Query(default="", max_length=30), q: str = Query(default="", max_length=120)):
+def home(orgnr: str = "", q: str = ""):
+    # Plain Python defaults avoid leaking FastAPI Query objects when this view is
+    # invoked directly by tests or internal callers. Validate again at the boundary.
+    orgnr = str(orgnr or "").strip()[:30]
+    q = str(q or "").strip()[:120]
     result_html = ""
     error_message = ""
-    search_text = q.strip()
+    search_text = q
     direct_orgnr = orgnr.strip() or (search_text if re.fullmatch(r"\d{9}", re.sub(r"\s+", "", search_text)) else "")
     if direct_orgnr:
         try:
@@ -327,6 +337,12 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 .result{min-width:0;max-width:100%;overflow:hidden}
 .result table{width:100%;max-width:100%;table-layout:fixed;display:block;overflow-x:auto}
 .result th,.result td{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+/* Keep evidence source links readable instead of wrapping one character per line. */
+.result .facts-table{display:table;table-layout:auto;overflow:visible;border-collapse:collapse}
+.result .facts-table th:first-child{width:24%}
+.result .facts-table td:nth-child(2){width:48%}
+.result .facts-table th:last-child,.result .facts-table td:last-child{width:120px;min-width:120px;white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.result .facts-table .source-link{white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .evidence-grid{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
 .article-evidence{min-width:0;max-width:100%;overflow:hidden;overflow-wrap:anywhere}
 .article-evidence .source-link{overflow-wrap:anywhere;word-break:break-all}
@@ -334,6 +350,37 @@ main{max-width:1000px;margin:0 auto;padding:26px 22px 60px}.topbar{display:flex;
 .article-evidence details,.result details{min-width:0;max-width:100%}
 @media(max-width:640px){.evidence-grid{grid-template-columns:minmax(0,1fr)}.result table{font-size:12px}.result th,.result td{padding:9px 6px}}
 @media(max-width:640px){main{padding:18px 14px 40px}.hero{padding:39px 0 20px}h1{letter-spacing:-1.7px}.panel,.result{padding:18px;border-radius:17px}.search-row .button{width:100%}.match{align-items:flex-start;flex-direction:column;gap:12px}.match .button{width:100%}.result th{width:40%;padding-right:10px}.result th,.result td{font-size:13px;padding:11px 5px}.purpose{grid-template-columns:1fr}.status{font-size:9px}.topbar{align-items:flex-start}}
+
+/* Fintech premium: cool porcelain, refined indigo, emerald signals. */
+:root{color-scheme:light;--bg:#eef3fa;--panel:#ffffff;--panel2:#f7f9fd;--line:#dce4ef;--muted:#52627a;--ink:#17243c;--mint:#087f78;--blue:#3557a8}
+body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),transparent 78%),radial-gradient(ellipse 54% 52% at 100% 3%,rgba(101,111,210,.20),transparent 78%),radial-gradient(ellipse 64% 42% at 50% 100%,rgba(73,188,165,.12),transparent 80%),linear-gradient(125deg,#f8fbff 0%,#edf3fb 52%,#f3f5ff 100%);background-attachment:fixed;color:#17243c}
+.topbar{border-bottom:1px solid #d8e2ef}
+.brand,.brand-name,.hero h1{color:#17243c}
+.brand-sub,.hero p{color:#52627a}
+.hero strong{color:#253e72}
+.kicker,.section-kicker,.match-type{color:#087f78}
+.logo{background:#e1f5f1;border-color:#b5e1d9}
+.status{color:#087f78;border-color:#b5e1d9;background:#e8f7f4}
+.panel,.result{background:rgba(255,255,255,.97);color:#17243c;border:1px solid #dce4ef;box-shadow:0 16px 42px rgba(28,55,95,.10)}
+.panel h2,.panel h3,.panel h4,.panel b,.panel strong,.panel label,.panel .search-label,.result h2,.result h3,.result b,.result strong,.result label{color:#17243c}
+.panel .hint,.panel .muted,.panel p,.result .hint,.result .muted,.result p{color:#52627a}
+.search-input{background:#f8fafd;border-color:#cbd8e7;color:#17243c}
+.search-input::placeholder{color:#74849b}
+.search-input:focus{border-color:#087f78;box-shadow:0 0 0 3px rgba(8,127,120,.14)}
+.button{background:linear-gradient(110deg,#087f78,#146f91);color:#ffffff;font-weight:750}
+.button:hover{filter:brightness(1.07)}
+.button.secondary{background:#fff;border-color:#cbd8e7;color:#253e72}
+.result th,.result td{border-bottom-color:#e7edf5}
+.result-actions{border-top-color:#dce4ef}
+.purpose article{background:#f7f9fd;border-color:#e1e8f2;color:#17243c}
+.purpose article b,.purpose article .purpose-icon{color:#146f91}
+.purpose article p{color:#52627a}
+.error{background:#fff1f2;border-color:#fecdd3;color:#881337}
+.error p{color:#9f1239}
+.source-link,.panel a,.result .facts-table .source-link{color:#087f78}
+.footer{color:#52627a;border-top-color:#d8e2ef}
+.footer a{color:#087f78}
+@media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 20px 48px rgba(28,55,95,.15);border-color:#c8d7e8}}
 </style>
 </head>
 <body><main>
@@ -365,11 +412,11 @@ const displayValue=value=>value===null||value===undefined?'—':(typeof value===
 for(const fact of (synthesis.facts||[]))facts+='<tr><th>'+esc(fact.claim)+'</th><td>'+esc(displayValue(fact.value))+'</td><td>'+(fact.source_url?'<a class="source-link" target="_blank" rel="noopener noreferrer" href="'+esc(fact.source_url)+'">Source ↗</a>':'Source unavailable')+'</td></tr>';
 const factCount=(synthesis.facts||[]).length, availableModules=Object.values(evidence).filter(item=>item.status==='available').length;
 const overview=synthesis.summary||('Research returned '+factCount+' source-linked facts across '+availableModules+' available evidence modules. Open each module below to inspect source records and uncertainty notes.');
-output.innerHTML='<section class="result"><div class="section-kicker">EVIDENCE RESEARCH RESULT</div><h2>'+esc(profile.name||data.company?.name)+'</h2><p class="hint">Run '+esc(data.run_id)+' · '+esc(data.terminal?.terminal_state||data.terminal?.status||'Completed')+'</p><h3>Source-linked synthesis</h3><p>'+esc(overview)+'</p><p class="hint">Baseline: '+esc(synthesis.change_status||'not stated')+' · Facts: '+esc(factCount)+' · Unsupported/uncertain: '+esc((synthesis.unsupported_or_uncertain||[]).length)+'</p>'+(facts?'<table>'+facts+'</table>':'')+'<h3>Module evidence</h3><div class="purpose evidence-grid">'+cards+'</div><details><summary>Run report and terminal envelope</summary><pre>'+esc(JSON.stringify({terminal:data.terminal,report:data.report,unsupported_or_uncertain:synthesis.unsupported_or_uncertain,changes:profile.changes},null,2))+'</pre></details><p class="hint">'+esc(data.scope_note)+'</p></section>';
+output.innerHTML='<section class="result"><div class="section-kicker">EVIDENCE RESEARCH RESULT</div><h2>'+esc(profile.name||data.company?.name)+'</h2><p class="hint">Run '+esc(data.run_id)+' · '+esc(data.terminal?.terminal_state||data.terminal?.status||'Completed')+'</p><h3>Source-linked synthesis</h3><p>'+esc(overview)+'</p><p class="hint">Baseline: '+esc(synthesis.change_status||'not stated')+' · Facts: '+esc(factCount)+' · Unsupported/uncertain: '+esc((synthesis.unsupported_or_uncertain||[]).length)+'</p>'+(facts?'<table class="facts-table">'+facts+'</table>':'')+'<h3>Module evidence</h3><div class="purpose evidence-grid">'+cards+'</div><details><summary>Run report and terminal envelope</summary><pre>'+esc(JSON.stringify({terminal:data.terminal,report:data.report,unsupported_or_uncertain:synthesis.unsupported_or_uncertain,changes:profile.changes},null,2))+'</pre></details><p class="hint">'+esc(data.scope_note)+'</p></section>';
 }catch(error){output.innerHTML='<section class="error"><strong>Research could not be completed</strong><p>'+esc(error.message)+'</p></section>';}
 finally{button.disabled=false;button.textContent='Run evidence research ↗';}
 });
 })();
-</script></body></html>"""
+</script><script src="/static/signalpost_dashboard.js" defer></script></body></html>"""
     html_page = html_page.replace("__SEARCH_VALUE__", html.escape(q, quote=True))
     return HTMLResponse(html_page)

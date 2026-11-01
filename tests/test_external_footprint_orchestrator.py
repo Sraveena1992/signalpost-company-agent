@@ -31,6 +31,7 @@ class ExternalFootprintOrchestratorTests(unittest.TestCase):
                         "pages": [{
                             "url": "https://example.no/news/latest",
                             "title": "Latest company update",
+                            "article_like": True,
                             "content_sha256": "b" * 64,
                         }],
                     },
@@ -43,9 +44,20 @@ class ExternalFootprintOrchestratorTests(unittest.TestCase):
 
     def test_verified_site_produces_evidence_complete_observations(self):
         rows = site_observations(self.profile(True))
-        self.assertEqual(len(rows), 2)
-        self.assertEqual({row["signal_type"] for row in rows}, {"profile_handle", "public_post"})
+        self.assertEqual(len(rows), 1)
+        self.assertEqual({row["signal_type"] for row in rows}, {"public_post"})
+        self.assertEqual(rows[0]["source_url"], "https://example.no/news/latest")
         self.assertTrue(all(publishable_observation(row) for row in rows))
+
+    def test_generic_news_category_is_not_an_article(self):
+        profile = self.profile(True)
+        profile["evidence"]["website"]["value"]["pages"][0]["url"] = "https://example.no/news"
+        self.assertEqual(site_observations(profile), [])
+
+    def test_off_domain_news_page_is_rejected(self):
+        profile = self.profile(True)
+        profile["evidence"]["website"]["value"]["pages"][0]["url"] = "https://unrelated.no/news/latest"
+        self.assertEqual(site_observations(profile), [])
 
 
 if __name__ == "__main__":
