@@ -51,6 +51,13 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
 
             dated_records = [record for record in records if period_end(record)]
             latest = max(dated_records, key=period_end) if dated_records else records[0]
+            if latest.get("revenue") is not None:
+                facts.append(_claim("Revenue accounting scope", latest.get("revenue_scope") or
+                    {"SELSKAP": "company (standalone)", "KONSERN": "group (consolidated)"}.get(
+                        str(latest.get("account_type") or "").upper(), "unknown"), financial, "official_annual_account"))
+                facts.append(_claim("Revenue currency", latest.get("currency") or "not specified", financial, "official_annual_account"))
+                if latest.get("revenue_yoy"):
+                    facts.append(_claim("Revenue year-over-year change", latest["revenue_yoy"], financial, "derived_from_official_annual_accounts"))
             for label, key in (
                 ("Reporting period", "period"),
                 ("Revenue", "revenue"),
