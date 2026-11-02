@@ -15,7 +15,7 @@ jobs:
   check-live:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Verify official registry search API directly
         run: |
           set -euo pipefail
