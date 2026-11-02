@@ -4,9 +4,9 @@
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-087F78?logo=render&logoColor=white)](https://signalpost-company-agent.onrender.com/)
 [![API Docs](https://img.shields.io/badge/API-Documentation-2563EB?logo=fastapi&logoColor=white)](https://signalpost-company-agent.onrender.com/docs)
-[![Source](https://img.shields.io/badge/GitHub-Source_Code-24292F?logo=github&logoColor=white)](https://github.com/Sraveena1992/signalpost-company-agent/tree/fix/exact-batch-membership)
-[![Tests](https://img.shields.io/badge/Tests-Validation-20885B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/fix/exact-batch-membership/README.md#testing-and-validation)
-[![Smoke Report](https://img.shields.io/badge/100_Companies-Smoke_Report-8A4A3B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/fix/exact-batch-membership/out/smoke-report.json)
+[![Source](https://img.shields.io/badge/GitHub-Source_Code-24292F?logo=github&logoColor=white)](https://github.com/Sraveena1992/signalpost-company-agent/tree/integration/signalpost-final-20261101)
+[![Tests](https://img.shields.io/badge/Tests-Validation-20885B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/integration/signalpost-final-20261101/README.md#testing-and-validation)
+[![Smoke Report](https://img.shields.io/badge/100_Companies-Smoke_Report-8A4A3B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/integration/signalpost-final-20261101/out/smoke-report-20261102.json)
 
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
 
@@ -24,7 +24,7 @@
 | Batch safeguards | Duplicate-input checks, terminal-state checks and exact organisation membership validation |
 | Public web interface | Company-name/number search plus on-demand single-company evidence research |
 | API | JSON company lookup and health endpoint |
-| Automated regression suite | Latest recorded successful run: 123 tests and 7 subtests |
+| Automated regression suite | Latest verified run (November 2, 2026): 143 tests and 7 subtests passed |
 
 ## Live demo
 
@@ -258,3 +258,27 @@ The smoke test validates output contracts, exact membership and provenance requi
 - Website identity assessments can require human review; company-controlled content is not automatically verified.
 - Registry and third-party source availability can affect completeness.
 - Default-run paid API/model cost excludes hosting and infrastructure.
+
+## November 2, 2026 — Verified 100-company smoke test
+
+The local recovery run completed successfully.
+
+| Metric | Result |
+|---|---|
+| Expected organisations | 100 |
+| Input organisations | 100 |
+| Terminal envelopes | 100 |
+| Validation checks | 7/7 passed |
+| Resumed profiles | 60 |
+| Newly fetched profiles | 40 |
+| Missing organisations | 0 |
+| Unexpected organisations | 0 |
+| Available module records | 687 / 1,000 |
+| Source-error module records | 45 / 1,000 |
+| Paid third-party API cost | $0.00 (hosting excluded) |
+
+**Evidence:** [November 2 smoke report](out/smoke-report-20261102.json)
+
+The validation establishes exact batch membership, output contracts and available-evidence provenance. It does not establish perfect research accuracy.
+
+The reported request and latency metrics describe the resumed execution, not cumulative operations across all checkpoint sessions.
