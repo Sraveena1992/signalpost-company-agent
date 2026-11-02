@@ -45,7 +45,9 @@ def observation(profile: dict) -> dict | None:
         # publication date, article markup, meaningful text, a non-menu title,
         # and exact legal-name token coverage in the article itself.
         if (
-            NEWS_PATH.search(path)
+            urlparse(str(page.get("url") or "")).scheme in {"http", "https"}
+            and urlparse(str(page.get("url") or "")).hostname
+            and NEWS_PATH.search(path)
             and published_at
             and page.get("article_like") is True
             and len(excerpt) >= 120
@@ -62,7 +64,7 @@ def observation(profile: dict) -> dict | None:
     page = pages[0]
     url = str(page.get("url") or "")
     digest = str(page.get("content_sha256") or "")
-    if not url.startswith(("http://", "https://")) or len(digest) != 64:
+    if not urlparse(url).hostname or urlparse(url).scheme not in {"http", "https"} or not re.fullmatch(r"[0-9a-fA-F]{64}", digest):
         return None
     org = str(profile["organisation_number"])
     title = str(page.get("title") or "Company news/activity page").strip()

@@ -35,10 +35,10 @@ def observation(profile: dict) -> dict | None:
         "acquisition_mode": "permitted_public_page",
         "rights_status": "approved",
         "source_class": "company_site",
-        "evidence_span": f"Exact company site snapshot with {len(pages)} bounded pages and {len(socials)} verified social links.",
+        "evidence_span": f"Exact company site snapshot with {len(pages)} bounded pages and {len(socials)} name-matched social links (ownership not independently verified).",
         "metrics": {
             "bounded_pages_captured": len(pages),
-            "verified_social_links": len(socials),
+            "name_matched_social_links": len(socials),
             "structured_organisation_records": len(value.get("structured_organisations") or []),
             "extraction_state": value.get("extraction_state"),
             "interpretation": "Observed site-surface completeness; not audience traffic or popularity.",

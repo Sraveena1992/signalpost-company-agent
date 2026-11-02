@@ -71,10 +71,30 @@ def _get(value: Any, *path: str) -> Any:
     return value
 
 
+def _financial_period_sort_key(item: Any) -> str:
+    """Return the period end date used to select the newest annual account first."""
+    if not isinstance(item, dict):
+        return ""
+    period = item.get("regnskapsperiode") or {}
+    if not isinstance(period, dict):
+        return ""
+    # ISO dates sort lexicographically; missing dates sort after dated records
+    # only when all records lack a usable period.
+    return str(period.get("tilDato") or period.get("fraDato") or "")
+
+
 def normalize_financials(body: Any) -> dict[str, Any]:
     records = body if isinstance(body, list) else []
     if not records:
         return {"records": []}
+    # The API response order is not a reliable recency contract. Sort all records
+    # before limiting the payload so an older first page/order cannot hide newer
+    # submitted accounts from the synthesis layer.
+    records = sorted(
+        records,
+        key=lambda item: (_financial_period_sort_key(item), str(item.get("id") or "")),
+        reverse=True,
+    )
     normalized = []
     for item in records[:3]:
         normalized.append({
@@ -90,6 +110,40 @@ def normalize_financials(body: Any) -> dict[str, Any]:
             "equity": _get(item, "egenkapitalGjeld", "egenkapital", "sumEgenkapital"),
             "debt": _get(item, "egenkapitalGjeld", "gjeldOversikt", "sumGjeld"),
         })
+    # Compare only consecutive years of the same accounting scope and currency.
+    # Never compare group (KONSERN) totals against standalone (SELSKAP) totals.
+    scope_names = {"KONSERN": "group (consolidated)", "SELSKAP": "company (standalone)"}
+    for current in normalized:
+        account_type = str(current.get("account_type") or "").upper()
+        current["revenue_scope"] = scope_names.get(account_type, f"unclassified ({account_type})" if account_type else "unknown")
+        period = current.get("period") or {}
+        end = str(period.get("tilDato") or "")
+        current_year = int(end[:4]) if len(end) >= 4 and end[:4].isdigit() else None
+        current["revenue_yoy"] = None
+        amount = current.get("revenue")
+        if current_year is None or not isinstance(amount, (int, float)) or isinstance(amount, bool):
+            continue
+        previous = next((
+            row for row in normalized
+            if row is not current
+            and str(row.get("account_type") or "").upper() == account_type
+            and row.get("currency") == current.get("currency")
+            and str((row.get("period") or {}).get("tilDato") or "")[:4] == str(current_year - 1)
+            and isinstance(row.get("revenue"), (int, float))
+            and not isinstance(row.get("revenue"), bool)
+        ), None)
+        if previous is None:
+            continue
+        prior = previous["revenue"]
+        current["revenue_yoy"] = {
+            "previous_year": current_year - 1,
+            "current_year": current_year,
+            "previous_revenue": prior,
+            "absolute_change": amount - prior,
+            "percentage_change": round((amount - prior) / abs(prior) * 100, 2) if prior else None,
+            "currency": current.get("currency"),
+            "account_type": current.get("account_type"),
+        }
     return {"records": normalized}
 
 
@@ -128,7 +182,15 @@ def normalize_roles(body: Any) -> dict[str, Any]:
             person = item.get("person") or {}
             name = person.get("navn") or {}
             entity = item.get("enhet") or {}
-            display_name = " ".join(filter(None, [name.get("fornavn"), name.get("mellomnavn"), name.get("etternavn")])) or entity.get("navn")
+            entity_name = entity.get("navn")
+            if isinstance(entity_name, list):
+                entity_name = " ".join(str(part).strip() for part in entity_name if part)
+
+            display_name = " ".join(filter(None, [
+                name.get("fornavn"),
+                name.get("mellomnavn"),
+                name.get("etternavn"),
+            ])) or entity_name
             roles.append({
                 "name": display_name or None,
                 "organisation_number": entity.get("organisasjonsnummer"),

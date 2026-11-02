@@ -91,7 +91,7 @@ class PublicAppSecurityTests(unittest.TestCase):
     def test_unexpected_homepage_search_error_is_sanitized(self):
         from app import home
         with patch("app.search_companies", side_effect=TypeError("internal diagnostic must not leak")):
-            response = home(q="ZAP")
+            response = home(orgnr="", q="ZAP")
         self.assertEqual(response.status_code, 200)
         self.assertIn("The company search could not be completed. Please retry later.", response.body.decode())
         self.assertNotIn("internal diagnostic must not leak", response.body.decode())
@@ -1287,6 +1287,24 @@ class OfficialNormalizationTests(unittest.TestCase):
         self.assertEqual(record["name"], "Ada Nord")
         self.assertNotIn("fodselsdato", json.dumps(record))
 
+    def test_public_roles_normalize_organisation_name(self):
+        body = {
+            "rollegrupper": [{
+                "type": {"kode": "REGN", "beskrivelse": "Regnskapsfører"},
+                "roller": [{
+                    "type": {"kode": "REGN", "beskrivelse": "Regnskapsfører"},
+                    "enhet": {
+                        "navn": ["FALKEBLIKK 2 AS"],
+                        "organisasjonsnummer": "932319020",
+                    },
+                }],
+            }],
+        }
+
+        record = normalize_roles(body)["roles"][0]
+
+        self.assertEqual(record["name"], "FALKEBLIKK 2 AS")
+        self.assertEqual(record["organisation_number"], "932319020")
 
 class ResearchAgentTests(unittest.TestCase):
     @staticmethod

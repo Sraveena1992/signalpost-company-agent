@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -20,6 +21,7 @@ from norway_company_agent.official import accounting_obligation_assessment, fetc
 from norway_company_agent.website import fetch_website  # noqa: E402
 from scripts.extract_company_site_activity import observation as site_activity_observation  # noqa: E402
 from scripts.extract_company_site_news import observation as site_news_observation  # noqa: E402
+from scripts.run_tavily_discovery import discover as tavily_discover  # noqa: E402
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -42,6 +44,8 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--expected-count", type=int, help="Optional exact input count; default is the batch's actual count")
     parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument("--tavily-discovery", action="store_true", help="Enable optional Tavily website discovery")
+    parser.add_argument("--tavily-max-requests", type=int, default=1, help="Maximum Tavily searches per run")
     parser.add_argument("--checkpoint-every", type=int, default=25)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument(
@@ -81,6 +85,16 @@ def main() -> None:
         requested_modules.insert(0, "registry_live")
     fetch_modules = set(requested_modules) - {"registry", "accounting_obligation", "website"}
     operations = {"requests": 0, "bytes": 0, "latencies_ms": []}
+
+    if args.tavily_discovery:
+        if args.workers != 1:
+            parser.error("--tavily-discovery requires --workers 1 for controlled API usage")
+        if args.tavily_max_requests < 1:
+            parser.error("--tavily-max-requests must be positive")
+        if not os.environ.get("TAVILY_API_KEY", "").strip():
+            parser.error("TAVILY_API_KEY is missing")
+
+    tavily_usage = {"requests": 0, "verified": 0, "errors": 0}
 
     def enrich(profile: dict) -> tuple[dict, dict]:
         records, metrics = fetch_official_modules(profile["organisation_number"], fetch_modules)
@@ -126,6 +140,64 @@ def main() -> None:
                     "website", "source_error", "company_website",
                     str(profile.get("website") or "https://www.brreg.no/"),
                     note=f"Website module failed safely: {type(exc).__name__}",
+                )
+
+        if (
+            args.tavily_discovery
+            and "website" in requested_modules
+            and not profile.get("website")
+            and tavily_usage["requests"] < args.tavily_max_requests
+        ):
+            tavily_usage["requests"] += 1
+            try:
+                discovery = tavily_discover(
+                    profile,
+                    os.environ["TAVILY_API_KEY"],
+                )
+                discovered_url = (
+                    discovery.get("website_url")
+                    if discovery.get("status") == "verified"
+                    else None
+                )
+                crawl_metrics = discovery.get("crawl_metrics") or {}
+                website_metrics["requests"] += crawl_metrics.get("requests", 0)
+                website_metrics["bytes"] += crawl_metrics.get("bytes", 0)
+                website_metrics["latencies_ms"].extend(
+                    crawl_metrics.get("latencies_ms", [])
+                )
+
+                if discovered_url:
+                    verified_record = discovery.get("website_record") or {}
+                    if verified_record.get("status") == "available":
+                        profile["evidence"]["website"] = verified_record
+                        profile["evidence"]["website_discovery"] = evidence(
+                            "website_discovery",
+                            "available",
+                            "tavily_search_then_independent_crawl",
+                            discovered_url,
+                            value={"verified_page_url": discovered_url},
+                            note="Search candidate independently verified against registry identity.",
+                        )
+                        tavily_usage["verified"] += 1
+                if "website_discovery" not in profile["evidence"]:
+                    profile["evidence"]["website_discovery"] = evidence(
+                        "website_discovery", "not_found",
+                        "tavily_search_then_independent_crawl",
+                        "https://api.tavily.com/search",
+                        value={
+                            "search_results": discovery.get("search_results"),
+                            "candidate_attempts": len(discovery.get("attempts") or []),
+                        },
+                        note="No candidate passed independent company website identity verification.",
+                    )
+            except Exception as exc:
+                tavily_usage["errors"] += 1
+                profile["evidence"]["website_discovery"] = evidence(
+                    "website_discovery",
+                    "source_error",
+                    "tavily_search_then_independent_crawl",
+                    "https://api.tavily.com/search",
+                    note=f"Optional discovery failed safely: {type(exc).__name__}",
                 )
 
         if "public_activity" in requested_modules:
@@ -277,8 +349,19 @@ def main() -> None:
         "registry": registry_metadata,
         "refresh": change_counts,
         "operations": operations,
-        "third_party_cost_usd": 0.0,
-        "cost_basis": "Default modules make no paid model/API calls; excludes hosting and general infrastructure.",
+        "third_party_cost_usd": None if args.tavily_discovery else 0.0,
+        "cost_basis": (
+            "Tavily usage may consume free credits or incur charges; monetary cost not calculated."
+            if args.tavily_discovery
+            else "Default modules make no paid model/API calls; excludes hosting and general infrastructure."
+        ),
+        "tavily_discovery": {
+            "enabled": args.tavily_discovery,
+            "max_requests": args.tavily_max_requests if args.tavily_discovery else 0,
+            "search_attempts": tavily_usage["requests"],
+            "verified_sites": tavily_usage["verified"],
+            "errors": tavily_usage["errors"],
+        },
         "validation": validation,
     }
     Path(args.report).parent.mkdir(parents=True, exist_ok=True)
