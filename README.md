@@ -4,9 +4,9 @@
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-087F78?logo=render&logoColor=white)](https://signalpost-company-agent.onrender.com/)
 [![API Docs](https://img.shields.io/badge/API-Documentation-2563EB?logo=fastapi&logoColor=white)](https://signalpost-company-agent.onrender.com/docs)
-[![Source](https://img.shields.io/badge/GitHub-Source_Code-24292F?logo=github&logoColor=white)](https://github.com/Sraveena1992/signalpost-company-agent/tree/integration/signalpost-final-20261101)
-[![Tests](https://img.shields.io/badge/Tests-Validation-20885B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/integration/signalpost-final-20261101/README.md#testing-and-validation)
-[![Smoke Report](https://img.shields.io/badge/100_Companies-Smoke_Report-8A4A3B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/integration/signalpost-final-20261101/out/smoke-report-20261102.json)
+[![Source](https://img.shields.io/badge/GitHub-Source_Code-24292F?logo=github&logoColor=white)](https://github.com/Sraveena1992/signalpost-company-agent/tree/main)
+[![Tests](https://img.shields.io/badge/Tests-Validation-20885B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/main/README.md#testing-and-validation)
+[![Smoke Report](https://img.shields.io/badge/100_Companies-Smoke_Report-8A4A3B)](https://github.com/Sraveena1992/signalpost-company-agent/blob/main/out/smoke-report-20261102.json)
 
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
 
@@ -139,7 +139,7 @@ After installing locked dependencies and placing the supplied organisation-numbe
 uv run python scripts/run_competition_batch.py --organisations data/organisations.jsonl --output artifacts/terminal-results.jsonl --profiles-output artifacts/profiles.jsonl --report artifacts/run-report.json --run-id signalpost-final
 ```
 
-The optional `--bulk path/to/brreg-snapshot.csv` flag seeds profiles from a frozen official registry snapshot; without it, the runner starts from the live Brønnøysund API. The input file is evaluator-owned and must not be replaced with a hard-coded company list. For the required 100-company smoke test, the repository now includes `scripts/run_100_company_smoke.py`. It downloads the official Brønnøysund entity snapshot, selects a deterministic sample of 100 active organisations with 2025 annual-account records, runs the real batch CLI, and writes terminal results, profiles, and a JSON run report. GitHub Actions workflow [`100-company-smoke.yml`](.github/workflows/100-company-smoke.yml) runs this check and uploads those files as an artifact. The sample is a local smoke test only, not Builderr's official scoring batch.
+The optional `--bulk path/to/brreg-snapshot.csv` flag seeds profiles from a frozen official registry snapshot; without it, the runner starts from the live Brønnøysund API. The input file is evaluator-owned and must not be replaced with a hard-coded company list. For the required 100-company smoke test, the repository now includes `scripts/run_100_company_smoke.py`. It downloads the official Brønnøysund entity snapshot, selects a deterministic sample of 100 active organisations with 2025 annual-account records, runs the real batch CLI, and writes terminal results, profiles, and a JSON run report. GitHub Actions workflow [`100-company-smoke-test.yml`](.github/workflows/100-company-smoke-test.yml) runs this check and uploads those files as an artifact. The sample is a local smoke test only, not Builderr's official scoring batch.
 
 The public terminal-state vocabulary is exactly: `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, and `failed`. Internal fetch states are mapped to this vocabulary before output. The validator checks the expected count, unique IDs, exact input membership, allowed entity/module states, and source URL plus retrieval time for available evidence. A per-company exception is emitted as an explicit failed state rather than silently dropping that input.
 
@@ -149,7 +149,7 @@ The project also includes batch utilities in [`src/norway_company_agent/batch.py
 
 ## Testing and validation
 
-The latest confirmed GitHub Actions regression run passed **123 tests and 7 subtests**:
+An earlier GitHub Actions regression run passed **123 tests and 7 subtests**:
 
 https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/39905813739
 
