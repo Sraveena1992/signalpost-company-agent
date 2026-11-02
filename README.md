@@ -212,9 +212,9 @@ Do not commit private API keys, credentials, or large local registry downloads. 
 **Maintainer:** Raveena Sharma  
 **Repository:** https://github.com/Sraveena1992/signalpost-company-agent
 
-## Final submission verification — 29 October 2026
+## Historical verification — 29 October 2026
 
-**Submission branch:** `fix/exact-batch-membership`
+**Release integration branch:** `integration/signalpost-final-20261101`
 
 **Latest locally verified regression run:**
 `uv run --frozen python -m pytest -q`
