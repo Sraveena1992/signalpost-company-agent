@@ -12,6 +12,27 @@
 
 > Signalpost is designed to identify Norwegian companies, collect evidence from permitted sources, preserve source provenance, and produce structured outputs that can be checked and rerun.
 
+## ✨ SIGNALPOST Web Experience — Built with JBOX
+
+> **Know the company. Verify the evidence.** Discover Norwegian companies, compare registry facts side by side, and follow the original sources.
+
+[![Explore JBOX Website](https://img.shields.io/badge/JBOX-Open_Interactive_Website-087F73?style=for-the-badge)](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/)
+[![Compare Companies](https://img.shields.io/badge/Compare-Two_Companies-101D32?style=for-the-badge)](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/compare)
+[![Inspect Evidence](https://img.shields.io/badge/Evidence-Inspect_Original_Sources-087F73?style=for-the-badge)](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/explore)
+
+**🌐 [Launch the JBOX-built SIGNALPOST website](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/)** · **🔎 [Explore companies](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/explore)** · **⚖️ [Compare companies](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/compare)** · **📚 [Methodology](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/about)**
+
+| Explore | Compare | Verify | Research |
+|:--|:--|:--|:--|
+| Search Norwegian companies by name or organisation number | Contrast two real registry records; swap and replace selections | Open official Brønnøysund source records for displayed registry facts | Run the existing evidence-rich SIGNALPOST pipeline on demand |
+| Read public company profiles | Share a two-company comparison link | See missing fields rather than fabricated values | Inspect returned company, terminal, profile and report sections |
+
+**Try a real company:** [EQUINOR ASA — 923609016](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/company/923609016) · [DNB BANK ASA — 984851006](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/company/984851006) · [DNB evidence inspector](https://xoejf74ky19lkpr0t0quic93.preview.jboxai.com/evidence/984851006)
+
+> **Publishing status (5 Nov 2026):** This is a **JBOX preview URL**, not a confirmed production deployment. The JBOX workspace reported a successful production build, but its **Publish** action displayed *“This part of JBOX is not available right now.”* The tested browser flows include registry lookup, company comparison, swap/replace, link copying and a completed on-demand DNB research response. This is not a claim of exhaustive accuracy testing or official Builderr judging approval.
+
+---
+
 ## At a glance
 
 | Capability | Current implementation |
