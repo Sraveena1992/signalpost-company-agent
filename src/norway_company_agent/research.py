@@ -41,16 +41,9 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     if all_topics or any(term in q for term in financial_terms):
         records = (financial.get("value") or {}).get("records") or []
         if records:
-            # Defend synthesis against records created by older snapshots or
-            # alternate callers that did not normalize financial recency.
-            def period_end(record: dict[str, Any]) -> str:
-                period = record.get("period") or {}
-                if not isinstance(period, dict):
-                    return ""
-                return str(period.get("tilDato") or period.get("fraDato") or "")
-
-            dated_records = [record for record in records if period_end(record)]
-            latest = max(dated_records, key=period_end) if dated_records else records[0]
+            # Apply the same dated, standalone-aware selection to the
+            # narrative answer and the screen/filter query interface.
+            latest = _latest_financial(row)
             if latest.get("revenue") is not None:
                 facts.append(_claim("Revenue accounting scope", latest.get("revenue_scope") or
                     {"SELSKAP": "company (standalone)", "KONSERN": "group (consolidated)"}.get(
@@ -125,8 +118,27 @@ UNSUPPORTED_SCREEN_TERMS = {
 
 
 def _latest_financial(row: dict[str, Any]) -> dict[str, Any]:
-    records = ((row.get("evidence", {}).get("financials", {}).get("value") or {}).get("records") or [])
-    return records[0] if records else {}
+    """Use the newest dated account, preferring standalone accounts for the same period.
+
+    Input ordering is not guaranteed. Avoid silently using a consolidated
+    group figure when a same-period standalone record exists.
+    """
+    financial = (row.get("evidence") or {}).get("financials") or {}
+    if financial.get("status") != "available":
+        return {}
+    records = ((financial.get("value") or {}).get("records") or [])
+    candidates = [record for record in records if isinstance(record, dict)]
+    if not candidates:
+        return {}
+
+    def key(record: dict[str, Any]) -> tuple[str, int, int]:
+        period = record.get("period") or {}
+        end = str(period.get("tilDato") or period.get("fraDato") or "") if isinstance(period, dict) else ""
+        scope = str(record.get("account_type") or "").upper()
+        standalone = scope == "SELSKAP" or str(record.get("revenue_scope") or "").casefold().startswith("company")
+        return (end, int(standalone), int(record.get("revenue") is not None))
+
+    return max(candidates, key=key)
 
 
 def _numeric_operator(phrase: str) -> str:
