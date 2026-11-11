@@ -1,0 +1,54 @@
+name: experimental-fresh-100-company-benchmark
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "scripts/audit_coverage.py"
+      - "src/norway_company_agent/**"
+      - ".github/workflows/experimental-fresh-benchmark.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked dependencies
+        run: uv sync --frozen --all-groups
+      - name: Select deterministic 100 organisations and perform a fresh run
+        run: |
+          SIGNALPOST_SMOKE_DIR="${{ github.workspace }}/artifacts/experimental-smoke" \
+          SIGNALPOST_DATA_DIR="${{ github.workspace }}/.smoke-data" \
+          uv run python scripts/run_100_company_smoke.py
+      - name: Audit module coverage and cache reuse
+        run: |
+          uv run python scripts/audit_coverage.py \
+            --report artifacts/experimental-smoke/run-report.json \
+            --profiles artifacts/experimental-smoke/profiles.jsonl \
+            --out artifacts/experimental-smoke/coverage-report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("artifacts/experimental-smoke/run-report.json").read_text())
+          assert report["validation"]["passed"]
+          assert report["input_count"] == report["emitted_envelopes"] == 100
+          assert report["resumed_profiles"] == 0, "Benchmark must fetch every profile fresh"
+          assert report["profiles_fetched_this_run"] == 100
+          print("Fresh benchmark completed and contract validated")
+          PY
+      - name: Upload experimental benchmark outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experimental-100-company-coverage
+          path: artifacts/experimental-smoke/
+          if-no-files-found: warn
+          retention-days: 30
