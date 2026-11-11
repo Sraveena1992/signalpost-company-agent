@@ -1,5 +1,5 @@
 """Regression cases for selecting the right annual account in financial screening."""
-from norway_company_agent.research import _latest_financial, answer_profile, screen_companies
+from norway_company_agent.research import _latest_financial, answer_profile
 
 
 def _row(records, status="available"):
