@@ -367,7 +367,12 @@ body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),tr
 .search-input{background:#f8fafd;border-color:#cbd8e7;color:#17243c}
 .search-input::placeholder{color:#74849b}
 .search-input:focus{border-color:#087f78;box-shadow:0 0 0 3px rgba(8,127,120,.14)}
-.button{background:linear-gradient(110deg,#087f78,#146f91);color:#ffffff;font-weight:750}
+.button{background:linear-gradient(110deg,#087f78,#146f91);color:#ffffff!important;font-weight:750}
+.panel a.button,.result a.button{color:#ffffff!important;text-decoration:none}
+.panel a.button:hover,.result a.button:hover{background:#075f5d;color:#ffffff!important}
+.panel a.button.secondary,.result a.button.secondary{color:#253e72!important}
+.panel a.button.secondary:hover,.result a.button.secondary:hover{background:#e8eff7;color:#17243c!important}
+.button:focus-visible{outline:3px solid #12a99b;outline-offset:3px}
 .button:hover{filter:brightness(1.07)}
 .button.secondary{background:#fff;border-color:#cbd8e7;color:#253e72}
 .result th,.result td{border-bottom-color:#e7edf5}
