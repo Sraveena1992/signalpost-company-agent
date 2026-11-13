@@ -117,3 +117,28 @@ def test_company_owned_jobposting_requires_date_exact_company_and_source():
     item["hiringOrganization"] = {"name": "EXAMPLE AS"}
     item["url"] = "https://squarespace.com/jobs/backend"
     assert job_observation(profile) is None
+
+
+def test_synthesis_reports_verified_business_and_honest_unknowns():
+    from norway_company_agent.batch import attach_synthesis
+    profile = {
+        "organisation_number": "999999991",
+        "name": "EXAMPLE AS",
+        "industry": {"beskrivelse": "Computer programming"},
+        "evidence": {
+            "registry_live": {
+                "status": "available",
+                "value": {"name": "EXAMPLE AS"},
+                "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/999999991",
+                "retrieved_at": "2026-11-13T00:00:00Z",
+            },
+            "financials": {"status": "not_found"},
+            "website": {"status": "ambiguous"},
+        },
+    }
+    attach_synthesis(profile)
+    overview = profile["synthesis"]["overview"]
+    assert any("Computer programming" in entry["text"] for entry in overview)
+    assert all(entry["source_url"] and entry["retrieved_at"] for entry in overview)
+    assert profile["synthesis"]["what_changed"]["status"] == "no_previous_snapshot"
+    assert any(item["topic"] == "normalized annual accounts" for item in profile["synthesis"]["unknowns"])
