@@ -54,7 +54,7 @@ def main():
         landing = browser.new_page(viewport={"width":1365,"height":900})
         landing.on("pageerror", lambda e: result["console_errors"].append(str(e)))
         landing.goto(BASE+"/",wait_until="domcontentloaded")
-        landing.locator("#featured-status").get_by_text("300 legal entities").wait_for(timeout=45000)
+        landing.locator("#featured-status").filter(has_text="300 legal entities").wait_for(timeout=45000)
         assert landing.locator("#featured-results article.company-card").count() == 12
         landing.locator("#featured-filter").fill("WEBLANCE")
         assert landing.locator("#featured-results article.company-card").count() == 1
