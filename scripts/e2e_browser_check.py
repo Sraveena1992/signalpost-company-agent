@@ -47,6 +47,7 @@ def main():
         original = page.url
         page.reload(wait_until="domcontentloaded")
         page.locator("#aname").filter(has_text="WEBLANCE AS").wait_for(timeout=30000)
+        page.locator("#bname").filter(has_text="SANDNES ELEKTRISKE AS").wait_for(timeout=30000)
         assert parse_qs(urlparse(page.url).query) == parse_qs(urlparse(original).query)
         result["checks"].append("Reload restores shareable comparison")
         page.screenshot(path=str(OUT/"desktop-compare.png"), full_page=False)
