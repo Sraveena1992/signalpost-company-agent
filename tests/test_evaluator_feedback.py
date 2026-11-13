@@ -275,3 +275,14 @@ def test_official_registry_facts_extend_synthesis_without_unverified_website_cla
     assert all(f["source_url"]==source for f in summary["facts"] if f["classification"]=="official_registry_fact")
     assert any(f["claim"]=="Bankruptcy flag" and f["value"] is False for f in summary["facts"])
     assert not any(f["classification"]=="company_reported_claim" for f in summary["facts"])
+
+
+def test_registry_failure_does_not_promote_unsourced_bulk_identity():
+    from norway_company_agent.research import answer_profile
+    profile={
+        "organisation_number":"999999991","name":"UNVERIFIED BULK ROW",
+        "legal_form":"AS","employees":12,
+        "evidence":{"registry":{"status":"source_error","source_url":None}}
+    }
+    summary=answer_profile(profile,"Give me a company overview")
+    assert not any(item["classification"]=="official_registry_fact" for item in summary["facts"])
