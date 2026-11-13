@@ -82,6 +82,12 @@ def test_verified_company_news_needs_date_and_exact_company_attribution():
     assert item and item["source_url"] == source and item["published_at"] == "2026-11-12"
     profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = None
     assert news_observation(profile) is None
+    profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2026-11-12"
+    profile["evidence"]["website"]["value"]["pages"][0]["url"] = "https://unrelated-vendor.no/news/new-project"
+    assert news_observation(profile) is None
+    profile["evidence"]["website"]["value"]["pages"][0]["url"] = source
+    profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2099-01-01"
+    assert news_observation(profile) is None
 
 
 def test_company_owned_jobposting_requires_date_exact_company_and_source():
