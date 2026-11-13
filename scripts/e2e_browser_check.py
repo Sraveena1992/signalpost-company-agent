@@ -30,11 +30,11 @@ def main():
         result["checks"].append("Directory search filter works")
         page.locator("#filterDirectory").fill("")
         page.locator("#results article.hit").first.get_by_role("button", name="Compare as A").click()
-        page.locator("#aname").get_by_text("SANDNES ELEKTRISKE AS").wait_for(timeout=30000)
+        page.locator("#aname").filter(has_text="SANDNES ELEKTRISKE AS").wait_for(timeout=30000)
         assert "a=810034882" in page.url
         result["checks"].append("Company A selected through real registry API")
         page.locator("#results article.hit").last.get_by_role("button", name="Compare as B").click()
-        page.locator("#bname").get_by_text("WEBLANCE AS").wait_for(timeout=30000)
+        page.locator("#bname").filter(has_text="WEBLANCE AS").wait_for(timeout=30000)
         assert "b=811695602" in page.url
         assert page.locator("#registryBody").inner_text().find("SANDNES ELEKTRISKE") >= 0
         result["checks"].append("Company B and comparison facts loaded")
@@ -43,7 +43,7 @@ def main():
         result["checks"].append("Swap preserves comparison state")
         original = page.url
         page.reload(wait_until="domcontentloaded")
-        page.locator("#aname").get_by_text("WEBLANCE AS").wait_for(timeout=30000)
+        page.locator("#aname").filter(has_text="WEBLANCE AS").wait_for(timeout=30000)
         assert page.url.split("#")[0] == original.split("#")[0]
         result["checks"].append("Reload restores shareable comparison")
         page.screenshot(path=str(OUT/"desktop-compare.png"), full_page=False)
