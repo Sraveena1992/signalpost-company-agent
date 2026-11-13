@@ -295,12 +295,6 @@ def attach_synthesis(profile: dict[str, Any], previous: dict[str, Any] | None = 
                 "source_url": registry.get("source_url"), "retrieved_at": registry.get("retrieved_at"),
                 "classification": "official_registry_fact",
             })
-    if changes:
-        overview.append({
-            "text": f"{len(changes)} source-backed changes detected relative to the supplied prior snapshot.",
-            "source_url": None, "retrieved_at": None,
-            "classification": "derived_refresh_comparison",
-        })
     missing = []
     for module, label in (
         ("website", "verified company website"),
