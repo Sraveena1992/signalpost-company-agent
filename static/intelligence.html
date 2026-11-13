@@ -54,22 +54,35 @@ function displayDirectory(){
 }
 $('filterDirectory').addEventListener('input',()=>{if(directoryRows.length)displayDirectory()});
 $('sortDirectory').addEventListener('change',()=>{if(directoryRows.length)displayDirectory()});
-$('browseDirectory').addEventListener('click',async()=>{
+async function loadDirectory(fresh=false){
  const button=$('browseDirectory');button.disabled=true;button.textContent='Retrieving official records…';
  directoryRows=[];$('results').replaceChildren();
+ let origin='live registry';
  try{
-  for(let page=0;page<3;page++){
-   const result=await getJson('/api/directory?page='+page);
-   directoryRows.push(...(result.results||[]));
-   status('searchState',directoryRows.length+' official registry records loaded…');
+  if(!fresh){
+   try{
+    const saved=await getJson('/static/verified-directory-300.json');
+    if(Array.isArray(saved)&&saved.length>=201&&saved.every(row=>/^\\d{9}$/.test(row.organisation_number||'')&&row.registry_source?.startsWith('https://data.brreg.no/enhetsregisteret/api/enheter/'))){
+     directoryRows=saved.map(row=>({...row,address:(row.business_address?.adresse||[]).concat([row.business_address?.postnummer,row.business_address?.poststed].filter(Boolean)).join(', ')}));
+     origin='individually verified official registry records';
+    }
+   }catch(error){ /* regenerate directory from the live official registry */ }
+  }
+  if(!directoryRows.length){
+   for(let page=0;page<3;page++){
+    const result=await getJson('/api/directory?page='+page);
+    directoryRows.push(...(result.results||[]));
+    status('searchState',directoryRows.length+' official registry records loaded…');
+   }
   }
   const unique=new Map(directoryRows.map(row=>[row.organisation_number,row]));
   directoryRows=Array.from(unique.values());
   addSuggestions(directoryRows);displayDirectory();
-  status('searchState','Select Compare as A or B; open the source record to inspect official identity. Registry listing is not a verified website/financial dossier.');
+  status('searchState',directoryRows.length+' '+origin+' loaded. Choose Compare A/B. Directory identity is not an external research dossier.');
  }catch(error){status('searchState','Directory load failed: '+error.message+' Use company name or organisation number search instead.',true)}
- finally{button.disabled=false;button.textContent='Reload company directory ↻'}
-});
+ finally{button.disabled=false;button.textContent='Refresh live directory ↻'}
+}
+$('browseDirectory').addEventListener('click',()=>loadDirectory(true));
 async function discover(q){$('results').replaceChildren();status('searchState','Searching live company records…');try{let rows=[];if(validOrg(q)){const c=await getJson('/api/company/'+encodeURIComponent(q));rows=[{name:c.name,organisation_number:c.organisation_number,address:c.business_address,industry:c.industry}]}else{const data=await getJson('/api/search?q='+encodeURIComponent(q)+'&size=20');rows=data.results||[]}addSuggestions(rows);for(const c of rows)addSearchResult(c);status('searchState',rows.length+' registry result(s) found. Select a company for column A or B. These are real search results, not the full registry.')}catch(err){status('searchState',err.message,true)}}
 $('searchForm').addEventListener('submit',async e=>{e.preventDefault();await discover($('q').value.trim())});
 for(const b of document.querySelectorAll('[data-browse]'))b.addEventListener('click',async()=>{$('q').value=b.dataset.browse;await discover(b.dataset.browse)});
@@ -116,6 +129,6 @@ $('refreshRecords').addEventListener('click',async()=>{const a=state.a?.organisa
 $('clearCompare').addEventListener('click',()=>{for(const w of ['a','b']){state[w]=null;state['r'+w]=null;$(w+'input').value='';$(w+'name').textContent='Select a company';$(w+'sub').textContent='Choose a result above or paste a 9-digit organisation number.';$(w+'research').disabled=true;$(w+'evidence').textContent='Not requested.'}syncUrl();draw();status('compareStatus','Comparison cleared. Choose a company from the Explorer.')});
 $('swap').addEventListener('click',()=>{[state.a,state.b]=[state.b,state.a];[state.ra,state.rb]=[state.rb,state.ra];for(const w of ['a','b']){const c=state[w];$(w+'input').value=c?.organisation_number||'';$(w+'name').textContent=c?.name||'Select a company';$(w+'sub').textContent=c?'Organisation '+c.organisation_number+' · '+format(c.organisation_form):'Select a company';$(w+'research').disabled=!c;$(w+'evidence').textContent='Select research again to inspect module evidence.'}syncUrl();draw()});
 $('share').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);$('shareStatus').textContent='Link copied.'}catch(e){$('shareStatus').textContent='Copy the address-bar URL.'}});
-(async()=>{const p=new URLSearchParams(location.search);addSuggestions(starts);for(const w of ['a','b'])if(validOrg(p.get(w)))await load(w,p.get(w));if(!p.get('a')&&!p.get('b')){await $('browseDirectory').click()}})()
+(async()=>{const p=new URLSearchParams(location.search);addSuggestions(starts);for(const w of ['a','b'])if(validOrg(p.get(w)))await load(w,p.get(w));if(!p.get('a')&&!p.get('b')){await loadDirectory(false)}})()
 })();
 </script></body></html>
