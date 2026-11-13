@@ -1,0 +1,44 @@
+name: Public 500 Company Identity Holdout
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/benchmark_public_500_identity.py
+      - .github/workflows/public-500-identity-holdout.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked agent dependencies
+        run: uv sync --frozen
+      - name: Select 500 fresh official registry identities
+        run: uv run python scripts/benchmark_public_500_identity.py prepare
+      - name: Run Signalpost on exact 500 public company IDs
+        run: |
+          uv run python scripts/run_competition_batch.py \
+            --organisations artifacts/public-500/input-500.json \
+            --output artifacts/public-500/terminal-500.jsonl \
+            --profiles-output artifacts/public-500/profiles-500.jsonl \
+            --report artifacts/public-500/run-report-500.json \
+            --run-id public-500-identity-${{ github.run_id }} \
+            --expected-count 500 \
+            --workers 12 \
+            --checkpoint-every 50 \
+            --modules registry,registry_live
+      - name: Compare exact identities against independent reference snapshot
+        run: uv run python scripts/benchmark_public_500_identity.py score
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-500-identity-holdout
+          path: artifacts/public-500/
+          retention-days: 30
