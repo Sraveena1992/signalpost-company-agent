@@ -1,3 +1,10 @@
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
+
 """Regressions from the 13 November Builderr evaluator feedback."""
 from norway_company_agent.identity import apply_website_identity_gate, assess_social_identity
 from norway_company_agent.research import answer_profile
