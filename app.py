@@ -457,6 +457,29 @@ body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),tr
 #featured-directory .company-card{border:1px solid #d3e5df;box-shadow:0 5px 18px rgba(9,29,38,.035);transition:transform .15s,border-color .15s}
 #featured-directory .company-card:hover{transform:translateY(-2px);border-color:#6cbcaf}
 #featured-directory .company-card .company-actions a{font-weight:750}
+
+/* Contrast-fix: global panel link rules must never hide secondary CTA labels. */
+.hero-actions a.button.secondary,
+.hero-actions a.button.secondary:link,
+.hero-actions a.button.secondary:visited,
+#featured-directory #featured-more.button.secondary{
+  color:#153d43!important;background:#e8f5f0!important;
+  border:2px solid #8fc9bd!important;
+  font-weight:800!important;text-decoration:none!important;
+  box-shadow:0 3px 12px rgba(6,87,77,.08);
+}
+.hero-actions a.button.secondary:hover,
+#featured-directory #featured-more.button.secondary:hover{
+  color:#062e30!important;background:#c9ece0!important;border-color:#087d70!important;
+}
+.hero-actions a.button.secondary:focus-visible,
+#featured-directory #featured-more.button.secondary:focus-visible{
+  outline:3px solid #087d70;outline-offset:3px;
+}
+.hero{box-shadow:0 28px 86px rgba(23,75,70,.13)}
+.hero-actions .button{min-height:47px;gap:8px}
+.hero-proof{border-top:1px solid rgba(21,100,90,.18);padding-top:19px}
+#featured-directory .company-card:hover{box-shadow:0 12px 30px rgba(16,78,75,.10)}
 @media(max-width:650px){.hero{padding:28px 20px;border-radius:19px}.hero h1{font-size:clamp(35px,8.5vw,48px)}.hero-proof{gap:7px 12px}.hero-actions .button{flex:1 1 100%}}
 </style>
 </head>
