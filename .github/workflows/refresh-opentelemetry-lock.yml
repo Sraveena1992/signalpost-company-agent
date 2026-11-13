@@ -1,0 +1,37 @@
+name: Refresh OpenTelemetry CVE Lock
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/refresh-opentelemetry-lock.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve patched dependency
+        run: |
+          uv lock --upgrade-package opentelemetry-api
+          uv sync --frozen
+          uv tree --frozen | grep -E 'opentelemetry-api|opentelemetry-sdk'
+      - name: Commit audited lock update to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add uv.lock
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix: bump vulnerable OpenTelemetry API lock to patched version'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
