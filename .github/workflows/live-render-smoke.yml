@@ -8,6 +8,9 @@ on:
       - static/verified-directory-300.json
       - scripts/check_live_deployment.py
       - .github/workflows/live-render-smoke.yml
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/live-render-smoke.yml, scripts/check_live_deployment.py]
   workflow_dispatch:
 permissions:
   contents: read
