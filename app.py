@@ -481,7 +481,7 @@ if(dirRoot && dirStatus){
  dirMore.addEventListener('click',()=>{visible+=12;renderDirectory()});
  fetch('/static/verified-directory-300.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Directory currently unavailable');return r.json()}).then(records=>{
   if(!Array.isArray(records)||records.length<201)throw new Error('Verified directory incomplete');
-  directory=records.filter(r=>/^\d{9}$/.test(r.organisation_number||'')&&r.registry_source==='https://data.brreg.no/enhetsregisteret/api/enheter/'+r.organisation_number);renderDirectory();
+  directory=records.filter(r=>/^\\d{9}$/.test(r.organisation_number||'')&&r.registry_source==='https://data.brreg.no/enhetsregisteret/api/enheter/'+r.organisation_number);renderDirectory();
  }).catch(()=>{dirStatus.textContent='Company directory is temporarily unavailable. Use live official-registry search above.'})
 }
 const button=document.getElementById('run-research'),output=document.getElementById('research-output');
