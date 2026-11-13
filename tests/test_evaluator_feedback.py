@@ -204,3 +204,85 @@ def test_directory_supports_300_real_registry_entries_and_auto_discovery():
     assert "for(let page=0;page<3;page++)" in source
     assert "await loadDirectory(false)" in source
     assert "Browse 300 Norwegian registry companies" in source
+
+
+def test_synthesis_includes_exact_owned_company_news_and_jobs_only():
+    from datetime import date
+    from norway_company_agent.research import answer_profile
+    site = "https://example-company.no"
+    org = "999999991"
+    base = {
+        "organisation_number": org, "name": "EXAMPLE COMPANY AS",
+        "evidence": {
+            "registry": {"status": "available", "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/999999991", "retrieved_at": "2026-11-13T00:00:00Z"},
+            "website": {"status": "available", "source_url": site, "value": {
+                "final_url": site, "identity_assessment": {"publishable": True}}},
+            "public_activity": {"status": "available", "retrieved_at": "2026-11-13T00:00:00Z", "value": {
+                "observations": [
+                    {"organisation_number": org, "signal_type": "public_post",
+                     "exact_entity": True, "source_url": site+"/news/launch",
+                     "published_at": date.today().isoformat(), "rights_status": "approved",
+                     "retrieved_at": "2026-11-13T00:00:00Z",
+                     "content_sha256": "a"*64, "evidence_span": "EXAMPLE COMPANY AS announces a launch"},
+                    {"organisation_number": org, "signal_type": "job_posting",
+                     "exact_entity": True, "source_url": site+"/careers/engineer",
+                     "published_at": date.today().isoformat(), "rights_status": "approved",
+                     "retrieved_at": "2026-11-13T00:00:00Z",
+                     "content_sha256": "b"*64, "evidence_span": "EXAMPLE COMPANY AS hiring engineer"},
+                    {"organisation_number": "111111111", "signal_type": "public_post",
+                     "exact_entity": True, "source_url": site+"/news/other",
+                     "published_at": date.today().isoformat(), "rights_status": "approved",
+                     "content_sha256": "c"*64, "evidence_span": "Wrong company"},
+                    {"organisation_number": org, "signal_type": "public_post",
+                     "exact_entity": True, "source_url": "https://squarespace.com/news/unrelated",
+                     "published_at": date.today().isoformat(), "rights_status": "approved",
+                     "content_sha256": "d"*64, "evidence_span": "Squarespace is unrelated"},
+                    {"organisation_number": org, "signal_type": "profile_metrics",
+                     "exact_entity": True, "source_url": site,
+                     "published_at": date.today().isoformat(), "rights_status": "approved",
+                     "content_sha256": "e"*64, "evidence_span": "Not a dated news story"}
+                ]
+            }}
+        }
+    }
+    result=answer_profile(base, "Give me a company overview")
+    facts=[f for f in result["facts"] if f["classification"].startswith("verified_company_site_")]
+    assert len(facts)==2
+    assert {x["claim"] for x in facts}=={"Verified company-site news","Verified company-site job posting"}
+    assert all(x["source_url"].startswith(site) for x in facts)
+    base["evidence"]["website"]["value"]["identity_assessment"]["publishable"]=False
+    result2=answer_profile(base,"Give me a company overview")
+    assert not any(f["classification"].startswith("verified_company_site_") for f in result2["facts"])
+
+
+def test_official_registry_facts_extend_synthesis_without_unverified_website_claims():
+    from norway_company_agent.research import answer_profile
+    source="https://data.brreg.no/enhetsregisteret/api/enheter/999999991"
+    profile={
+        "organisation_number":"999999991","name":"EXAMPLE COMPANY AS",
+        "industry":{"kode":"62.010","beskrivelse":"Computer programming"},
+        "bankrupt":False,"liquidating":False,
+        "latest_submitted_accounts":"2025",
+        "business_address":{"adresse":["Main Street 4"],"postnummer":"0150","poststed":"OSLO","land":"Norge"},
+        "website":"https://unverified-supplier.com",
+        "evidence":{"registry":{"status":"available","source_url":source,"retrieved_at":"2026-11-13T00:00:00Z"}}
+    }
+    summary=answer_profile(profile,"Give me a company overview")
+    labels={f["claim"] for f in summary["facts"]}
+    assert {"Registered industry","Registered industry code","Bankruptcy flag",
+            "Registered business address","Latest reported annual accounts period"} <= labels
+    assert "Registry-listed verified website" not in labels
+    assert all(f["source_url"]==source for f in summary["facts"] if f["classification"]=="official_registry_fact")
+    assert any(f["claim"]=="Bankruptcy flag" and f["value"] is False for f in summary["facts"])
+    assert not any(f["classification"]=="company_reported_claim" for f in summary["facts"])
+
+
+def test_registry_failure_does_not_promote_unsourced_bulk_identity():
+    from norway_company_agent.research import answer_profile
+    profile={
+        "organisation_number":"999999991","name":"UNVERIFIED BULK ROW",
+        "legal_form":"AS","employees":12,
+        "evidence":{"registry":{"status":"source_error","source_url":None}}
+    }
+    summary=answer_profile(profile,"Give me a company overview")
+    assert not any(item["classification"]=="official_registry_fact" for item in summary["facts"])
