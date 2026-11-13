@@ -142,3 +142,35 @@ def test_synthesis_reports_verified_business_and_honest_unknowns():
     assert all(entry["source_url"] and entry["retrieved_at"] for entry in overview)
     assert profile["synthesis"]["what_changed"]["status"] == "no_previous_snapshot"
     assert any(item["topic"] == "normalized annual accounts" for item in profile["synthesis"]["unknowns"])
+
+
+def test_real_registry_directory_bounded_two_pages(monkeypatch):
+    import app
+    calls = []
+    def fake_get(url):
+        calls.append(url)
+        return {"_embedded": {"enheter": [{
+            "organisasjonsnummer": "923609016",
+            "navn": "EQUINOR ASA",
+            "organisasjonsform": {"beskrivelse": "Allmennaksjeselskap"},
+            "forretningsadresse": {"adresse": ["Forusbeen 50"], "postnummer": "4035", "poststed": "STAVANGER"},
+            "naeringskode1": {"beskrivelse": "Utvinning av råolje"},
+        }]}}
+    monkeypatch.setattr(app, "_get_json", fake_get)
+    result = app.browse_registry_page(page=1, size=100)
+    assert result["results"][0]["organisation_number"] == "923609016"
+    assert result["results"][0]["registry_source"].endswith("/923609016")
+    assert "page=1" in calls[0] and "size=100" in calls[0]
+    import pytest
+    with pytest.raises(ValueError):
+        app.browse_registry_page(page=2)
+
+
+def test_workspace_exposes_live_company_directory():
+    from pathlib import Path
+    html = (Path(__file__).resolve().parents[1] / "static" / "intelligence.html").read_text(encoding="utf-8")
+    assert 'id="browseDirectory"' in html
+    assert '/api/directory?page=' in html
+    assert 'id="filterDirectory"' in html
+    assert 'id="sortDirectory"' in html
+    assert 'addSuggestions(directoryRows)' in html
