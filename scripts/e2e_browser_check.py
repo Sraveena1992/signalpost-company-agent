@@ -91,6 +91,17 @@ def main():
         assert '{"current_year"' not in page.locator("#aevidence").inner_text()
         page.screenshot(path=str(OUT/"desktop-readable-evidence.png"),full_page=False)
         result["checks"].append("Mock research contract renders readable financials, sourced synthesis and explicit gaps")
+        other=json.loads(json.dumps(sample))
+        other["profile"]["organisation_number"]="810034882"
+        other["profile"]["name"]="SANDNES ELEKTRISKE AS"
+        other["profile"]["evidence"]["financials"]["source_url"]="https://data.brreg.no/regnskapsregisteret/regnskap/810034882"
+        page.route("**/api/research/810034882",lambda route:route.fulfill(
+            status=200,content_type="application/json",body=json.dumps(other)))
+        page.locator("#researchBoth").click()
+        page.locator("#researchBothStatus").filter(has_text="Both research requests completed").wait_for(timeout=20000)
+        assert "12,345,678 NOK" in page.locator("#financialBody").inner_text()
+        assert "What the sources establish" in page.locator("#bevidence").inner_text()
+        result["checks"].append("One-click research both companies completes two independent source-linked UI states")
         # Verify the primary landing page displays the audited directory without navigating away.
         landing = browser.new_page(viewport={"width":1365,"height":900})
         landing.on("pageerror", lambda e: result["console_errors"].append(str(e)))
