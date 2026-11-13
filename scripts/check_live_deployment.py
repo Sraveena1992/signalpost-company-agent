@@ -24,12 +24,16 @@ def check():
     home=read("/")
     assert 'id="featured-directory"' in home
     assert 'id="featured-filter"' in home
+    assert 'NORWEGIAN COMPANY INTELLIGENCE' in home
+    assert 'Explore 300 registry companies' in home
     directory=json.loads(read("/static/verified-directory-300.json"))
     assert len(directory)==300
     assert len({item["organisation_number"] for item in directory})==300
     assert all(item["registry_source"].endswith("/"+item["organisation_number"]) for item in directory)
     workspace=read("/static/intelligence.html")
     assert "loadDirectory(false)" in workspace and "Compare as " in workspace
+    assert "formatFinancial(v,key,f.currency)" in workspace
+    assert "What the sources establish" in workspace
     company=json.loads(read("/api/company/923609016"))
     assert company.get("organisation_number")=="923609016"
     last_page=json.loads(read("/api/directory?page=2"))
@@ -37,6 +41,8 @@ def check():
     return {
         "health":"passed",
         "new_homepage_directory":"present",
+        "premium_landing":"present",
+        "human_readable_financial_and_synthesis":"present",
         "verified_records":len(directory),
         "workspace":"passed",
         "equnior_exact_lookup":"passed",
