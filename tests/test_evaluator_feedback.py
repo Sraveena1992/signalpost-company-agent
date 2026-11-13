@@ -54,7 +54,7 @@ def test_missing_explicit_website_gate_cannot_publish_claims():
     assert not any(f["classification"] in {"company_reported_claim", "company_linked_social_profile"} for f in facts)
 
 
-def test_verified_company_news_needs_date_and_real_article_not_legal_name():
+def test_verified_company_news_needs_date_and_exact_company_attribution():
     import hashlib
     source = "https://www.example.no/news/new-project"
     profile = {
@@ -68,7 +68,7 @@ def test_verified_company_news_needs_date_and_real_article_not_legal_name():
                     "identity_assessment": {"publishable": True, "score": 1.0},
                     "pages": [{
                         "url": source,
-                        "title": "New research centre opens",
+                        "title": "EXAMPLE opens new research centre",
                         "published_at": "2026-11-12",
                         "article_like": True,
                         "main_text_excerpt": "The company opened a new research centre today. " * 5,
