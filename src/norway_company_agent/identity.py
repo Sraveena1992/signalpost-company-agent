@@ -146,14 +146,25 @@ def apply_website_identity_gate(profile: dict[str, Any], website: dict[str, Any]
     value = website.get("value") or {}
     assessment = assess_website_identity(temporary_profile)
     value["identity_assessment"] = assessment
+    # Registered website ownership can be mis-attributed to a hosted site builder
+    # or another company. In particular, the vendor's social/profile links must
+    # never be promoted merely because they appeared in the target's HTML.
     original = list(value.get("discovered_social_links") or value.get("social_links") or [])
     value["discovered_social_links"] = original
     social_assessments = [assess_social_identity(profile, link) for link in original]
     value["social_link_assessments"] = social_assessments
+    # Strictly require BOTH exact website identity AND exact social handle.
+    # Never treat footer/website-builder links as company-owned profiles.
+    website_host = (urllib.parse.urlparse(value.get("final_url") or website.get("source_url") or "").hostname or "").lower()
+    known_platform_hosts = (
+        "squarespace.com", "wixsite.com", "wix.com", "webflow.io",
+        "wordpress.com", "godaddysites.com", "myshopify.com",
+    )
+    hosted_by_platform = any(website_host == host or website_host.endswith("." + host) for host in known_platform_hosts)
     value["social_links"] = [
         {"platform": item["platform"], "url": item["url"]}
         for item in social_assessments
-        if assessment["publishable"] and item["publishable"]
+        if assessment["publishable"] and item["publishable"] and not hosted_by_platform
     ]
     website["value"] = value
     return {
