@@ -31,9 +31,10 @@ SOCIAL_HOSTS = {
     "tiktok.com": "tiktok",
 }
 PRIORITY_TERMS = (
+    "careers", "career", "stillinger", "ledige-stillinger", "jobs", "jobb",
+    "news", "press", "aktuelt", "nyheter",
     "om-oss", "om_oss", "about", "kontakt", "contact", "ledelse", "management",
     "team", "people", "locations", "lokasjoner", "avdelinger", "butikker",
-    "news", "press", "aktuelt", "nyheter",
 )
 
 
@@ -186,7 +187,7 @@ def normalize_social_url(url: str) -> dict[str, str] | None:
     return {"platform": platform, "url": f"https://{canonical_host}/{'/'.join(parts)}"}
 
 
-def _priority_links(base_url: str, soup: BeautifulSoup, limit: int = 4) -> list[str]:
+def _priority_links(base_url: str, soup: BeautifulSoup, limit: int = 6) -> list[str]:
     base = urllib.parse.urlparse(base_url)
     candidates: dict[str, int] = {}
     for anchor in soup.select("a[href]"):
@@ -268,7 +269,34 @@ def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max
         page_text = trafilatura.extract(page_html, url=final_url, include_links=False, include_tables=False, favor_precision=True) or ""
         article_meta = page_soup.select_one('meta[property="og:type"], meta[name="type"]')
         article_type = str(article_meta.get("content") or "").casefold() if article_meta else ""
+        # Only capture explicit structured postings on this exact crawled page.
+        # A careers landing page alone is not proof that a job is open.
+        job_postings = []
+        for script in page_soup.select('script[type="application/ld+json"]'):
+            try:
+                structured = json.loads(script.string or script.get_text())
+            except (TypeError, ValueError):
+                continue
+            def visit(node):
+                if isinstance(node, list):
+                    for element in node:
+                        visit(element)
+                elif isinstance(node, dict):
+                    kind = node.get("@type")
+                    types = kind if isinstance(kind, list) else [kind]
+                    if "JobPosting" in types:
+                        job_postings.append({
+                            "title": str(node.get("title") or "")[:200],
+                            "datePosted": str(node.get("datePosted") or "")[:80],
+                            "validThrough": str(node.get("validThrough") or "")[:80],
+                            "url": str(node.get("url") or final_url)[:1000],
+                            "hiringOrganization": node.get("hiringOrganization"),
+                        })
+                    for child in node.values():
+                        visit(child)
+            visit(structured)
         page = {
+            "job_postings": job_postings[:20],
             "url": final_url,
             "title": page_soup.title.get_text(" ", strip=True)[:500] if page_soup.title else "",
             "main_text_excerpt": page_text[:5000],
