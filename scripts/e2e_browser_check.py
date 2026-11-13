@@ -51,6 +51,46 @@ def main():
         assert parse_qs(urlparse(page.url).query) == parse_qs(urlparse(original).query)
         result["checks"].append("Reload restores shareable comparison")
         page.screenshot(path=str(OUT/"desktop-compare.png"), full_page=False)
+        # UI-only fixture: assert structured source-linked research renders as readable
+        # prose, not serialized JSON. This DOES NOT validate external financial data.
+        sample={
+            "run_id":"browser-test-only",
+            "profile":{
+                "organisation_number":"811695602","name":"WEBLANCE AS",
+                "evidence":{
+                    "financials":{
+                        "status":"available",
+                        "source_url":"https://data.brreg.no/regnskapsregisteret/regnskap/811695602",
+                        "retrieved_at":"2026-11-13T10:00:00Z",
+                        "value":{"records":[{"period":{"fraDato":"2025-01-01","tilDato":"2025-12-31"},
+                                           "account_type":"SELSKAP","currency":"NOK",
+                                           "revenue":12345678,"operating_result":210000,
+                                           "annual_result":180000,"assets":9999999,"debt":3000000}]}
+                    },
+                },
+                "synthesis":{
+                    "overview":[{"text":"Sample entity's registry identity was verified (synthetic browser fixture).",
+                                 "source_url":"https://data.brreg.no/enhetsregisteret/api/enheter/811695602",
+                                 "retrieved_at":"2026-11-13T10:00:00Z"}],
+                    "unknowns":[{"topic":"job vacancies","state":"not_verified","explanation":"No employer-owned dated posting validated."}],
+                    "what_changed":{"status":"no_previous_snapshot","change_count":0},
+                    "facts":[{"claim":"Year-over-year revenue change",
+                              "value":{"current_year":2025,"previous_year":2024,"percentage_change":17.56},
+                              "source_url":"https://data.brreg.no/regnskapsregisteret/regnskap/811695602"}]
+                }
+            }
+        }
+        page.route("**/api/research/811695602",lambda route:route.fulfill(
+            status=200,content_type="application/json",body=json.dumps(sample)))
+        page.locator("#aresearch").click()
+        page.locator("#aevidence .synthesis-card").wait_for(timeout=20000)
+        assert "What the sources establish" in page.locator("#aevidence").inner_text()
+        assert "job vacancies" in page.locator("#aevidence").text_content()
+        assert "Current year: 2025" in page.locator("#aevidence").inner_text()
+        assert "12,345,678 NOK" in page.locator("#financialBody").inner_text()
+        assert '{"current_year"' not in page.locator("#aevidence").inner_text()
+        page.screenshot(path=str(OUT/"desktop-readable-evidence.png"),full_page=False)
+        result["checks"].append("Mock research contract renders readable financials, sourced synthesis and explicit gaps")
         # Verify the primary landing page displays the audited directory without navigating away.
         landing = browser.new_page(viewport={"width":1365,"height":900})
         landing.on("pageerror", lambda e: result["console_errors"].append(str(e)))
