@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+from datetime import date, timedelta
+from urllib.parse import urlparse
 from typing import Any
 
 
@@ -92,6 +94,62 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
             unsupported.append("A registry-linked website was fetched, but exact legal-entity identity was not established; its claims and social links are quarantined.")
         if website.get("status") != "available":
             unsupported.append("The registry-linked company website was not available to this run.")
+
+    # Promote only dated, exact-company, source-linked news/jobs to synthesis.
+    # A generic site-activity signal is NOT a news article or an open job.
+    activity = evidence.get("public_activity") or {}
+    site_value = (website.get("value") or {})
+    company_site = str(site_value.get("final_url") or website.get("source_url") or "")
+    company_host = (urlparse(company_site).hostname or "").casefold().removeprefix("www.")
+    website_verified = (
+        website.get("status") == "available"
+        and (site_value.get("identity_assessment") or {}).get("publishable") is True
+        and bool(company_host)
+    )
+    if all_topics or any(word in q for word in ("news", "jobs", "hiring", "vacanc", "posting")):
+        confirmed = 0
+        observations = ((activity.get("value") or {}).get("observations") or []) if activity.get("status") == "available" else []
+        for item in observations[:30]:
+            if not isinstance(item, dict) or item.get("signal_type") not in {"public_post", "job_posting"}:
+                continue
+            source = str(item.get("source_url") or "")
+            parsed = urlparse(source)
+            source_host = (parsed.hostname or "").casefold().removeprefix("www.")
+            stamp = str(item.get("published_at") or "")
+            digest = str(item.get("content_sha256") or "")
+            try:
+                published = date.fromisoformat(stamp[:10])
+            except ValueError:
+                continue
+            if not (
+                website_verified and item.get("exact_entity") is True
+                and str(item.get("organisation_number") or "") == str(row.get("organisation_number") or "")
+                and parsed.scheme == "https" and source_host == company_host
+                and item.get("rights_status") == "approved"
+                and published <= date.today() + timedelta(days=1)
+                and re.fullmatch(r"[0-9a-fA-F]{64}", digest)
+            ):
+                continue
+            kind = item["signal_type"]
+            label = "Verified company-site news" if kind == "public_post" else "Verified company-site job posting"
+            summary = str(item.get("evidence_span") or (item.get("metrics") or {}).get("title") or "").strip()
+            if not summary:
+                continue
+            value = {
+                "headline_or_role": summary[:300],
+                "published_at": stamp,
+                "original_url": source,
+                "verification_scope": "company-owned site, not independent third-party coverage",
+            }
+            facts.append(_claim(label, value, {
+                "source_url": source,
+                "retrieved_at": item.get("retrieved_at") or activity.get("retrieved_at"),
+                "content_sha256": digest,
+                "source_class": "verified_company_site",
+            }, "verified_company_site_news" if kind == "public_post" else "verified_company_site_job_posting"))
+            confirmed += 1
+        if confirmed == 0:
+            unsupported.append("No exact-company, dated company-site news or open posting could be verified in this run; this does not prove none exist.")
 
     if "sentiment" in q:
         unsupported.append("Sentiment is not scored: no labelled Norwegian news/social evaluation corpus has been run, and company-owned pages are structurally promotional.")
