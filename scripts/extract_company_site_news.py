@@ -32,14 +32,18 @@ def observation(profile: dict) -> dict | None:
         "services", "tjenester", "home", "homepage",
     }
     pages = []
+    company_tokens = set(_tokens(str(profile.get("name") or "")))
+    if not company_tokens:
+        return None
     for page in (value.get("pages") or []):
         path = urlparse(str(page.get("url") or "")).path
         title = str(page.get("title") or "").strip()
         published_at = str(page.get("published_at") or "").strip()
         excerpt = str(page.get("main_text_excerpt") or "").strip()
+        article_tokens = set(_tokens(title + " " + excerpt))
         # A URL under /news/ is not proof of a news item. Require an explicit
         # publication date, article markup, meaningful text, a non-menu title,
-        # and publication on an independently identity-verified company site.
+        # plus independent identity verification and exact company-name coverage.
         if (
             urlparse(str(page.get("url") or "")).scheme in {"http", "https"}
             and urlparse(str(page.get("url") or "")).hostname
@@ -48,6 +52,7 @@ def observation(profile: dict) -> dict | None:
             and page.get("article_like") is True
             and len(excerpt) >= 120
             and title.casefold() not in generic_titles
+            and company_tokens.issubset(article_tokens)
         ):
             pages.append(page)
     if not pages:
