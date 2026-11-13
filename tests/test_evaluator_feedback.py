@@ -196,5 +196,5 @@ def test_directory_supports_300_real_registry_entries_and_auto_discovery():
     assert "0 <= page <= 2" in inspect.getsource(app.browse_registry_page)
     source=(ROOT/"static"/"intelligence.html").read_text(encoding="utf-8")
     assert "for(let page=0;page<3;page++)" in source
-    assert "await $('browseDirectory').click()" in source
+    assert "await loadDirectory(false)" in source
     assert "Browse 300 Norwegian registry companies" in source
