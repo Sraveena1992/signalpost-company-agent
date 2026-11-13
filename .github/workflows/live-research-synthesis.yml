@@ -1,0 +1,26 @@
+name: Live Research Synthesis Verification
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/check_live_research_synthesis.py
+      - .github/workflows/live-research-synthesis.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify deployed source-linked company research
+        run: python scripts/check_live_research_synthesis.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signalpost-live-research-synthesis-report
+          path: artifacts/live-research-synthesis-smoke.json
