@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 
 from playwright.sync_api import sync_playwright
 
@@ -46,9 +47,21 @@ def main():
         original = page.url
         page.reload(wait_until="domcontentloaded")
         page.locator("#aname").filter(has_text="WEBLANCE AS").wait_for(timeout=30000)
-        assert page.url.split("#")[0] == original.split("#")[0]
+        assert parse_qs(urlparse(page.url).query) == parse_qs(urlparse(original).query)
         result["checks"].append("Reload restores shareable comparison")
         page.screenshot(path=str(OUT/"desktop-compare.png"), full_page=False)
+        # Verify the primary landing page displays the audited directory without navigating away.
+        landing = browser.new_page(viewport={"width":1365,"height":900})
+        landing.on("pageerror", lambda e: result["console_errors"].append(str(e)))
+        landing.goto(BASE+"/",wait_until="domcontentloaded")
+        landing.locator("#featured-status").get_by_text("300 legal entities").wait_for(timeout=45000)
+        assert landing.locator("#featured-results article.company-card").count() == 12
+        landing.locator("#featured-filter").fill("WEBLANCE")
+        assert landing.locator("#featured-results article.company-card").count() == 1
+        assert "WEBLANCE" in landing.locator("#featured-results").inner_text()
+        landing.screenshot(path=str(OUT/"desktop-homepage-directory.png"),full_page=False)
+        landing.close()
+        result["checks"].append("Homepage shows 300 independently verified records with working filtering")
         page.set_viewport_size({"width": 390, "height": 844})
         page.reload(wait_until="domcontentloaded")
         page.locator("#aname").get_by_text("WEBLANCE AS").wait_for(timeout=30000)
