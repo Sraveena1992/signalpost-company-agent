@@ -38,6 +38,11 @@ def prepare(directory):
         records[org]={
             "organisation_number":org,"name":row["navn"],
             "legal_form":((row.get("organisasjonsform") or {}).get("kode")),
+            "industry_code":((row.get("naeringskode1") or {}).get("kode")),
+            "employees":row.get("antallAnsatte"),
+            "bankrupt":row.get("konkurs"),
+            "liquidating":row.get("underAvvikling"),
+            "business_address":row.get("forretningsadresse"),
         }
     if len(records)<N:
         raise RuntimeError(f"Insufficient public identities for holdout: {len(records)}; refusing to invent data")
@@ -90,6 +95,50 @@ def score(directory):
                 "expected_name":reference["name"],"observed_name":row.get("name"),
                 "expected_legal_form":reference.get("legal_form"),"observed_legal_form":row.get("legal_form"),
                 "source_url":source_url,"value_org":official_org})
+    # Cross-check extra fields against the separately captured registry search
+    # snapshot, using only values actually present in the reference source.
+    # These comparisons are a SOURCE-CONSISTENCY audit, not full truth labeling.
+    value_outcomes={"matched":0,"mismatched":0,"not_in_reference":0}
+    value_failures=[]
+    for org,refrow in expected.items():
+        profile=seen[org]
+        source=((profile.get("evidence") or {}).get("registry_live") or {})
+        if source.get("status")!="available":
+            continue
+        checks=(
+            ("industry_code", ((profile.get("industry") or {}).get("kode"))),
+            ("employees", profile.get("employees")),
+            ("bankrupt", profile.get("bankrupt")),
+            ("liquidating", profile.get("liquidating")),
+        )
+        for key,actual in checks:
+            expected_value=refrow.get(key)
+            if expected_value is None:
+                value_outcomes["not_in_reference"]+=1
+                continue
+            if norm(actual)==norm(expected_value):
+                value_outcomes["matched"]+=1
+            else:
+                value_outcomes["mismatched"]+=1
+                value_failures.append({"org":org,"field":key,"expected":expected_value,"actual":actual})
+        # Compare address subfields individually; extra fields from the detail
+        # endpoint are not mismatches if the search snapshot omits them.
+        address=refrow.get("business_address") or {}
+        observed=profile.get("business_address") or {}
+        for key in ("adresse","postnummer","poststed","kommune","land"):
+            expected_value=address.get(key)
+            if expected_value is None:
+                value_outcomes["not_in_reference"]+=1
+                continue
+            actual=observed.get(key)
+            if norm(actual)==norm(expected_value):
+                value_outcomes["matched"]+=1
+            else:
+                value_outcomes["mismatched"]+=1
+                value_failures.append({"org":org,"field":"business_address."+key,
+                                       "expected":expected_value,"actual":actual})
+    total_values=value_outcomes["matched"]+value_outcomes["mismatched"]
+    value_agreement=(value_outcomes["matched"]/total_values) if total_values else 0.0
     accuracy=outcomes["matched"]/N
     coverage=(outcomes["matched"]+outcomes["mismatched"])/N
     result={"benchmark":"public-500-official-identity-holdout",
@@ -100,13 +149,18 @@ def score(directory):
             "exact_identity_match_rate":round(accuracy,5),
             "registry_response_coverage":round(coverage,5),
             "zero_wrong_company":outcomes["mismatched"]==0,
+            "registry_multifield":value_outcomes,
+            "multifield_source_consistency_rate":round(value_agreement,5),
+            "multifield_reference_fields_checked":total_values,
+            "reference_coverage_limitations":"Only fields present in registry search snapshot scored; no independent gold labels for website/news/jobs/finance.",
+            "first_multifield_mismatches":value_failures[:25],
             "at_least_95_percent_identity_match":accuracy>=0.95,
             "batch_contract_passed":bool((report.get("validation") or {}).get("passed")),
             "first_failures":failures[:50]}
     (directory/"public-holdout-500-report.json").write_text(
         json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    if outcomes["mismatched"] or accuracy<0.95 or not result["batch_contract_passed"]:
+    if outcomes["mismatched"] or accuracy<0.95 or value_agreement<0.95 or not result["batch_contract_passed"]:
         raise SystemExit("Public 500 legal identity holdout failed; inspect report.")
 
 
