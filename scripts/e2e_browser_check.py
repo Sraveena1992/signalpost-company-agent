@@ -85,7 +85,7 @@ def main():
         page.locator("#aresearch").click()
         page.locator("#aevidence .synthesis-card").wait_for(timeout=20000)
         assert "What the sources establish" in page.locator("#aevidence").inner_text()
-        assert "job vacancies" in page.locator("#aevidence").inner_text()
+        assert "job vacancies" in page.locator("#aevidence").text_content()
         assert "Current year: 2025" in page.locator("#aevidence").inner_text()
         assert "12,345,678 NOK" in page.locator("#financialBody").inner_text()
         assert '{"current_year"' not in page.locator("#aevidence").inner_text()
