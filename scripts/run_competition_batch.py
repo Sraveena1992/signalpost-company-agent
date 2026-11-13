@@ -21,6 +21,7 @@ from norway_company_agent.official import accounting_obligation_assessment, fetc
 from norway_company_agent.website import fetch_website  # noqa: E402
 from scripts.extract_company_site_activity import observation as site_activity_observation  # noqa: E402
 from scripts.extract_company_site_news import observation as site_news_observation  # noqa: E402
+from scripts.extract_company_site_jobs import observation as site_jobs_observation  # noqa: E402
 from scripts.run_tavily_discovery import discover as tavily_discover  # noqa: E402
 
 
@@ -204,7 +205,7 @@ def main() -> None:
             website_record = profile["evidence"].get("website") or {}
             website_value = website_record.get("value") or {}
             observations = []
-            for extractor in (site_activity_observation, site_news_observation):
+            for extractor in (site_activity_observation, site_news_observation, site_jobs_observation):
                 try:
                     observation = extractor(profile)
                     if observation:

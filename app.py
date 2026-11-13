@@ -233,6 +233,50 @@ def research_api(orgnr: str, request: Request):
         return {"company": company, "run_id": run_id, "terminal": terminals[0], "profile": profiles[0], "report": report, "scope_note": "This runs the real implemented batch modules. It does not include an external jobs connector or guarantee a Builderr score."}
 
 
+def browse_registry_page(page: int = 0, size: int = 100) -> dict:
+    """Bounded directory browsing of actual official registry records.
+
+    This is a live registry page, not a claim that the 200 records have
+    independent enrichment or individually verified company-site coverage.
+    """
+    if not 0 <= page <= 1:
+        raise ValueError("Directory page must be 0 or 1.")
+    if not 1 <= size <= 100:
+        raise ValueError("Directory page size must be between 1 and 100.")
+    params = urlencode({"page": page, "size": size})
+    payload = _get_json(REGISTRY_SEARCH_URL + "?" + params)
+    entities = ((payload.get("_embedded") or {}).get("enheter") or [])
+    results = []
+    for entity in entities:
+        orgnr = str(entity.get("organisasjonsnummer") or "")
+        if not re.fullmatch(r"\d{9}", orgnr):
+            continue
+        addr = entity.get("forretningsadresse") or {}
+        industry = entity.get("naeringskode1") or {}
+        results.append({
+            "name": entity.get("navn") or "Unnamed organisation",
+            "organisation_number": orgnr,
+            "organisation_form": (entity.get("organisasjonsform") or {}).get("beskrivelse"),
+            "industry": industry.get("beskrivelse"),
+            "address": ", ".join(str(v) for v in
+                [*(addr.get("adresse") or []), addr.get("postnummer"), addr.get("poststed")] if v),
+            "registry_source": REGISTRY_SEARCH_URL + "/" + orgnr,
+        })
+    return {
+        "page": page, "size": size, "results": results,
+        "source_url": REGISTRY_SEARCH_URL + "?" + params,
+        "scope": "Live official-registry directory page; no external company-site claim verified.",
+    }
+
+
+@app.get("/api/directory")
+def company_directory_api(page: int = Query(default=0, ge=0, le=1)):
+    try:
+        return browse_registry_page(page=page)
+    except (ValueError, LookupError, RuntimeError) as exc:
+        return JSONResponse(status_code=502, content={"error": str(exc)})
+
+
 @app.get("/api/search")
 def company_search_api(q: str = Query(min_length=2, max_length=120), size: int = Query(default=10, ge=1, le=20)):
     try:

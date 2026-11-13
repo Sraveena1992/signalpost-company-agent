@@ -272,6 +272,48 @@ def attach_synthesis(profile: dict[str, Any], previous: dict[str, Any] | None = 
         else "changes_detected" if changes
         else "no_material_changes"
     )
+    # Useful deterministic synthesis: only field-backed sentences with explicit
+    # source references. Never turn a failed optional module into "none exist".
+    registry = (profile.get("evidence") or {}).get("registry_live") or (profile.get("evidence") or {}).get("registry") or {}
+    registry_value = registry.get("value") or {}
+    industry = profile.get("industry") or registry_value.get("industry") or {}
+    if isinstance(industry, dict):
+        industry_label = industry.get("beskrivelse") or industry.get("description")
+    else:
+        industry_label = str(industry or "") or None
+    name = profile.get("name") or profile.get("organisation_number")
+    overview = []
+    if registry.get("status") == "available" and name:
+        overview.append({
+            "text": f"{name} is recorded in Norway's official company registry.",
+            "source_url": registry.get("source_url"), "retrieved_at": registry.get("retrieved_at"),
+            "classification": "official_registry_fact",
+        })
+        if industry_label:
+            overview.append({
+                "text": f"Registry-reported industry: {industry_label}.",
+                "source_url": registry.get("source_url"), "retrieved_at": registry.get("retrieved_at"),
+                "classification": "official_registry_fact",
+            })
+    missing = []
+    for module, label in (
+        ("website", "verified company website"),
+        ("financials", "normalized annual accounts"),
+        ("roles", "registered roles"),
+        ("locations", "registered subunits"),
+        ("public_activity", "dated company news or job postings"),
+    ):
+        record = (profile.get("evidence") or {}).get(module) or {}
+        if record.get("status") != "available":
+            missing.append({"topic": label, "state": record.get("status") or "not_fetched",
+                            "explanation": "Not verified in this run; this does not establish absence."})
+    summary["overview"] = overview
+    summary["what_changed"] = {
+        "status": "no_previous_snapshot" if previous is None else ("changes_detected" if changes else "no_material_changes"),
+        "change_count": len(changes),
+    }
+    summary["unknowns"] = missing
+    summary["synthesis_policy"] = "Each assertion cites verified evidence; no unsupported interpretation or invented source."
     profile["changes"] = changes
     profile["synthesis"] = summary
     return profile

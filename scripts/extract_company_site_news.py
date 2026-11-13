@@ -43,7 +43,7 @@ def observation(profile: dict) -> dict | None:
         article_tokens = set(_tokens(title + " " + excerpt))
         # A URL under /news/ is not proof of a news item. Require an explicit
         # publication date, article markup, meaningful text, a non-menu title,
-        # and exact legal-name token coverage in the article itself.
+        # plus independent identity verification and exact company-name coverage.
         if (
             urlparse(str(page.get("url") or "")).scheme in {"http", "https"}
             and urlparse(str(page.get("url") or "")).hostname

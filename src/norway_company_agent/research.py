@@ -83,7 +83,7 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     website = evidence.get("website", {})
     if all_topics or "social" in q:
         value = website.get("value") or {}
-        website_publishable = (value.get("identity_assessment") or {}).get("publishable", True)
+        website_publishable = (value.get("identity_assessment") or {}).get("publishable") is True
         if value.get("description") and website_publishable:
             facts.append(_claim("Website description", value["description"], website, "company_reported_claim"))
         for item in (value.get("social_links") or []) if website_publishable else []:
