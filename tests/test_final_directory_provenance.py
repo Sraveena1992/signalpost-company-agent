@@ -72,3 +72,13 @@ def test_workspace_autoloads_300_live_records():
     assert "await loadDirectory(false)" in page
     assert "id=\"sortDirectory\"" in page
     assert "id=\"filterDirectory\"" in page
+
+
+def test_homepage_prioritizes_verified_company_list_over_methodology_copy():
+    response=app.home()
+    html=str(response.body.decode("utf-8") if hasattr(response,"body") else response)
+    assert 'id="featured-directory"' in html
+    assert html.index('id="featured-directory"') < html.index("NEW · INTELLIGENCE WORKSPACE")
+    assert html.index('id="featured-directory"') < html.index("WHY SIGNALPOST")
+    assert 'id="featured-filter"' in html
+    assert '/static/verified-directory-300.json' in html
