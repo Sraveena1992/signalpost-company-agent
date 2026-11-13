@@ -153,7 +153,7 @@ def apply_website_identity_gate(profile: dict[str, Any], website: dict[str, Any]
     value["discovered_social_links"] = original
     social_assessments = [assess_social_identity(profile, link) for link in original]
     value["social_link_assessments"] = social_assessments
-    # Strictly require BOTH exact website identity AND exact social handle.
+    # Require independent social account ownership evidence in addition to exact website identity and handle.
     # Never treat footer/website-builder links as company-owned profiles.
     website_host = (urllib.parse.urlparse(value.get("final_url") or website.get("source_url") or "").hostname or "").lower()
     known_platform_hosts = (
@@ -164,7 +164,7 @@ def apply_website_identity_gate(profile: dict[str, Any], website: dict[str, Any]
     value["social_links"] = [
         {"platform": item["platform"], "url": item["url"]}
         for item in social_assessments
-        if assessment["publishable"] and item["publishable"] and not hosted_by_platform
+        if assessment["publishable"] and item["publishable"] and item.get("ownership_verified") is True and not hosted_by_platform
     ]
     website["value"] = value
     return {

@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 import unicodedata
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -32,6 +33,9 @@ def observation(profile: dict) -> dict | None:
         "services", "tjenester", "home", "homepage",
     }
     pages = []
+    owned_host = (urlparse(str(value.get("final_url") or website.get("source_url") or "")).hostname or "").lower().removeprefix("www.")
+    if not owned_host:
+        return None
     company_tokens = set(_tokens(str(profile.get("name") or "")))
     if not company_tokens:
         return None
@@ -41,6 +45,11 @@ def observation(profile: dict) -> dict | None:
         published_at = str(page.get("published_at") or "").strip()
         excerpt = str(page.get("main_text_excerpt") or "").strip()
         article_tokens = set(_tokens(title + " " + excerpt))
+        page_host = (urlparse(str(page.get("url") or "")).hostname or "").lower().removeprefix("www.")
+        try:
+            publication_date = date.fromisoformat(published_at[:10])
+        except ValueError:
+            continue
         # A URL under /news/ is not proof of a news item. Require an explicit
         # publication date, article markup, meaningful text, a non-menu title,
         # plus independent identity verification and exact company-name coverage.
@@ -49,6 +58,8 @@ def observation(profile: dict) -> dict | None:
             and urlparse(str(page.get("url") or "")).hostname
             and NEWS_PATH.search(path)
             and published_at
+            and page_host == owned_host
+            and publication_date <= date.today() + timedelta(days=1)
             and page.get("article_like") is True
             and len(excerpt) >= 120
             and title.casefold() not in generic_titles

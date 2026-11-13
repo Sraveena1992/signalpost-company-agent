@@ -236,11 +236,11 @@ def research_api(orgnr: str, request: Request):
 def browse_registry_page(page: int = 0, size: int = 100) -> dict:
     """Bounded directory browsing of actual official registry records.
 
-    This is a live registry page, not a claim that the 200 records have
+    This is a live registry page, not a claim that the directory records have
     independent enrichment or individually verified company-site coverage.
     """
-    if not 0 <= page <= 1:
-        raise ValueError("Directory page must be 0 or 1.")
+    if not 0 <= page <= 2:
+        raise ValueError("Directory page must be between 0 and 2.")
     if not 1 <= size <= 100:
         raise ValueError("Directory page size must be between 1 and 100.")
     params = urlencode({"page": page, "size": size})
@@ -270,7 +270,7 @@ def browse_registry_page(page: int = 0, size: int = 100) -> dict:
 
 
 @app.get("/api/directory")
-def company_directory_api(page: int = Query(default=0, ge=0, le=1)):
+def company_directory_api(page: int = Query(default=0, ge=0, le=2)):
     try:
         return browse_registry_page(page=page)
     except (ValueError, LookupError, RuntimeError) as exc:
@@ -430,6 +430,17 @@ body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),tr
 .footer{color:#52627a;border-top-color:#d8e2ef}
 .footer a{color:#087f78}
 @media(prefers-reduced-motion:no-preference){.panel,.result{transition:box-shadow .18s ease,border-color .18s ease}.panel:hover,.result:hover{box-shadow:0 20px 48px rgba(28,55,95,.15);border-color:#c8d7e8}}
+
+#featured-directory .directory-tools{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+#featured-directory .directory-tools input,#featured-directory .directory-tools select{padding:12px;border:1px solid #cbd8e7;border-radius:10px;background:#f8fafd;color:#17243c;min-width:180px;flex:1}
+#featured-directory .company-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+#featured-directory .company-card{padding:18px;border-radius:15px;border:1px solid #dae5ee;background:#f8fbfc;min-width:0}
+#featured-directory .company-card strong{display:block;color:#17243c;font-size:17px;overflow-wrap:anywhere}
+#featured-directory .company-card .company-sub{font-size:12px;color:#597182;line-height:1.6;margin:10px 0}
+#featured-directory .company-card .company-actions{display:flex;gap:12px;flex-wrap:wrap;font-weight:650;font-size:13px}
+#featured-directory .company-card .company-actions a{color:#087f78}
+#featured-directory .directory-total{color:#087f78;font-weight:750;font-size:13px}
+@media(max-width:620px){#featured-directory .company-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><main>
@@ -437,12 +448,42 @@ body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),tr
 <header class="hero"><div class="kicker">NORWEGIAN COMPANY RESEARCH</div><h1>Know the company.<br>Verify the evidence.</h1><p>Find a registered Norwegian organisation by <strong>company name or organisation number</strong>. Start with the official register, then follow the source for yourself.</p></header>
 <section class="panel"><form method="get" action="/" id="search-form"><label class="search-label" for="search-query">What company are you looking for?</label><div class="search-row"><input class="search-input" id="search-query" name="q" value="__SEARCH_VALUE__" placeholder="Company name or 9-digit organisation number" autocomplete="off" aria-describedby="search-hint" required><button class="button" type="submit">Search registry ↗</button></div><p class="hint" id="search-hint">Tip: enter a company name if you don’t know its organisation number. Search uses the official Brønnøysund Register.</p></form></section>
 """ + result_html + """
+<section class="panel" id="featured-directory"><div class="section-kicker">EXPLORE VERIFIED LEGAL ENTITIES</div><h2>300 Norwegian companies. One clear starting point.</h2><p>Browse official records independently matched to each company's legal name and 9-digit organisation number. Search, open the original source, or compare any two organisations. Detailed research is available on demand.</p><div class="directory-tools"><input id="featured-filter" placeholder="Search a company, city or industry…" aria-label="Filter companies by name, city or industry" autocomplete="off"><select id="featured-sort" aria-label="Sort directory"><option value="name">Name A–Z</option><option value="location">Location</option><option value="industry">Industry</option></select></div><p id="featured-status" class="directory-total" role="status">Loading official company directory…</p><div id="featured-results" class="company-grid"></div><p><button type="button" class="button secondary" id="featured-more" style="display:none">Show more companies ↓</button> <a class="button" href="/static/intelligence.html">Advanced Explorer &amp; Compare ↗</a></p><p class="hint">Source: Brønnøysundregistrene. Legal identity checked individually; this does not independently verify company websites, finance, news or hiring. Search is limited to the verified 300-record directory; use the full registry search above for other companies.</p></section>
 <section class="panel"><div class="section-kicker">NEW · INTELLIGENCE WORKSPACE</div><h2>Explore. Compare. Inspect financial evidence.</h2><p>Use the interactive workspace to search the official Norwegian register, compare two legal entities, and request detailed source-linked research on demand. Financial values are marked incomparable when periods, currencies or reporting scopes do not match.</p><p><a class="button" href="/static/intelligence.html">Open Intelligence Workspace ↗</a></p><p class="hint">This is an optional interactive frontend to the research engine; it does not change the evaluator batch or claim an official score.</p></section>\n<section class="panel"><div class="section-kicker">WHY SIGNALPOST</div><h2>Research you can trace back to its source.</h2><div class="purpose"><article><div class="purpose-icon">⌕</div><b>Find the right entity</b><p>Search by name or number and check the legal organisation before relying on its details.</p></article><article><div class="purpose-icon">↗</div><b>Verify the source</b><p>Open the original public registry record instead of treating an unlinked claim as fact.</p></article><article><div class="purpose-icon">◎</div><b>Start due diligence</b><p>Use official identity details as a starting point for supplier, customer, or partner research.</p></article></div><p class="hint">Select a company and use “Run evidence research” to inspect implemented research modules, source-linked facts, and the run report. The public app researches one company per run; it is not a hosted 100-company dashboard and does not independently verify every financial, social, or news claim.</p><p class="hint">Source: <a class="source-link" href="https://www.brreg.no/en/" target="_blank" rel="noopener noreferrer">Brønnøysund Register Centre</a> · <a class="source-link" href="/docs">API documentation ↗</a> · <a class="source-link" href="/healthz">Service health ↗</a></p></section>
 <footer class="footer">Signalpost Company Intelligence · Prototype · Registry data may be incomplete or change over time. <a href="https://data.brreg.no/enhetsregisteret/api/dokumentasjon/en/index.html" target="_blank" rel="noopener noreferrer">Registry API documentation</a></footer>
 </main><script>
 (function(){
 const input=document.getElementById('search-query');
 if(input)input.addEventListener('keydown',function(e){if(e.key==='Escape'){input.value='';input.focus();}});
+const dirRoot=document.getElementById('featured-results'),dirStatus=document.getElementById('featured-status'),dirFilter=document.getElementById('featured-filter'),dirSort=document.getElementById('featured-sort'),dirMore=document.getElementById('featured-more');
+if(dirRoot && dirStatus){
+ let directory=[],visible=12;
+ function renderDirectory(){
+  const term=dirFilter.value.trim().toLocaleLowerCase(),sort=dirSort.value;
+  let rows=directory.filter(x=>[x.name,x.industry,x.business_address?.poststed,x.organisation_number].some(v=>String(v||'').toLocaleLowerCase().includes(term)));
+  rows.sort((a,b)=>String(sort==='location'?a.business_address?.poststed:sort==='industry'?a.industry:a.name||'').localeCompare(String(sort==='location'?b.business_address?.poststed:sort==='industry'?b.industry:b.name||'')));
+  dirRoot.replaceChildren();
+  for(const c of rows.slice(0,visible)){
+   const card=document.createElement('article');card.className='company-card';
+   const title=document.createElement('strong');title.textContent=c.name||c.organisation_number;
+   const meta=document.createElement('p');meta.className='company-sub';meta.textContent='Org. '+c.organisation_number+' · '+(c.business_address?.poststed||'Location unavailable')+' · '+(c.industry||'Industry not listed');
+   const actions=document.createElement('div');actions.className='company-actions';
+   for(const [label,url] of [['Company profile','/?orgnr='+encodeURIComponent(c.organisation_number)],['Compare','/static/intelligence.html?a='+encodeURIComponent(c.organisation_number)+'#compare'],['Official registry',c.registry_source]]){
+    const a=document.createElement('a');a.textContent=label+' ↗';a.href=url;if(label==='Official registry'){a.target='_blank';a.rel='noopener noreferrer'}actions.append(a)
+   }
+   card.append(title,meta,actions);dirRoot.append(card)
+  }
+  dirStatus.textContent=rows.length+' matching companies · '+directory.length+' legal entities verified against official records';
+  dirMore.style.display=rows.length>visible?'inline-block':'none';
+ }
+ dirFilter.addEventListener('input',()=>{visible=12;renderDirectory()});
+ dirSort.addEventListener('change',renderDirectory);
+ dirMore.addEventListener('click',()=>{visible+=12;renderDirectory()});
+ fetch('/static/verified-directory-300.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Directory currently unavailable');return r.json()}).then(records=>{
+  if(!Array.isArray(records)||records.length<201)throw new Error('Verified directory incomplete');
+  directory=records.filter(r=>/^\\d{9}$/.test(r.organisation_number||'')&&r.registry_source==='https://data.brreg.no/enhetsregisteret/api/enheter/'+r.organisation_number);renderDirectory();
+ }).catch(()=>{dirStatus.textContent='Company directory is temporarily unavailable. Use live official-registry search above.'})
+}
 const button=document.getElementById('run-research'),output=document.getElementById('research-output');
 if(!button||!output)return;
 button.addEventListener('click',async function(){

@@ -635,7 +635,7 @@ class CompletenessScoreTests(unittest.TestCase):
             "organisation_number": "923609016",
             "name": "Example AS",
             "evidence": {"website": {
-                "status": "available", "retrieved_at": "2026-08-23T00:00:00Z",
+                "status": "available", "retrieved_at": "2026-08-23T00:00:00Z", "source_url": "https://example.test/",
                 "value": {
                     "identity_assessment": {"publishable": True, "score": 1.0},
                     "pages": [{

@@ -82,6 +82,12 @@ def test_verified_company_news_needs_date_and_exact_company_attribution():
     assert item and item["source_url"] == source and item["published_at"] == "2026-11-12"
     profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = None
     assert news_observation(profile) is None
+    profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2026-11-12"
+    profile["evidence"]["website"]["value"]["pages"][0]["url"] = "https://unrelated-vendor.no/news/new-project"
+    assert news_observation(profile) is None
+    profile["evidence"]["website"]["value"]["pages"][0]["url"] = source
+    profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = "2099-01-01"
+    assert news_observation(profile) is None
 
 
 def test_company_owned_jobposting_requires_date_exact_company_and_source():
@@ -163,7 +169,7 @@ def test_real_registry_directory_bounded_two_pages(monkeypatch):
     assert "page=1" in calls[0] and "size=100" in calls[0]
     import pytest
     with pytest.raises(ValueError):
-        app.browse_registry_page(page=2)
+        app.browse_registry_page(page=3)
 
 
 def test_workspace_exposes_live_company_directory():
@@ -174,3 +180,27 @@ def test_workspace_exposes_live_company_directory():
     assert 'id="filterDirectory"' in html
     assert 'id="sortDirectory"' in html
     assert 'addSuggestions(directoryRows)' in html
+
+
+def test_social_handle_match_alone_does_not_prove_account_ownership():
+    profile={"organisation_number":"923609016","name":"EQUINOR ASA"}
+    website={"status":"available","source_url":"https://www.equinor.com","value":{
+        "final_url":"https://www.equinor.com",
+        "title":"EQUINOR ASA",
+        "description":"EQUINOR ASA global energy organisation.",
+        "main_text_excerpt":"EQUINOR ASA global energy organisation. "*10,
+        "social_links":[{"platform":"x","url":"https://x.com/equinor"}]}}
+    assessment=apply_website_identity_gate(profile,website)
+    assert assessment["assessment"]["publishable"] is True
+    assert assessment["website"]["value"]["social_links"] == []
+    assert assessment["quarantined_social_links"] == 1
+
+
+def test_directory_supports_300_real_registry_entries_and_auto_discovery():
+    import app
+    import inspect
+    assert "0 <= page <= 2" in inspect.getsource(app.browse_registry_page)
+    source=(ROOT/"static"/"intelligence.html").read_text(encoding="utf-8")
+    assert "for(let page=0;page<3;page++)" in source
+    assert "await loadDirectory(false)" in source
+    assert "Browse 300 Norwegian registry companies" in source

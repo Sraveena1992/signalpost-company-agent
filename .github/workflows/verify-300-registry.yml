@@ -1,0 +1,48 @@
+name: Verify 300 Official Company Records
+on:
+  push:
+    branches: [fix/final-directory-300-evidence-audit-20261113]
+    paths:
+      - scripts/verify_registry_directory.py
+      - .github/workflows/verify-300-registry.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/verify_registry_directory.py
+      - .github/workflows/verify-300-registry.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify 300 company identities against exact official records
+        run: |
+          python scripts/verify_registry_directory.py --count 300 --workers 4 --output static/verified-directory-300.json --report static/verified-directory-report.json
+      - name: Save verified directory in this GitHub branch
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add static/verified-directory-300.json static/verified-directory-report.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: verified 300 live registry company identities'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+      - name: Upload official record audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-300-company-directory-audit
+          path: |
+            static/verified-directory-300.json
+            static/verified-directory-report.json

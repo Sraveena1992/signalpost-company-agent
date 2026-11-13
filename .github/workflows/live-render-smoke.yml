@@ -1,0 +1,31 @@
+name: Live Render Deployment Smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - app.py
+      - static/intelligence.html
+      - static/verified-directory-300.json
+      - scripts/check_live_deployment.py
+      - .github/workflows/live-render-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  production-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify production Render deployment
+        run: |
+          python scripts/check_live_deployment.py --attempts 28 --delay-seconds 15 --output artifacts/live-render-verification.json
+      - name: Upload verified live site report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signalpost-live-production-verification
+          path: artifacts/live-render-verification.json
