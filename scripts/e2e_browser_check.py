@@ -29,13 +29,13 @@ def main():
         assert page.locator("#results article.hit").count() < 300
         result["checks"].append("Directory search filter works")
         page.locator("#filterDirectory").fill("")
-        page.locator("#results article.hit").first.get_by_role("button", name="Compare as A").click()
+        page.locator("#results article.hit").filter(has_text="SANDNES ELEKTRISKE AS").get_by_role("button", name="Compare as A").click()
         page.wait_for_timeout(3000)
         print("DIAGNOSTIC_A", json.dumps({"status":page.locator("#compareStatus").inner_text(),"name":page.locator("#aname").inner_text(),"url":page.url}),flush=True)
         page.locator("#aname").filter(has_text="SANDNES ELEKTRISKE AS").wait_for(timeout=30000)
         assert "a=810034882" in page.url
         result["checks"].append("Company A selected through real registry API")
-        page.locator("#results article.hit").last.get_by_role("button", name="Compare as B").click()
+        page.locator("#results article.hit").filter(has_text="WEBLANCE AS").get_by_role("button", name="Compare as B").click()
         page.locator("#bname").filter(has_text="WEBLANCE AS").wait_for(timeout=30000)
         assert "b=811695602" in page.url
         assert page.locator("#registryBody").inner_text().find("SANDNES ELEKTRISKE") >= 0
