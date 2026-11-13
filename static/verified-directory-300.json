@@ -20,7 +20,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810034882",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.242210+00:00"
+    "retrieved_at": "2026-11-13T16:15:18.390522+00:00"
   },
   {
     "organisation_number": "810059672",
@@ -43,7 +43,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810059672",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.225311+00:00"
+    "retrieved_at": "2026-11-13T16:15:18.367172+00:00"
   },
   {
     "organisation_number": "810094532",
@@ -66,7 +66,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810094532",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.241376+00:00"
+    "retrieved_at": "2026-11-13T16:15:18.385690+00:00"
   },
   {
     "organisation_number": "810098252",
@@ -89,7 +89,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810098252",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.224529+00:00"
+    "retrieved_at": "2026-11-13T16:15:18.374442+00:00"
   },
   {
     "organisation_number": "810105372",
@@ -110,7 +110,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810105372",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.952344+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.006220+00:00"
   },
   {
     "organisation_number": "810130822",
@@ -133,7 +133,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810130822",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.910948+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.016060+00:00"
   },
   {
     "organisation_number": "810182482",
@@ -156,7 +156,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810182482",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.945078+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.022343+00:00"
   },
   {
     "organisation_number": "810202572",
@@ -179,7 +179,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810202572",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:40.930590+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.029249+00:00"
   },
   {
     "organisation_number": "810274042",
@@ -202,7 +202,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810274042",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:41.602144+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.634351+00:00"
   },
   {
     "organisation_number": "810359862",
@@ -225,7 +225,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810359862",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:41.636874+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.645738+00:00"
   },
   {
     "organisation_number": "810363142",
@@ -249,7 +249,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810363142",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:41.655020+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.653415+00:00"
   },
   {
     "organisation_number": "810392312",
@@ -272,7 +272,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810392312",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:41.645899+00:00"
+    "retrieved_at": "2026-11-13T16:15:19.650094+00:00"
   },
   {
     "organisation_number": "810393572",
@@ -295,7 +295,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810393572",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:42.292513+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.251590+00:00"
   },
   {
     "organisation_number": "810431172",
@@ -318,7 +318,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810431172",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:42.346695+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.265540+00:00"
   },
   {
     "organisation_number": "810432322",
@@ -341,7 +341,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810432322",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:42.375119+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.278122+00:00"
   },
   {
     "organisation_number": "810438452",
@@ -364,7 +364,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810438452",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:42.343206+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.324858+00:00"
   },
   {
     "organisation_number": "810441682",
@@ -388,7 +388,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810441682",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.004214+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.878701+00:00"
   },
   {
     "organisation_number": "810463902",
@@ -411,7 +411,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810463902",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.035818+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.904974+00:00"
   },
   {
     "organisation_number": "810483822",
@@ -434,7 +434,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810483822",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.055377+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.930529+00:00"
   },
   {
     "organisation_number": "810547472",
@@ -457,7 +457,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810547472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.065488+00:00"
+    "retrieved_at": "2026-11-13T16:15:20.948230+00:00"
   },
   {
     "organisation_number": "810556722",
@@ -481,7 +481,7 @@
     "bankruptcy": true,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810556722",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.692130+00:00"
+    "retrieved_at": "2026-11-13T16:15:21.522539+00:00"
   },
   {
     "organisation_number": "810574232",
@@ -504,7 +504,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810574232",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.747750+00:00"
+    "retrieved_at": "2026-11-13T16:15:21.526435+00:00"
   },
   {
     "organisation_number": "810582332",
@@ -527,7 +527,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810582332",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.746354+00:00"
+    "retrieved_at": "2026-11-13T16:15:21.569446+00:00"
   },
   {
     "organisation_number": "810584742",
@@ -550,7 +550,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810584742",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:43.752667+00:00"
+    "retrieved_at": "2026-11-13T16:15:21.573981+00:00"
   },
   {
     "organisation_number": "810684402",
@@ -573,7 +573,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810684402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:44.403850+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.158981+00:00"
   },
   {
     "organisation_number": "810703342",
@@ -597,7 +597,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810703342",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:44.435362+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.148893+00:00"
   },
   {
     "organisation_number": "810733772",
@@ -620,7 +620,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810733772",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:44.441892+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.205088+00:00"
   },
   {
     "organisation_number": "810855762",
@@ -643,7 +643,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810855762",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:44.447897+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.198958+00:00"
   },
   {
     "organisation_number": "810859482",
@@ -666,7 +666,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810859482",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.093440+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.766262+00:00"
   },
   {
     "organisation_number": "810876832",
@@ -689,7 +689,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810876832",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.146495+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.778722+00:00"
   },
   {
     "organisation_number": "810894342",
@@ -710,7 +710,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810894342",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.130750+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.824800+00:00"
   },
   {
     "organisation_number": "810902612",
@@ -734,7 +734,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810902612",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.155720+00:00"
+    "retrieved_at": "2026-11-13T16:15:22.844039+00:00"
   },
   {
     "organisation_number": "810969652",
@@ -757,7 +757,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/810969652",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.784062+00:00"
+    "retrieved_at": "2026-11-13T16:15:23.427946+00:00"
   },
   {
     "organisation_number": "811014982",
@@ -770,7 +770,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811014982",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.819731+00:00"
+    "retrieved_at": "2026-11-13T16:15:23.420600+00:00"
   },
   {
     "organisation_number": "811025542",
@@ -793,7 +793,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811025542",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.857985+00:00"
+    "retrieved_at": "2026-11-13T16:15:23.448255+00:00"
   },
   {
     "organisation_number": "811060402",
@@ -816,7 +816,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811060402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:45.849274+00:00"
+    "retrieved_at": "2026-11-13T16:15:23.464123+00:00"
   },
   {
     "organisation_number": "811102822",
@@ -839,7 +839,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811102822",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:46.496270+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.064708+00:00"
   },
   {
     "organisation_number": "811114642",
@@ -862,7 +862,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811114642",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:46.508337+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.108862+00:00"
   },
   {
     "organisation_number": "811141402",
@@ -885,7 +885,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811141402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:46.566443+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.069208+00:00"
   },
   {
     "organisation_number": "811162582",
@@ -908,7 +908,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811162582",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:46.548719+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.091126+00:00"
   },
   {
     "organisation_number": "811167452",
@@ -931,7 +931,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811167452",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.209319+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.696442+00:00"
   },
   {
     "organisation_number": "811176702",
@@ -955,7 +955,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811176702",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.232157+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.700814+00:00"
   },
   {
     "organisation_number": "811235482",
@@ -978,7 +978,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811235482",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.238025+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.717716+00:00"
   },
   {
     "organisation_number": "811251682",
@@ -1001,7 +1001,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811251682",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.256752+00:00"
+    "retrieved_at": "2026-11-13T16:15:24.753551+00:00"
   },
   {
     "organisation_number": "811280852",
@@ -1024,7 +1024,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811280852",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.900320+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.317027+00:00"
   },
   {
     "organisation_number": "811320862",
@@ -1047,7 +1047,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811320862",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.926767+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.341881+00:00"
   },
   {
     "organisation_number": "811349372",
@@ -1070,7 +1070,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811349372",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.927803+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.337020+00:00"
   },
   {
     "organisation_number": "811410012",
@@ -1093,7 +1093,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811410012",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:47.944618+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.393580+00:00"
   },
   {
     "organisation_number": "811413682",
@@ -1116,7 +1116,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811413682",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:48.591994+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.960302+00:00"
   },
   {
     "organisation_number": "811451002",
@@ -1140,7 +1140,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811451002",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:48.655360+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.967015+00:00"
   },
   {
     "organisation_number": "811480282",
@@ -1163,7 +1163,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811480282",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:48.616548+00:00"
+    "retrieved_at": "2026-11-13T16:15:25.989611+00:00"
   },
   {
     "organisation_number": "811489972",
@@ -1186,7 +1186,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811489972",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:48.666624+00:00"
+    "retrieved_at": "2026-11-13T16:15:26.019729+00:00"
   },
   {
     "organisation_number": "811544922",
@@ -1209,7 +1209,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811544922",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:49.286271+00:00"
+    "retrieved_at": "2026-11-13T16:15:26.585338+00:00"
   },
   {
     "organisation_number": "811546402",
@@ -1232,7 +1232,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811546402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:49.323226+00:00"
+    "retrieved_at": "2026-11-13T16:15:26.622723+00:00"
   },
   {
     "organisation_number": "811546712",
@@ -1255,7 +1255,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811546712",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:49.365862+00:00"
+    "retrieved_at": "2026-11-13T16:15:26.610525+00:00"
   },
   {
     "organisation_number": "811546852",
@@ -1278,7 +1278,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811546852",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:49.354132+00:00"
+    "retrieved_at": "2026-11-13T16:15:26.639559+00:00"
   },
   {
     "organisation_number": "811547042",
@@ -1301,7 +1301,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811547042",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:49.983217+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.220496+00:00"
   },
   {
     "organisation_number": "811548022",
@@ -1324,7 +1324,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811548022",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.036510+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.232483+00:00"
   },
   {
     "organisation_number": "811548472",
@@ -1347,7 +1347,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811548472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.042700+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.241495+00:00"
   },
   {
     "organisation_number": "811548642",
@@ -1370,7 +1370,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811548642",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.074391+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.278881+00:00"
   },
   {
     "organisation_number": "811548812",
@@ -1393,7 +1393,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811548812",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.692488+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.852583+00:00"
   },
   {
     "organisation_number": "811549312",
@@ -1416,7 +1416,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811549312",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.748006+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.859274+00:00"
   },
   {
     "organisation_number": "811550582",
@@ -1439,7 +1439,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811550582",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.751871+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.880916+00:00"
   },
   {
     "organisation_number": "811551422",
@@ -1459,7 +1459,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811551422",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:50.761068+00:00"
+    "retrieved_at": "2026-11-13T16:15:27.925111+00:00"
   },
   {
     "organisation_number": "811551902",
@@ -1483,7 +1483,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811551902",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:51.380746+00:00"
+    "retrieved_at": "2026-11-13T16:15:28.479927+00:00"
   },
   {
     "organisation_number": "811552372",
@@ -1506,7 +1506,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811552372",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:51.458818+00:00"
+    "retrieved_at": "2026-11-13T16:15:28.498413+00:00"
   },
   {
     "organisation_number": "811555312",
@@ -1529,7 +1529,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811555312",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:51.441172+00:00"
+    "retrieved_at": "2026-11-13T16:15:28.502275+00:00"
   },
   {
     "organisation_number": "811555622",
@@ -1552,7 +1552,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811555622",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:51.450249+00:00"
+    "retrieved_at": "2026-11-13T16:15:28.559469+00:00"
   },
   {
     "organisation_number": "811555762",
@@ -1575,7 +1575,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811555762",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.070796+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.115649+00:00"
   },
   {
     "organisation_number": "811556092",
@@ -1598,7 +1598,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811556092",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.137203+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.120295+00:00"
   },
   {
     "organisation_number": "811556912",
@@ -1622,7 +1622,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811556912",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.137920+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.135404+00:00"
   },
   {
     "organisation_number": "811557552",
@@ -1645,7 +1645,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811557552",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.203069+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.199924+00:00"
   },
   {
     "organisation_number": "811560472",
@@ -1669,7 +1669,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811560472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.762240+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.758845+00:00"
   },
   {
     "organisation_number": "811560782",
@@ -1692,7 +1692,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811560782",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.847680+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.748651+00:00"
   },
   {
     "organisation_number": "811561592",
@@ -1715,7 +1715,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811561592",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.825228+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.761513+00:00"
   },
   {
     "organisation_number": "811561762",
@@ -1738,7 +1738,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811561762",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:52.891956+00:00"
+    "retrieved_at": "2026-11-13T16:15:29.819855+00:00"
   },
   {
     "organisation_number": "811561932",
@@ -1751,7 +1751,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811561932",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:53.473388+00:00"
+    "retrieved_at": "2026-11-13T16:15:30.377544+00:00"
   },
   {
     "organisation_number": "811563382",
@@ -1775,7 +1775,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811563382",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:53.535962+00:00"
+    "retrieved_at": "2026-11-13T16:15:30.385533+00:00"
   },
   {
     "organisation_number": "811563722",
@@ -1799,7 +1799,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811563722",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:53.556364+00:00"
+    "retrieved_at": "2026-11-13T16:15:30.405031+00:00"
   },
   {
     "organisation_number": "811564222",
@@ -1822,7 +1822,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811564222",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:53.581602+00:00"
+    "retrieved_at": "2026-11-13T16:15:30.464351+00:00"
   },
   {
     "organisation_number": "811565032",
@@ -1845,7 +1845,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811565032",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.184128+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.014216+00:00"
   },
   {
     "organisation_number": "811566462",
@@ -1869,7 +1869,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811566462",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.229915+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.016215+00:00"
   },
   {
     "organisation_number": "811566772",
@@ -1882,7 +1882,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811566772",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.267017+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.027931+00:00"
   },
   {
     "organisation_number": "811566942",
@@ -1905,7 +1905,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811566942",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.291149+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.127130+00:00"
   },
   {
     "organisation_number": "811567132",
@@ -1929,7 +1929,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811567132",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.872197+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.633232+00:00"
   },
   {
     "organisation_number": "811567612",
@@ -1952,7 +1952,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811567612",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.938759+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.636046+00:00"
   },
   {
     "organisation_number": "811568392",
@@ -1976,7 +1976,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811568392",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.954872+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.652212+00:00"
   },
   {
     "organisation_number": "811568732",
@@ -1996,7 +1996,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811568732",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:54.986944+00:00"
+    "retrieved_at": "2026-11-13T16:15:31.765342+00:00"
   },
   {
     "organisation_number": "811569062",
@@ -2019,7 +2019,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811569062",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:55.582367+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.252107+00:00"
   },
   {
     "organisation_number": "811569402",
@@ -2042,7 +2042,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811569402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:55.655386+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.253056+00:00"
   },
   {
     "organisation_number": "811569852",
@@ -2066,7 +2066,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811569852",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:55.643132+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.276482+00:00"
   },
   {
     "organisation_number": "811571172",
@@ -2089,7 +2089,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811571172",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:55.675218+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.420181+00:00"
   },
   {
     "organisation_number": "811571202",
@@ -2113,7 +2113,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811571202",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:56.271721+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.894367+00:00"
   },
   {
     "organisation_number": "811571342",
@@ -2136,7 +2136,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811571342",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:56.332519+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.884872+00:00"
   },
   {
     "organisation_number": "811571822",
@@ -2159,7 +2159,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811571822",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:56.360580+00:00"
+    "retrieved_at": "2026-11-13T16:15:32.924689+00:00"
   },
   {
     "organisation_number": "811572012",
@@ -2172,7 +2172,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811572012",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:56.384987+00:00"
+    "retrieved_at": "2026-11-13T16:15:33.045823+00:00"
   },
   {
     "organisation_number": "811572292",
@@ -2195,7 +2195,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811572292",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:56.966012+00:00"
+    "retrieved_at": "2026-11-13T16:15:33.536895+00:00"
   },
   {
     "organisation_number": "811572322",
@@ -2218,7 +2218,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811572322",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.023142+00:00"
+    "retrieved_at": "2026-11-13T16:15:33.561188+00:00"
   },
   {
     "organisation_number": "811572802",
@@ -2242,7 +2242,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811572802",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.049058+00:00"
+    "retrieved_at": "2026-11-13T16:15:33.554818+00:00"
   },
   {
     "organisation_number": "811572942",
@@ -2265,7 +2265,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811572942",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.096871+00:00"
+    "retrieved_at": "2026-11-13T16:15:33.677592+00:00"
   },
   {
     "organisation_number": "811573272",
@@ -2288,7 +2288,7 @@
     "bankruptcy": true,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811573272",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.679387+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.184401+00:00"
   },
   {
     "organisation_number": "811573302",
@@ -2311,7 +2311,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811573302",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.732858+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.182660+00:00"
   },
   {
     "organisation_number": "811573582",
@@ -2334,7 +2334,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811573582",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.765892+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.190873+00:00"
   },
   {
     "organisation_number": "811573612",
@@ -2358,7 +2358,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811573612",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:57.806108+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.306330+00:00"
   },
   {
     "organisation_number": "811573752",
@@ -2381,7 +2381,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811573752",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:58.378153+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.824444+00:00"
   },
   {
     "organisation_number": "811576182",
@@ -2405,7 +2405,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811576182",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:58.440184+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.809890+00:00"
   },
   {
     "organisation_number": "811576972",
@@ -2428,7 +2428,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811576972",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:58.476702+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.816682+00:00"
   },
   {
     "organisation_number": "811577022",
@@ -2452,7 +2452,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811577022",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:58.498142+00:00"
+    "retrieved_at": "2026-11-13T16:15:34.926628+00:00"
   },
   {
     "organisation_number": "811577332",
@@ -2475,7 +2475,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811577332",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.087685+00:00"
+    "retrieved_at": "2026-11-13T16:15:35.448339+00:00"
   },
   {
     "organisation_number": "811577472",
@@ -2498,7 +2498,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811577472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.135997+00:00"
+    "retrieved_at": "2026-11-13T16:15:35.446519+00:00"
   },
   {
     "organisation_number": "811577502",
@@ -2522,7 +2522,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811577502",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.203435+00:00"
+    "retrieved_at": "2026-11-13T16:15:35.475054+00:00"
   },
   {
     "organisation_number": "811577642",
@@ -2545,7 +2545,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811577642",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.210130+00:00"
+    "retrieved_at": "2026-11-13T16:15:35.548942+00:00"
   },
   {
     "organisation_number": "811577812",
@@ -2568,7 +2568,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811577812",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.795906+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.084130+00:00"
   },
   {
     "organisation_number": "811578282",
@@ -2591,7 +2591,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811578282",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.827033+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.083364+00:00"
   },
   {
     "organisation_number": "811580082",
@@ -2614,7 +2614,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811580082",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.932351+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.093403+00:00"
   },
   {
     "organisation_number": "811581232",
@@ -2637,7 +2637,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811581232",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:10:59.917407+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.188512+00:00"
   },
   {
     "organisation_number": "811582662",
@@ -2660,7 +2660,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811582662",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:00.487889+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.751192+00:00"
   },
   {
     "organisation_number": "811582832",
@@ -2683,7 +2683,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811582832",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:00.538420+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.729610+00:00"
   },
   {
     "organisation_number": "811583472",
@@ -2706,7 +2706,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811583472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:00.625788+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.720519+00:00"
   },
   {
     "organisation_number": "811583812",
@@ -2729,7 +2729,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811583812",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:00.626225+00:00"
+    "retrieved_at": "2026-11-13T16:15:36.805401+00:00"
   },
   {
     "organisation_number": "811584282",
@@ -2752,7 +2752,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811584282",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:01.197609+00:00"
+    "retrieved_at": "2026-11-13T16:15:37.356814+00:00"
   },
   {
     "organisation_number": "811584762",
@@ -2775,7 +2775,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811584762",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:01.233323+00:00"
+    "retrieved_at": "2026-11-13T16:15:37.352433+00:00"
   },
   {
     "organisation_number": "811585092",
@@ -2798,7 +2798,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811585092",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:01.315335+00:00"
+    "retrieved_at": "2026-11-13T16:15:37.370570+00:00"
   },
   {
     "organisation_number": "811585572",
@@ -2821,7 +2821,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811585572",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:01.333292+00:00"
+    "retrieved_at": "2026-11-13T16:15:37.426512+00:00"
   },
   {
     "organisation_number": "811586412",
@@ -2844,7 +2844,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811586412",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:01.904545+00:00"
+    "retrieved_at": "2026-11-13T16:15:37.985772+00:00"
   },
   {
     "organisation_number": "811586722",
@@ -2867,7 +2867,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811586722",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:01.923396+00:00"
+    "retrieved_at": "2026-11-13T16:15:37.998137+00:00"
   },
   {
     "organisation_number": "811587222",
@@ -2890,7 +2890,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811587222",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:02.053049+00:00"
+    "retrieved_at": "2026-11-13T16:15:38.026813+00:00"
   },
   {
     "organisation_number": "811587362",
@@ -2913,7 +2913,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811587362",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:02.023094+00:00"
+    "retrieved_at": "2026-11-13T16:15:38.048682+00:00"
   },
   {
     "organisation_number": "811588032",
@@ -2937,7 +2937,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811588032",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:02.598661+00:00"
+    "retrieved_at": "2026-11-13T16:15:38.606214+00:00"
   },
   {
     "organisation_number": "811588202",
@@ -2960,7 +2960,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811588202",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:02.632743+00:00"
+    "retrieved_at": "2026-11-13T16:15:38.626933+00:00"
   },
   {
     "organisation_number": "811589292",
@@ -2984,7 +2984,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811589292",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:02.721911+00:00"
+    "retrieved_at": "2026-11-13T16:15:38.665537+00:00"
   },
   {
     "organisation_number": "811591122",
@@ -3007,7 +3007,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811591122",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:02.784628+00:00"
+    "retrieved_at": "2026-11-13T16:15:38.674812+00:00"
   },
   {
     "organisation_number": "811592072",
@@ -3030,7 +3030,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811592072",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:03.328158+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.227371+00:00"
   },
   {
     "organisation_number": "811592692",
@@ -3053,7 +3053,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811592692",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:03.317984+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.248727+00:00"
   },
   {
     "organisation_number": "811592862",
@@ -3076,7 +3076,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811592862",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:03.412228+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.311527+00:00"
   },
   {
     "organisation_number": "811593052",
@@ -3099,7 +3099,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811593052",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:03.494675+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.315473+00:00"
   },
   {
     "organisation_number": "811593192",
@@ -3122,7 +3122,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811593192",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.047834+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.880260+00:00"
   },
   {
     "organisation_number": "811593362",
@@ -3145,7 +3145,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811593362",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.018428+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.879663+00:00"
   },
   {
     "organisation_number": "811593672",
@@ -3168,7 +3168,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811593672",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.106789+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.940422+00:00"
   },
   {
     "organisation_number": "811594032",
@@ -3191,7 +3191,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811594032",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.224614+00:00"
+    "retrieved_at": "2026-11-13T16:15:39.959093+00:00"
   },
   {
     "organisation_number": "811594172",
@@ -3214,7 +3214,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811594172",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.706169+00:00"
+    "retrieved_at": "2026-11-13T16:15:40.509860+00:00"
   },
   {
     "organisation_number": "811594512",
@@ -3237,7 +3237,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811594512",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.754756+00:00"
+    "retrieved_at": "2026-11-13T16:15:40.508829+00:00"
   },
   {
     "organisation_number": "811594652",
@@ -3261,7 +3261,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811594652",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.811963+00:00"
+    "retrieved_at": "2026-11-13T16:15:40.562858+00:00"
   },
   {
     "organisation_number": "811594792",
@@ -3281,7 +3281,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811594792",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:04.912541+00:00"
+    "retrieved_at": "2026-11-13T16:15:40.603822+00:00"
   },
   {
     "organisation_number": "811595942",
@@ -3304,7 +3304,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811595942",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:05.396464+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.136260+00:00"
   },
   {
     "organisation_number": "811597732",
@@ -3327,7 +3327,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811597732",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:05.442140+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.135251+00:00"
   },
   {
     "organisation_number": "811598542",
@@ -3350,7 +3350,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811598542",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:05.499980+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.192614+00:00"
   },
   {
     "organisation_number": "811598682",
@@ -3373,7 +3373,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811598682",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:05.641916+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.250308+00:00"
   },
   {
     "organisation_number": "811598992",
@@ -3396,7 +3396,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811598992",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.088461+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.758615+00:00"
   },
   {
     "organisation_number": "811599492",
@@ -3419,7 +3419,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811599492",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.167267+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.763552+00:00"
   },
   {
     "organisation_number": "811599522",
@@ -3442,7 +3442,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811599522",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.208357+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.850857+00:00"
   },
   {
     "organisation_number": "811600032",
@@ -3465,7 +3465,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811600032",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.375507+00:00"
+    "retrieved_at": "2026-11-13T16:15:41.888703+00:00"
   },
   {
     "organisation_number": "811600202",
@@ -3488,7 +3488,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811600202",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.776558+00:00"
+    "retrieved_at": "2026-11-13T16:15:42.393096+00:00"
   },
   {
     "organisation_number": "811600792",
@@ -3511,7 +3511,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811600792",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.856523+00:00"
+    "retrieved_at": "2026-11-13T16:15:42.388287+00:00"
   },
   {
     "organisation_number": "811602892",
@@ -3534,7 +3534,7 @@
     "bankruptcy": true,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811602892",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:06.895113+00:00"
+    "retrieved_at": "2026-11-13T16:15:42.496836+00:00"
   },
   {
     "organisation_number": "811602922",
@@ -3557,7 +3557,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811602922",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:07.084886+00:00"
+    "retrieved_at": "2026-11-13T16:15:42.510205+00:00"
   },
   {
     "organisation_number": "811603112",
@@ -3570,7 +3570,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811603112",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:07.465000+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.009040+00:00"
   },
   {
     "organisation_number": "811604062",
@@ -3594,7 +3594,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811604062",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:07.564026+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.022105+00:00"
   },
   {
     "organisation_number": "811604542",
@@ -3617,7 +3617,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811604542",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:07.582186+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.142836+00:00"
   },
   {
     "organisation_number": "811604712",
@@ -3640,7 +3640,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811604712",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:07.777155+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.143056+00:00"
   },
   {
     "organisation_number": "811604992",
@@ -3663,7 +3663,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811604992",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.165595+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.639639+00:00"
   },
   {
     "organisation_number": "811605212",
@@ -3686,7 +3686,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811605212",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.252224+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.654433+00:00"
   },
   {
     "organisation_number": "811605352",
@@ -3709,7 +3709,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811605352",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.280524+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.775291+00:00"
   },
   {
     "organisation_number": "811606472",
@@ -3729,7 +3729,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811606472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.467579+00:00"
+    "retrieved_at": "2026-11-13T16:15:43.768269+00:00"
   },
   {
     "organisation_number": "811607002",
@@ -3753,7 +3753,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811607002",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.854577+00:00"
+    "retrieved_at": "2026-11-13T16:15:44.276180+00:00"
   },
   {
     "organisation_number": "811608602",
@@ -3776,7 +3776,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811608602",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.961235+00:00"
+    "retrieved_at": "2026-11-13T16:15:44.290506+00:00"
   },
   {
     "organisation_number": "811609072",
@@ -3799,7 +3799,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811609072",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:08.998205+00:00"
+    "retrieved_at": "2026-11-13T16:15:44.393494+00:00"
   },
   {
     "organisation_number": "811610402",
@@ -3822,7 +3822,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811610402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:09.156293+00:00"
+    "retrieved_at": "2026-11-13T16:15:44.415541+00:00"
   },
   {
     "organisation_number": "811610712",
@@ -3845,7 +3845,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811610712",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:09.577920+00:00"
+    "retrieved_at": "2026-11-13T16:15:44.912363+00:00"
   },
   {
     "organisation_number": "811611212",
@@ -3868,7 +3868,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811611212",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:09.656713+00:00"
+    "retrieved_at": "2026-11-13T16:15:44.933902+00:00"
   },
   {
     "organisation_number": "811611972",
@@ -3889,7 +3889,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811611972",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:09.685400+00:00"
+    "retrieved_at": "2026-11-13T16:15:45.032139+00:00"
   },
   {
     "organisation_number": "811612022",
@@ -3910,7 +3910,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811612022",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:09.844844+00:00"
+    "retrieved_at": "2026-11-13T16:15:45.041495+00:00"
   },
   {
     "organisation_number": "811612162",
@@ -3923,7 +3923,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811612162",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:10.270904+00:00"
+    "retrieved_at": "2026-11-13T16:15:45.554595+00:00"
   },
   {
     "organisation_number": "811612472",
@@ -3946,7 +3946,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811612472",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:10.348457+00:00"
+    "retrieved_at": "2026-11-13T16:15:45.599879+00:00"
   },
   {
     "organisation_number": "811612502",
@@ -3966,7 +3966,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811612502",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:10.394945+00:00"
+    "retrieved_at": "2026-11-13T16:15:45.672550+00:00"
   },
   {
     "organisation_number": "811613932",
@@ -3989,7 +3989,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811613932",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:10.532999+00:00"
+    "retrieved_at": "2026-11-13T16:15:45.670269+00:00"
   },
   {
     "organisation_number": "811615412",
@@ -4012,7 +4012,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811615412",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:10.960358+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.174494+00:00"
   },
   {
     "organisation_number": "811615552",
@@ -4035,7 +4035,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811615552",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.037332+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.230013+00:00"
   },
   {
     "organisation_number": "811616362",
@@ -4058,7 +4058,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811616362",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.088288+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.310863+00:00"
   },
   {
     "organisation_number": "811618292",
@@ -4081,7 +4081,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811618292",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.255456+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.302703+00:00"
   },
   {
     "organisation_number": "811618772",
@@ -4104,7 +4104,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811618772",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.671392+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.815519+00:00"
   },
   {
     "organisation_number": "811620122",
@@ -4127,7 +4127,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811620122",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.744979+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.850877+00:00"
   },
   {
     "organisation_number": "811620432",
@@ -4151,7 +4151,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811620432",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.783923+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.929200+00:00"
   },
   {
     "organisation_number": "811620882",
@@ -4174,7 +4174,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811620882",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:11.962482+00:00"
+    "retrieved_at": "2026-11-13T16:15:46.954400+00:00"
   },
   {
     "organisation_number": "811621382",
@@ -4197,7 +4197,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811621382",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:12.382711+00:00"
+    "retrieved_at": "2026-11-13T16:15:47.461191+00:00"
   },
   {
     "organisation_number": "811621862",
@@ -4221,7 +4221,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811621862",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:12.454047+00:00"
+    "retrieved_at": "2026-11-13T16:15:47.470326+00:00"
   },
   {
     "organisation_number": "811623202",
@@ -4244,7 +4244,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811623202",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:12.472587+00:00"
+    "retrieved_at": "2026-11-13T16:15:47.551433+00:00"
   },
   {
     "organisation_number": "811624632",
@@ -4267,7 +4267,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811624632",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:12.651238+00:00"
+    "retrieved_at": "2026-11-13T16:15:47.590932+00:00"
   },
   {
     "organisation_number": "811624942",
@@ -4290,7 +4290,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811624942",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.114457+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.101161+00:00"
   },
   {
     "organisation_number": "811625132",
@@ -4314,7 +4314,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811625132",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.142456+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.090176+00:00"
   },
   {
     "organisation_number": "811625442",
@@ -4337,7 +4337,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811625442",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.162198+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.179842+00:00"
   },
   {
     "organisation_number": "811625582",
@@ -4361,7 +4361,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811625582",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.345045+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.206700+00:00"
   },
   {
     "organisation_number": "811625612",
@@ -4384,7 +4384,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811625612",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.846778+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.720289+00:00"
   },
   {
     "organisation_number": "811625922",
@@ -4408,7 +4408,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811625922",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.849672+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.724818+00:00"
   },
   {
     "organisation_number": "811626562",
@@ -4432,7 +4432,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811626562",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:13.851376+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.800511+00:00"
   },
   {
     "organisation_number": "811629642",
@@ -4455,7 +4455,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811629642",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:14.034790+00:00"
+    "retrieved_at": "2026-11-13T16:15:48.831764+00:00"
   },
   {
     "organisation_number": "811630012",
@@ -4478,7 +4478,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811630012",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:14.556581+00:00"
+    "retrieved_at": "2026-11-13T16:15:49.341266+00:00"
   },
   {
     "organisation_number": "811630292",
@@ -4501,7 +4501,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811630292",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:14.538437+00:00"
+    "retrieved_at": "2026-11-13T16:15:49.363762+00:00"
   },
   {
     "organisation_number": "811630632",
@@ -4524,7 +4524,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811630632",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:14.541494+00:00"
+    "retrieved_at": "2026-11-13T16:15:49.442403+00:00"
   },
   {
     "organisation_number": "811632082",
@@ -4549,7 +4549,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811632082",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:14.747607+00:00"
+    "retrieved_at": "2026-11-13T16:15:49.454059+00:00"
   },
   {
     "organisation_number": "811632112",
@@ -4569,7 +4569,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811632112",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.248407+00:00"
+    "retrieved_at": "2026-11-13T16:15:49.980041+00:00"
   },
   {
     "organisation_number": "811632562",
@@ -4592,7 +4592,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811632562",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.252541+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.007305+00:00"
   },
   {
     "organisation_number": "811633062",
@@ -4615,7 +4615,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811633062",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.265718+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.068812+00:00"
   },
   {
     "organisation_number": "811633402",
@@ -4635,7 +4635,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811633402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.435109+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.091536+00:00"
   },
   {
     "organisation_number": "811633992",
@@ -4658,7 +4658,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811633992",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.935550+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.621354+00:00"
   },
   {
     "organisation_number": "811634182",
@@ -4681,7 +4681,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811634182",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.961393+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.658159+00:00"
   },
   {
     "organisation_number": "811635162",
@@ -4701,7 +4701,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811635162",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:15.954069+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.702270+00:00"
   },
   {
     "organisation_number": "811636002",
@@ -4724,7 +4724,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811636002",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:16.142143+00:00"
+    "retrieved_at": "2026-11-13T16:15:50.732384+00:00"
   },
   {
     "organisation_number": "811636282",
@@ -4748,7 +4748,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811636282",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:16.631380+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.252206+00:00"
   },
   {
     "organisation_number": "811637432",
@@ -4771,7 +4771,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811637432",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:16.641118+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.327107+00:00"
   },
   {
     "organisation_number": "811639222",
@@ -4784,7 +4784,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811639222",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:16.670944+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.333017+00:00"
   },
   {
     "organisation_number": "811639842",
@@ -4807,7 +4807,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811639842",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:16.831420+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.414246+00:00"
   },
   {
     "organisation_number": "811640522",
@@ -4831,7 +4831,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811640522",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:17.346952+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.899364+00:00"
   },
   {
     "organisation_number": "811641332",
@@ -4854,7 +4854,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811641332",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:17.360079+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.960245+00:00"
   },
   {
     "organisation_number": "811641642",
@@ -4877,7 +4877,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811641642",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:17.359179+00:00"
+    "retrieved_at": "2026-11-13T16:15:51.953064+00:00"
   },
   {
     "organisation_number": "811642622",
@@ -4900,7 +4900,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811642622",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:17.534157+00:00"
+    "retrieved_at": "2026-11-13T16:15:52.044045+00:00"
   },
   {
     "organisation_number": "811643122",
@@ -4924,7 +4924,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811643122",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.056533+00:00"
+    "retrieved_at": "2026-11-13T16:15:52.546220+00:00"
   },
   {
     "organisation_number": "811644072",
@@ -4947,7 +4947,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811644072",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.048628+00:00"
+    "retrieved_at": "2026-11-13T16:15:52.576297+00:00"
   },
   {
     "organisation_number": "811644412",
@@ -4970,7 +4970,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811644412",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.089112+00:00"
+    "retrieved_at": "2026-11-13T16:15:52.589963+00:00"
   },
   {
     "organisation_number": "811644862",
@@ -4993,7 +4993,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811644862",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.219936+00:00"
+    "retrieved_at": "2026-11-13T16:15:52.667276+00:00"
   },
   {
     "organisation_number": "811648272",
@@ -5016,7 +5016,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811648272",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.742678+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.176923+00:00"
   },
   {
     "organisation_number": "811648582",
@@ -5039,7 +5039,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811648582",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.746179+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.195283+00:00"
   },
   {
     "organisation_number": "811649422",
@@ -5062,7 +5062,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811649422",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.800337+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.226549+00:00"
   },
   {
     "organisation_number": "811649732",
@@ -5085,7 +5085,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811649732",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:18.914262+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.299927+00:00"
   },
   {
     "organisation_number": "811649872",
@@ -5108,7 +5108,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811649872",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:19.430618+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.806192+00:00"
   },
   {
     "organisation_number": "811650072",
@@ -5131,7 +5131,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811650072",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:19.433832+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.822070+00:00"
   },
   {
     "organisation_number": "811650382",
@@ -5154,7 +5154,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811650382",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:19.507819+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.856972+00:00"
   },
   {
     "organisation_number": "811651222",
@@ -5177,7 +5177,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811651222",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:19.631006+00:00"
+    "retrieved_at": "2026-11-13T16:15:53.920430+00:00"
   },
   {
     "organisation_number": "811651532",
@@ -5200,7 +5200,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811651532",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.141064+00:00"
+    "retrieved_at": "2026-11-13T16:15:54.436153+00:00"
   },
   {
     "organisation_number": "811651842",
@@ -5223,7 +5223,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811651842",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.127593+00:00"
+    "retrieved_at": "2026-11-13T16:15:54.439437+00:00"
   },
   {
     "organisation_number": "811653942",
@@ -5246,7 +5246,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811653942",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.198347+00:00"
+    "retrieved_at": "2026-11-13T16:15:54.520990+00:00"
   },
   {
     "organisation_number": "811654132",
@@ -5269,7 +5269,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811654132",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.347507+00:00"
+    "retrieved_at": "2026-11-13T16:15:54.582510+00:00"
   },
   {
     "organisation_number": "811654302",
@@ -5292,7 +5292,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811654302",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.816705+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.054573+00:00"
   },
   {
     "organisation_number": "811654922",
@@ -5316,7 +5316,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811654922",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.847336+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.062646+00:00"
   },
   {
     "organisation_number": "811655082",
@@ -5340,7 +5340,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811655082",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:20.895586+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.164100+00:00"
   },
   {
     "organisation_number": "811655252",
@@ -5363,7 +5363,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811655252",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:21.056932+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.224873+00:00"
   },
   {
     "organisation_number": "811655422",
@@ -5386,7 +5386,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811655422",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:21.511902+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.672845+00:00"
   },
   {
     "organisation_number": "811655732",
@@ -5410,7 +5410,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811655732",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:21.542619+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.696561+00:00"
   },
   {
     "organisation_number": "811655902",
@@ -5433,7 +5433,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811655902",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:21.607285+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.793292+00:00"
   },
   {
     "organisation_number": "811656232",
@@ -5456,7 +5456,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811656232",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:21.773473+00:00"
+    "retrieved_at": "2026-11-13T16:15:55.863038+00:00"
   },
   {
     "organisation_number": "811656682",
@@ -5479,7 +5479,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811656682",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:22.203878+00:00"
+    "retrieved_at": "2026-11-13T16:15:56.299159+00:00"
   },
   {
     "organisation_number": "811656712",
@@ -5503,7 +5503,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811656712",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:22.232009+00:00"
+    "retrieved_at": "2026-11-13T16:15:56.338626+00:00"
   },
   {
     "organisation_number": "811656992",
@@ -5527,7 +5527,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811656992",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:22.323217+00:00"
+    "retrieved_at": "2026-11-13T16:15:56.414425+00:00"
   },
   {
     "organisation_number": "811657522",
@@ -5551,7 +5551,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811657522",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:22.462561+00:00"
+    "retrieved_at": "2026-11-13T16:15:56.481088+00:00"
   },
   {
     "organisation_number": "811659282",
@@ -5574,7 +5574,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811659282",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:22.892200+00:00"
+    "retrieved_at": "2026-11-13T16:15:56.943237+00:00"
   },
   {
     "organisation_number": "811660582",
@@ -5598,7 +5598,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811660582",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:22.920672+00:00"
+    "retrieved_at": "2026-11-13T16:15:56.967512+00:00"
   },
   {
     "organisation_number": "811661112",
@@ -5621,7 +5621,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811661112",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:23.034533+00:00"
+    "retrieved_at": "2026-11-13T16:15:57.058914+00:00"
   },
   {
     "organisation_number": "811661252",
@@ -5644,7 +5644,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811661252",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:23.177879+00:00"
+    "retrieved_at": "2026-11-13T16:15:57.104941+00:00"
   },
   {
     "organisation_number": "811661902",
@@ -5668,7 +5668,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811661902",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:23.580912+00:00"
+    "retrieved_at": "2026-11-13T16:15:57.568484+00:00"
   },
   {
     "organisation_number": "811662232",
@@ -5691,7 +5691,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811662232",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:23.609576+00:00"
+    "retrieved_at": "2026-11-13T16:15:57.592212+00:00"
   },
   {
     "organisation_number": "811662372",
@@ -5711,7 +5711,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811662372",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:23.744672+00:00"
+    "retrieved_at": "2026-11-13T16:15:57.708747+00:00"
   },
   {
     "organisation_number": "811662712",
@@ -5734,7 +5734,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811662712",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:23.865404+00:00"
+    "retrieved_at": "2026-11-13T16:15:57.734633+00:00"
   },
   {
     "organisation_number": "811665762",
@@ -5757,7 +5757,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811665762",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:24.270897+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.194482+00:00"
   },
   {
     "organisation_number": "811668052",
@@ -5780,7 +5780,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811668052",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:24.298006+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.241450+00:00"
   },
   {
     "organisation_number": "811668532",
@@ -5803,7 +5803,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811668532",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:24.433105+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.345896+00:00"
   },
   {
     "organisation_number": "811669202",
@@ -5826,7 +5826,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811669202",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:24.552836+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.382192+00:00"
   },
   {
     "organisation_number": "811669342",
@@ -5849,7 +5849,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811669342",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:24.979952+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.831391+00:00"
   },
   {
     "organisation_number": "811669482",
@@ -5872,7 +5872,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811669482",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:24.987582+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.865646+00:00"
   },
   {
     "organisation_number": "811669512",
@@ -5895,7 +5895,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811669512",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:25.121814+00:00"
+    "retrieved_at": "2026-11-13T16:15:58.973840+00:00"
   },
   {
     "organisation_number": "811671592",
@@ -5919,7 +5919,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811671592",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:25.265963+00:00"
+    "retrieved_at": "2026-11-13T16:15:59.033279+00:00"
   },
   {
     "organisation_number": "811671622",
@@ -5939,7 +5939,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811671622",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:25.669246+00:00"
+    "retrieved_at": "2026-11-13T16:15:59.465879+00:00"
   },
   {
     "organisation_number": "811671762",
@@ -5952,7 +5952,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811671762",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:25.699474+00:00"
+    "retrieved_at": "2026-11-13T16:15:59.505174+00:00"
   },
   {
     "organisation_number": "811673862",
@@ -5975,7 +5975,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811673862",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:25.809749+00:00"
+    "retrieved_at": "2026-11-13T16:15:59.625533+00:00"
   },
   {
     "organisation_number": "811674362",
@@ -5998,7 +5998,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811674362",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:25.965915+00:00"
+    "retrieved_at": "2026-11-13T16:15:59.669955+00:00"
   },
   {
     "organisation_number": "811674532",
@@ -6021,7 +6021,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811674532",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:26.384022+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.114509+00:00"
   },
   {
     "organisation_number": "811674982",
@@ -6044,7 +6044,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811674982",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:26.394828+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.151920+00:00"
   },
   {
     "organisation_number": "811675032",
@@ -6067,7 +6067,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811675032",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:26.516776+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.259392+00:00"
   },
   {
     "organisation_number": "811675482",
@@ -6090,7 +6090,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811675482",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:26.656049+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.291814+00:00"
   },
   {
     "organisation_number": "811675792",
@@ -6113,7 +6113,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811675792",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.075770+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.739893+00:00"
   },
   {
     "organisation_number": "811676632",
@@ -6136,7 +6136,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811676632",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.095854+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.779006+00:00"
   },
   {
     "organisation_number": "811678082",
@@ -6157,7 +6157,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811678082",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.234076+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.877038+00:00"
   },
   {
     "organisation_number": "811678112",
@@ -6178,7 +6178,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811678112",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.383854+00:00"
+    "retrieved_at": "2026-11-13T16:16:00.912357+00:00"
   },
   {
     "organisation_number": "811679402",
@@ -6202,7 +6202,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811679402",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.780237+00:00"
+    "retrieved_at": "2026-11-13T16:16:01.366179+00:00"
   },
   {
     "organisation_number": "811679712",
@@ -6215,7 +6215,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811679712",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.782714+00:00"
+    "retrieved_at": "2026-11-13T16:16:01.417943+00:00"
   },
   {
     "organisation_number": "811679992",
@@ -6238,7 +6238,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811679992",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:27.924046+00:00"
+    "retrieved_at": "2026-11-13T16:16:01.510392+00:00"
   },
   {
     "organisation_number": "811680532",
@@ -6261,7 +6261,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811680532",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:28.073366+00:00"
+    "retrieved_at": "2026-11-13T16:16:01.535091+00:00"
   },
   {
     "organisation_number": "811682462",
@@ -6284,7 +6284,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811682462",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:28.470478+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.012203+00:00"
   },
   {
     "organisation_number": "811683612",
@@ -6305,7 +6305,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811683612",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:28.469282+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.047337+00:00"
   },
   {
     "organisation_number": "811683922",
@@ -6328,7 +6328,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811683922",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:28.614223+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.154381+00:00"
   },
   {
     "organisation_number": "811684252",
@@ -6351,7 +6351,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811684252",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:28.762238+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.160366+00:00"
   },
   {
     "organisation_number": "811684732",
@@ -6374,7 +6374,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811684732",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:29.158416+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.647255+00:00"
   },
   {
     "organisation_number": "811684872",
@@ -6397,7 +6397,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811684872",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:29.166899+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.671131+00:00"
   },
   {
     "organisation_number": "811685852",
@@ -6420,7 +6420,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811685852",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:29.326535+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.808456+00:00"
   },
   {
     "organisation_number": "811686212",
@@ -6443,7 +6443,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811686212",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:29.450146+00:00"
+    "retrieved_at": "2026-11-13T16:16:02.799825+00:00"
   },
   {
     "organisation_number": "811686522",
@@ -6466,7 +6466,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811686522",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:29.874752+00:00"
+    "retrieved_at": "2026-11-13T16:16:03.284162+00:00"
   },
   {
     "organisation_number": "811687022",
@@ -6489,7 +6489,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811687022",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:29.855953+00:00"
+    "retrieved_at": "2026-11-13T16:16:03.297391+00:00"
   },
   {
     "organisation_number": "811687162",
@@ -6512,7 +6512,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811687162",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:30.038358+00:00"
+    "retrieved_at": "2026-11-13T16:16:03.448277+00:00"
   },
   {
     "organisation_number": "811687332",
@@ -6536,7 +6536,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811687332",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:30.138249+00:00"
+    "retrieved_at": "2026-11-13T16:16:03.448610+00:00"
   },
   {
     "organisation_number": "811687642",
@@ -6559,7 +6559,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811687642",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:30.545628+00:00"
+    "retrieved_at": "2026-11-13T16:16:03.908627+00:00"
   },
   {
     "organisation_number": "811687952",
@@ -6582,7 +6582,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811687952",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:30.605574+00:00"
+    "retrieved_at": "2026-11-13T16:16:03.928432+00:00"
   },
   {
     "organisation_number": "811688282",
@@ -6605,7 +6605,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811688282",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:30.749283+00:00"
+    "retrieved_at": "2026-11-13T16:16:04.089902+00:00"
   },
   {
     "organisation_number": "811689262",
@@ -6628,7 +6628,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811689262",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:30.827160+00:00"
+    "retrieved_at": "2026-11-13T16:16:04.069748+00:00"
   },
   {
     "organisation_number": "811689432",
@@ -6652,7 +6652,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811689432",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:31.235431+00:00"
+    "retrieved_at": "2026-11-13T16:16:04.537516+00:00"
   },
   {
     "organisation_number": "811690252",
@@ -6675,7 +6675,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811690252",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:31.320403+00:00"
+    "retrieved_at": "2026-11-13T16:16:04.569312+00:00"
   },
   {
     "organisation_number": "811693502",
@@ -6698,7 +6698,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811693502",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:31.465492+00:00"
+    "retrieved_at": "2026-11-13T16:16:04.694037+00:00"
   },
   {
     "organisation_number": "811694002",
@@ -6718,7 +6718,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811694002",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:31.520421+00:00"
+    "retrieved_at": "2026-11-13T16:16:04.711736+00:00"
   },
   {
     "organisation_number": "811695262",
@@ -6741,7 +6741,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811695262",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:31.959778+00:00"
+    "retrieved_at": "2026-11-13T16:16:05.206979+00:00"
   },
   {
     "organisation_number": "811695432",
@@ -6764,7 +6764,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811695432",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:32.030494+00:00"
+    "retrieved_at": "2026-11-13T16:16:05.192812+00:00"
   },
   {
     "organisation_number": "811695572",
@@ -6789,7 +6789,7 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811695572",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:32.154573+00:00"
+    "retrieved_at": "2026-11-13T16:16:05.321838+00:00"
   },
   {
     "organisation_number": "811695602",
@@ -6812,6 +6812,6 @@
     "bankruptcy": false,
     "registry_source": "https://data.brreg.no/enhetsregisteret/api/enheter/811695602",
     "verification": "exact official org-number record and legal-name match",
-    "retrieved_at": "2026-11-13T16:11:32.208598+00:00"
+    "retrieved_at": "2026-11-13T16:16:05.351284+00:00"
   }
 ]
