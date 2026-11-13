@@ -24,6 +24,8 @@ html,body{max-width:100%;overflow-x:clip}
 .hero h1{font-weight:850;max-width:840px}
 .surface{box-shadow:0 14px 35px rgba(9,29,38,.06)}
 @media(max-width:480px){.compare-table{font-size:11px}.compare-table td,.compare-table th{padding:8px 5px}.evidence-facts{grid-template-columns:1fr}.evidence-facts dt{padding-top:7px}}
+.synthesis-card{padding:18px;border:1px solid #c6e6d9;border-radius:14px;background:linear-gradient(140deg,#f4fbf7,#e6f5ed);margin:15px 0}
+.synthesis-card p{margin:10px 0;color:#254e49;line-height:1.65}.synthesis-card .sourcelink{margin:0 0 10px}
 @media(max-width:720px){.grid,.cards{grid-template-columns:1fr}.top .wrap{align-items:flex-start;padding-top:14px;padding-bottom:14px;flex-direction:column;gap:7px}.hero{padding:40px 0 24px}.wrap{padding:0 16px}.surface{padding:16px}.searchbar{grid-template-columns:1fr}.searchbar .btn{width:100%}.compare-table{font-size:12px}h1{letter-spacing:-.04em}}
 </style></head><body>
 <header class="top"><div class="wrap"><a href="/" class="brand">◈ SIGNALPOST<span>.</span></a><nav class="nav"><a href="#discover">Discover</a><a href="#compare">Compare</a><a href="#research">Research &amp; evidence</a><a href="/docs">API docs</a></nav></div></header>
@@ -142,6 +144,19 @@ function appendEvidenceFields(host,value,depth=0){
 function renderEvidence(which,data){
 const host=$(which+'evidence');host.replaceChildren();const p=data.profile||{},sy=p.synthesis||{},modules=p.evidence||{};
 const intro=document.createElement('p');intro.className='sub';intro.textContent='Run: '+(data.run_id||'unknown')+' · '+Object.keys(modules).length+' modules · '+(sy.facts||[]).length+' reported facts';host.append(intro);
+if((sy.overview||[]).length){
+ const section=document.createElement('section');section.className='synthesis-card';
+ const heading=document.createElement('h3');heading.textContent='What the sources establish';section.append(heading);
+ for(const entry of sy.overview){const row=document.createElement('p');row.textContent=entry.text||'';section.append(row);if(entry.source_url){section.append(linkEl(entry.source_url,'Verify statement ↗'))}}
+ host.append(section)
+}
+if((sy.unknowns||[]).length){
+ const panel=document.createElement('details');panel.className='module';
+ const heading=document.createElement('summary');heading.textContent=sy.unknowns.length+' research gaps / not independently established';panel.append(heading);
+ for(const unknown of sy.unknowns){const p=document.createElement('p');p.className='sub';p.textContent=(unknown.topic||'Unknown')+' — '+(unknown.state||'not verified')+'. '+(unknown.explanation||'');panel.append(p)}
+ host.append(panel)
+}
+if(sy.what_changed){const note=document.createElement('p');note.className='sub';note.textContent='Refresh status: '+humanLabel(sy.what_changed.status||'not evaluated')+' · '+String(sy.what_changed.change_count??0)+' documented changes';host.append(note)}
 for(const [name,item] of Object.entries(modules)){
 const box=document.createElement('details');box.className='module';const summary=document.createElement('summary');summary.textContent=humanLabel(name)+' · '+(item?.status||'unavailable');box.append(summary);
 const meta=document.createElement('p');meta.className='source-meta';meta.textContent='Status: '+(item?.status||'not reported')+' · Retrieved: '+format(item?.retrieved_at);box.append(meta);
