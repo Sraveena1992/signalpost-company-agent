@@ -93,3 +93,6 @@ def test_workspace_financial_and_evidence_rendering_is_human_readable():
     assert "table-layout:fixed" in html
     assert "overflow-x:clip" in html
     assert "Not verified in this run" in html
+    assert "What the sources establish" in html
+    assert "research gaps / not independently established" in html
+    assert "Refresh status:" in html
