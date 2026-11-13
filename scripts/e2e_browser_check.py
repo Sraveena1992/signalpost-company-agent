@@ -110,6 +110,9 @@ def main():
         secondary=landing.locator(".hero-actions a.button.secondary")
         assert secondary.count()==1
         assert "Compare two companies" in secondary.inner_text()
+        assert landing.locator(".hero-visual .hero-step").count()==3
+        assert "SOURCE-LED RESEARCH" in landing.locator(".hero-visual").inner_text()
+        assert "Every company." in landing.locator(".hero h1").inner_text()
         ratio=secondary.evaluate("""el=>{
           const css=getComputedStyle(el), fg=css.color,bg=css.backgroundColor;
           function luminance(str){
