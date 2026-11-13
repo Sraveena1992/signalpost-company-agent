@@ -30,6 +30,9 @@ def check():
     assert all(item["registry_source"].endswith("/"+item["organisation_number"]) for item in directory)
     workspace=read("/static/intelligence.html")
     assert "loadDirectory(false)" in workspace and "Compare as " in workspace
+    assert 'id="researchBoth"' in workspace
+    assert "Research both companies" in workspace
+    assert "What the sources establish" in workspace
     company=json.loads(read("/api/company/923609016"))
     assert company.get("organisation_number")=="923609016"
     last_page=json.loads(read("/api/directory?page=2"))
