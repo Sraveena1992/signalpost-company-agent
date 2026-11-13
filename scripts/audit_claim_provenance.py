@@ -12,7 +12,7 @@ from collections import Counter
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
-REGISTRY_PATH = re.compile(r"/(?:enheter|regnskap)/(\\d{9})(?:/|$)")
+REGISTRY_PATH = re.compile(r"/(?:enheter|regnskap)/(\d{9})(?:/|$)")
 
 
 def audit(path: Path) -> dict:
@@ -26,7 +26,7 @@ def audit(path: Path) -> dict:
         org = str(profile.get("organisation_number") or "")
         name = str(profile.get("name") or "")
         counts["profiles"] += 1
-        if not re.fullmatch(r"\\d{9}", org) or org in orgs:
+        if not re.fullmatch(r"\d{9}", org) or org in orgs:
             flags.append({"line": lineno, "org": org, "reason": "Invalid or repeated organisation number"})
         orgs.add(org)
         facts = ((profile.get("synthesis") or {}).get("facts") or [])
@@ -84,7 +84,7 @@ def main() -> None:
     rendered = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(rendered + "\\n", encoding="utf-8")
+        args.output.write_text(rendered + "\n", encoding="utf-8")
     print(rendered)
     if args.fail_on_flags and report["flag_count"]:
         raise SystemExit(1)
