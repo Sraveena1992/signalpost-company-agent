@@ -441,11 +441,28 @@ body{background:radial-gradient(ellipse 56% 50% at 0% 0%,rgba(78,165,194,.23),tr
 #featured-directory .company-card .company-actions a{color:#087f78}
 #featured-directory .directory-total{color:#087f78;font-weight:750;font-size:13px}
 @media(max-width:620px){#featured-directory .company-grid{grid-template-columns:1fr}}
+
+.hero{position:relative;isolation:isolate;overflow:hidden;border:1px solid #d9e9e5;border-radius:26px;background:radial-gradient(circle at 85% 17%,rgba(26,160,143,.18),transparent 32%),linear-gradient(125deg,#f9fcfa,#eaf7f2 62%,#deeee9);padding:52px 48px;margin:24px 0 20px;box-shadow:0 26px 75px rgba(18,65,73,.08)}
+.hero::after{content:"";position:absolute;right:-125px;top:-130px;width:380px;height:380px;border:1px solid rgba(9,134,126,.19);border-radius:50%;box-shadow:0 0 0 45px rgba(9,134,126,.035),0 0 0 90px rgba(9,134,126,.025);pointer-events:none;z-index:-1}
+.hero h1{color:#132b38;font-size:clamp(40px,5.9vw,70px);line-height:1.045;letter-spacing:-.055em;max-width:800px;margin:18px 0 22px}
+.hero h1 em{font-style:normal;color:#078777}
+.hero>p{font-size:17px;line-height:1.7;color:#46606b;max-width:660px}
+.hero .kicker{color:#087d70;letter-spacing:.17em}
+.hero-actions{display:flex;gap:11px;flex-wrap:wrap;margin:23px 0}
+.hero-actions .button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.hero-proof{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:29px;color:#365962;font-size:12px;font-weight:700}
+.hero-proof span:before{content:"✓";color:#07947f;margin-right:7px}
+#featured-directory{border-color:#cce2dd;background:linear-gradient(180deg,#fff,#f9fdfb)}
+#featured-directory h2{font-size:clamp(25px,3.5vw,34px);line-height:1.12;letter-spacing:-.04em;color:#142f3b}
+#featured-directory .company-card{border:1px solid #d3e5df;box-shadow:0 5px 18px rgba(9,29,38,.035);transition:transform .15s,border-color .15s}
+#featured-directory .company-card:hover{transform:translateY(-2px);border-color:#6cbcaf}
+#featured-directory .company-card .company-actions a{font-weight:750}
+@media(max-width:650px){.hero{padding:28px 20px;border-radius:19px}.hero h1{font-size:clamp(35px,8.5vw,48px)}.hero-proof{gap:7px 12px}.hero-actions .button{flex:1 1 100%}}
 </style>
 </head>
 <body><main>
 <nav class="topbar"><a class="brand" href="/" aria-label="Signalpost home"><span class="logo"><svg width="27" height="27" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 24V8h5l12 10V8h5v16h-5L10 14v10z" fill="#67dec7"/><path d="M4 28h24" stroke="#f2bd78" stroke-width="2" stroke-linecap="round"/></svg></span><span><span class="brand-name">SIGNALPOST</span><span class="brand-sub">COMPANY INTELLIGENCE</span></span></a><span class="status">● LIVE PROTOTYPE</span></nav>
-<header class="hero"><div class="kicker">NORWEGIAN COMPANY RESEARCH</div><h1>Know the company.<br>Verify the evidence.</h1><p>Find a registered Norwegian organisation by <strong>company name or organisation number</strong>. Start with the official register, then follow the source for yourself.</p></header>
+<header class="hero"><div class="kicker">NORWEGIAN COMPANY INTELLIGENCE · OFFICIAL SOURCE FIRST</div><h1>Know the company.<br><em>Verify the evidence.</em></h1><p>From the Norwegian company register to a clearer decision. Discover legal entities, compare registry facts and follow original sources—without guessing what the data cannot prove.</p><div class="hero-actions"><a class="button" href="#featured-directory">Explore 300 registry companies ↗</a><a class="button secondary" href="/static/intelligence.html#compare">Compare two companies ↗</a></div><div class="hero-proof"><span>300 exact legal identities checked</span><span>Original registry source links</span><span>On-demand research</span></div></header>
 <section class="panel"><form method="get" action="/" id="search-form"><label class="search-label" for="search-query">What company are you looking for?</label><div class="search-row"><input class="search-input" id="search-query" name="q" value="__SEARCH_VALUE__" placeholder="Company name or 9-digit organisation number" autocomplete="off" aria-describedby="search-hint" required><button class="button" type="submit">Search registry ↗</button></div><p class="hint" id="search-hint">Tip: enter a company name if you don’t know its organisation number. Search uses the official Brønnøysund Register.</p></form></section>
 """ + result_html + """
 <section class="panel" id="featured-directory"><div class="section-kicker">EXPLORE VERIFIED LEGAL ENTITIES</div><h2>300 Norwegian companies. One clear starting point.</h2><p>Browse official records independently matched to each company's legal name and 9-digit organisation number. Search, open the original source, or compare any two organisations. Detailed research is available on demand.</p><div class="directory-tools"><input id="featured-filter" placeholder="Search a company, city or industry…" aria-label="Filter companies by name, city or industry" autocomplete="off"><select id="featured-sort" aria-label="Sort directory"><option value="name">Name A–Z</option><option value="location">Location</option><option value="industry">Industry</option></select></div><p id="featured-status" class="directory-total" role="status">Loading official company directory…</p><div id="featured-results" class="company-grid"></div><p><button type="button" class="button secondary" id="featured-more" style="display:none">Show more companies ↓</button> <a class="button" href="/static/intelligence.html">Advanced Explorer &amp; Compare ↗</a></p><p class="hint">Source: Brønnøysundregistrene. Legal identity checked individually; this does not independently verify company websites, finance, news or hiring. Search is limited to the verified 300-record directory; use the full registry search above for other companies.</p></section>
