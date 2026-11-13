@@ -28,7 +28,7 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     unsupported: list[str] = []
 
     registry = evidence.get("registry", {})
-    if all_topics or "employee" in q:
+    if (all_topics or "employee" in q) and registry.get("status") == "available" and registry.get("source_url"):
         for label, value in (
             ("Registered name", row.get("name")),
             ("Organisation number", row.get("organisation_number")),
