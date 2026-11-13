@@ -249,7 +249,7 @@ def browse_registry_page(page: int = 0, size: int = 100) -> dict:
     results = []
     for entity in entities:
         orgnr = str(entity.get("organisasjonsnummer") or "")
-        if not re.fullmatch(r"\\d{9}", orgnr):
+        if not re.fullmatch(r"\d{9}", orgnr):
             continue
         addr = entity.get("forretningsadresse") or {}
         industry = entity.get("naeringskode1") or {}
