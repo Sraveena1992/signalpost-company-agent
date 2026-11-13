@@ -32,15 +32,11 @@ def observation(profile: dict) -> dict | None:
         "services", "tjenester", "home", "homepage",
     }
     pages = []
-    company_tokens = set(_tokens(str(profile.get("name") or "")))
-    if not company_tokens:
-        return None
     for page in (value.get("pages") or []):
         path = urlparse(str(page.get("url") or "")).path
         title = str(page.get("title") or "").strip()
         published_at = str(page.get("published_at") or "").strip()
         excerpt = str(page.get("main_text_excerpt") or "").strip()
-        article_tokens = set(_tokens(title + " " + excerpt))
         # A URL under /news/ is not proof of a news item. Require an explicit
         # publication date, article markup, meaningful text, a non-menu title,
         # and exact legal-name token coverage in the article itself.
@@ -52,8 +48,7 @@ def observation(profile: dict) -> dict | None:
             and page.get("article_like") is True
             and len(excerpt) >= 120
             and title.casefold() not in generic_titles
-            and company_tokens.issubset(article_tokens)
-        ):
+            # The exact verified company-owned site is the publisher. Its article\n            # title need not repeat the full registered legal name.\n        ):
             pages.append(page)
     if not pages:
         return None
