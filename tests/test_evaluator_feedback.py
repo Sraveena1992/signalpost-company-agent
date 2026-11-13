@@ -75,3 +75,38 @@ def test_verified_company_news_needs_date_and_real_article_not_legal_name():
     assert item and item["source_url"] == source and item["published_at"] == "2026-11-12"
     profile["evidence"]["website"]["value"]["pages"][0]["published_at"] = None
     assert news_observation(profile) is None
+
+
+def test_company_owned_jobposting_requires_date_exact_company_and_source():
+    import hashlib
+    from datetime import timedelta, datetime, timezone
+    from scripts.extract_company_site_jobs import observation as job_observation
+    url = "https://example.no/careers/backend-developer"
+    item = {
+        "title": "Backend Developer",
+        "datePosted": "2026-11-12",
+        "validThrough": (datetime.now(timezone.utc)+timedelta(days=30)).date().isoformat(),
+        "hiringOrganization": {"name": "EXAMPLE AS"},
+        "url": url,
+    }
+    profile = {
+        "name": "EXAMPLE AS",
+        "organisation_number": "999999991",
+        "evidence": {"website": {
+            "status": "available", "source_url": "https://example.no",
+            "retrieved_at": "2026-11-13",
+            "value": {
+                "final_url": "https://example.no",
+                "identity_assessment": {"publishable": True, "score": 1.0},
+                "pages": [{"url": url, "content_sha256": hashlib.sha256(b"job").hexdigest(), "job_postings": [item]}],
+            },
+        }},
+    }
+    result = job_observation(profile)
+    assert result and result["signal_type"] == "job_posting"
+    assert result["source_url"] == url
+    item["hiringOrganization"] = {"name": "SQUARESPACE"}
+    assert job_observation(profile) is None
+    item["hiringOrganization"] = {"name": "EXAMPLE AS"}
+    item["url"] = "https://squarespace.com/jobs/backend"
+    assert job_observation(profile) is None
