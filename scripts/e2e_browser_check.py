@@ -107,6 +107,34 @@ def main():
         landing.on("pageerror", lambda e: result["console_errors"].append(str(e)))
         landing.goto(BASE+"/",wait_until="domcontentloaded")
         landing.locator("#featured-status").filter(has_text="300 legal entities").wait_for(timeout=45000)
+        secondary=landing.locator(".hero-actions a.button.secondary")
+        assert secondary.count()==1
+        assert "Compare two companies" in secondary.inner_text()
+        ratio=secondary.evaluate("""el=>{
+          const css=getComputedStyle(el), fg=css.color,bg=css.backgroundColor;
+          function luminance(str){
+            const nums=str.match(/[\\d.]+/g).slice(0,3).map(Number);
+            const c=nums.map(n=>{n=n/255;return n<=0.04045?n/12.92:Math.pow((n+0.055)/1.055,2.4)});
+            return c[0]*0.2126+c[1]*0.7152+c[2]*0.0722;
+          }
+          const l1=luminance(fg),l2=luminance(bg);
+          return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);
+        }""")
+        assert ratio>=4.5, f"Hero secondary CTA contrast {ratio:.2f} below WCAG AA"
+        landing.locator("#featured-more").wait_for(state="visible")
+        show_more=landing.locator("#featured-more")
+        assert "Show more companies" in show_more.inner_text()
+        ratio2=show_more.evaluate("""el=>{
+          const css=getComputedStyle(el);
+          function luminance(str){
+            const c=str.match(/[\\d.]+/g).slice(0,3).map(Number).map(n=>{n/=255;return n<=0.04045?n/12.92:Math.pow((n+0.055)/1.055,2.4)});
+            return c[0]*0.2126+c[1]*0.7152+c[2]*0.0722;
+          }
+          const a=luminance(css.color),b=luminance(css.backgroundColor);
+          return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+        }""")
+        assert ratio2>=4.5, f"Directory show-more CTA contrast {ratio2:.2f} below WCAG AA"
+        result["checks"].append("Hero Compare and Show More buttons pass WCAG AA 4.5:1 contrast")
         assert landing.locator("#featured-results article.company-card").count() == 12
         landing.locator("#featured-filter").fill("WEBLANCE")
         assert landing.locator("#featured-results article.company-card").count() == 1
