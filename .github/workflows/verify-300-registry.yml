@@ -5,6 +5,11 @@ on:
     paths:
       - scripts/verify_registry_directory.py
       - .github/workflows/verify-300-registry.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/verify_registry_directory.py
+      - .github/workflows/verify-300-registry.yml
   workflow_dispatch:
 permissions:
   contents: read
