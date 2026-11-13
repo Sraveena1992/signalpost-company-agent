@@ -236,11 +236,11 @@ def research_api(orgnr: str, request: Request):
 def browse_registry_page(page: int = 0, size: int = 100) -> dict:
     """Bounded directory browsing of actual official registry records.
 
-    This is a live registry page, not a claim that the 200 records have
+    This is a live registry page, not a claim that the directory records have
     independent enrichment or individually verified company-site coverage.
     """
-    if not 0 <= page <= 1:
-        raise ValueError("Directory page must be 0 or 1.")
+    if not 0 <= page <= 2:
+        raise ValueError("Directory page must be between 0 and 2.")
     if not 1 <= size <= 100:
         raise ValueError("Directory page size must be between 1 and 100.")
     params = urlencode({"page": page, "size": size})
@@ -270,7 +270,7 @@ def browse_registry_page(page: int = 0, size: int = 100) -> dict:
 
 
 @app.get("/api/directory")
-def company_directory_api(page: int = Query(default=0, ge=0, le=1)):
+def company_directory_api(page: int = Query(default=0, ge=0, le=2)):
     try:
         return browse_registry_page(page=page)
     except (ValueError, LookupError, RuntimeError) as exc:
