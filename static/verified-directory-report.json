@@ -1,0 +1,11 @@
+{
+  "requested": 300,
+  "official_search_candidates": 300,
+  "exact_official_details_verified": 300,
+  "duplicate_organisation_numbers": 0,
+  "failed_records": [],
+  "completed_at": "2026-11-13T15:57:44.280234+00:00",
+  "source": "https://data.brreg.no/enhetsregisteret/api/enheter",
+  "interpretation": "Exact official legal entity identity only. Not a complete research or scoring benchmark.",
+  "passed": true
+}
