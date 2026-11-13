@@ -62,7 +62,7 @@ async function loadDirectory(fresh=false){
   if(!fresh){
    try{
     const saved=await getJson('/static/verified-directory-300.json');
-    if(Array.isArray(saved)&&saved.length>=201&&saved.every(row=>/^\\d{9}$/.test(row.organisation_number||'')&&row.registry_source?.startsWith('https://data.brreg.no/enhetsregisteret/api/enheter/'))){
+    if(Array.isArray(saved)&&saved.length>=201&&saved.every(row=>/^\d{9}$/.test(row.organisation_number||'')&&row.registry_source?.startsWith('https://data.brreg.no/enhetsregisteret/api/enheter/'))){
      directoryRows=saved.map(row=>({...row,address:(row.business_address?.adresse||[]).concat([row.business_address?.postnummer,row.business_address?.poststed].filter(Boolean)).join(', ')}));
      origin='individually verified official registry records';
     }
