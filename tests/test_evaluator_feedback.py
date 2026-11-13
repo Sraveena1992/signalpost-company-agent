@@ -253,3 +253,25 @@ def test_synthesis_includes_exact_owned_company_news_and_jobs_only():
     base["evidence"]["website"]["value"]["identity_assessment"]["publishable"]=False
     result2=answer_profile(base,"Give me a company overview")
     assert not any(f["classification"].startswith("verified_company_site_") for f in result2["facts"])
+
+
+def test_official_registry_facts_extend_synthesis_without_unverified_website_claims():
+    from norway_company_agent.research import answer_profile
+    source="https://data.brreg.no/enhetsregisteret/api/enheter/999999991"
+    profile={
+        "organisation_number":"999999991","name":"EXAMPLE COMPANY AS",
+        "industry":{"kode":"62.010","beskrivelse":"Computer programming"},
+        "bankrupt":False,"liquidating":False,
+        "latest_submitted_accounts":"2025",
+        "business_address":{"adresse":["Main Street 4"],"postnummer":"0150","poststed":"OSLO","land":"Norge"},
+        "website":"https://unverified-supplier.com",
+        "evidence":{"registry":{"status":"available","source_url":source,"retrieved_at":"2026-11-13T00:00:00Z"}}
+    }
+    summary=answer_profile(profile,"Give me a company overview")
+    labels={f["claim"] for f in summary["facts"]}
+    assert {"Registered industry","Registered industry code","Bankruptcy flag",
+            "Registered business address","Latest reported annual accounts period"} <= labels
+    assert "Registry-listed verified website" not in labels
+    assert all(f["source_url"]==source for f in summary["facts"] if f["classification"]=="official_registry_fact")
+    assert any(f["claim"]=="Bankruptcy flag" and f["value"] is False for f in summary["facts"])
+    assert not any(f["classification"]=="company_reported_claim" for f in summary["facts"])
