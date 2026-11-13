@@ -1,0 +1,45 @@
+name: Browser E2E Company Explorer
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - app.py
+      - static/intelligence.html
+      - static/verified-directory-300.json
+      - scripts/e2e_browser_check.py
+      - .github/workflows/browser-e2e.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install backend and Chromium test tooling
+        run: |
+          uv sync --frozen
+          uv pip install --python .venv/bin/python playwright
+          uv run --no-sync python -m playwright install --with-deps chromium
+      - name: Start app
+        run: |
+          uv run --no-sync python -m uvicorn app:app --host 127.0.0.1 --port 8000 > /tmp/signalpost.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8000/healthz >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/signalpost.log
+          exit 1
+      - name: Run actual desktop/mobile browser journeys
+        run: uv run --no-sync python scripts/e2e_browser_check.py
+      - name: Upload browser report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signalpost-browser-e2e
+          path: artifacts/browser-smoke/
