@@ -39,6 +39,42 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
             if value not in (None, ""):
                 facts.append(_claim(label, value, registry, "official_registry_fact"))
 
+    # Direct official registry fields provide useful high-confidence coverage.
+    # Preserve the difference between a company-listed URL and proven ownership.
+    if all_topics or any(word in q for word in ("registry", "industry", "address", "status")):
+        if registry.get("status") == "available" and registry.get("source_url"):
+            industry = row.get("industry") or {}
+            if isinstance(industry, dict):
+                for label, value in (
+                    ("Registered industry", industry.get("beskrivelse")),
+                    ("Registered industry code", industry.get("kode")),
+                ):
+                    if value not in (None, ""):
+                        facts.append(_claim(label, value, registry, "official_registry_fact"))
+            for label, key in (
+                ("Bankruptcy flag", "bankrupt"),
+                ("Liquidation flag", "liquidating"),
+                ("Latest reported annual accounts period", "latest_submitted_accounts"),
+            ):
+                value = row.get(key)
+                if value is not None and value != "":
+                    facts.append(_claim(label, value, registry, "official_registry_fact"))
+            for label, key in (
+                ("Registered business address", "business_address"),
+                ("Registered postal address", "postal_address"),
+            ):
+                address = row.get(key)
+                if not isinstance(address, dict):
+                    continue
+                lines = address.get("adresse") or []
+                if not isinstance(lines, list):
+                    lines = [lines] if lines else []
+                fields = [*lines, address.get("postnummer"), address.get("poststed"),
+                          address.get("kommune"), address.get("land")]
+                display = ", ".join(str(v) for v in fields if v not in (None, ""))
+                if display:
+                    facts.append(_claim(label, display, registry, "official_registry_fact"))
+
     financial = evidence.get("financials", {})
     if all_topics or any(term in q for term in financial_terms):
         records = (financial.get("value") or {}).get("records") or []
