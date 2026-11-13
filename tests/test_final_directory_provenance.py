@@ -82,3 +82,14 @@ def test_homepage_prioritizes_verified_company_list_over_methodology_copy():
     assert html.index('id="featured-directory"') < html.index("WHY SIGNALPOST")
     assert 'id="featured-filter"' in html
     assert '/static/verified-directory-300.json' in html
+
+
+def test_workspace_financial_and_evidence_rendering_is_human_readable():
+    html=(ROOT/"static"/"intelligence.html").read_text(encoding="utf-8")
+    assert "typeof v==='object'?JSON.stringify(v):String(v)" not in html
+    assert "humanLabel(k)+': '" in html
+    assert "formatFinancial(v,key,f.currency)" in html
+    assert "if(f?.source&&v!=null)" in html
+    assert "table-layout:fixed" in html
+    assert "overflow-x:clip" in html
+    assert "Not verified in this run" in html
