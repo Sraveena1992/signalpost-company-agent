@@ -69,6 +69,6 @@ def test_workspace_autoloads_300_live_records():
     page=(ROOT/"static"/"intelligence.html").read_text(encoding="utf-8")
     assert "for(let page=0;page<3;page++)" in page
     assert "Browse 300 Norwegian registry companies" in page
-    assert "await $('browseDirectory').click()" in page
+    assert "await loadDirectory(false)" in page
     assert "id=\"sortDirectory\"" in page
     assert "id=\"filterDirectory\"" in page
