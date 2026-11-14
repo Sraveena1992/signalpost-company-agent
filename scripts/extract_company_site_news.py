@@ -49,9 +49,7 @@ def observation(profile: dict) -> dict | None:
         title = str(page.get("title") or "").strip()
         published_at = str(page.get("published_at") or "").strip()
         excerpt = str(page.get("main_text_excerpt") or "").strip()
-        article_tokens = set(_tokens(excerpt))
-        # Website navigation/title alone may contain the legal company name;
-        # require the substantive article body to identify the same entity.
+        article_tokens = set(_tokens(title + " " + excerpt))
         page_host = (urlparse(str(page.get("url") or "")).hostname or "").lower().removeprefix("www.")
         try:
             publication_date = date.fromisoformat(published_at[:10])
