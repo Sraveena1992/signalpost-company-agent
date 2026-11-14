@@ -1,0 +1,34 @@
+name: Diagnose 500 Company News and Jobs
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/diagnose_500_news_jobs.py
+      - .github/workflows/diagnose-news-jobs.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download archived updated 500-company full research
+        run: |
+          mkdir -p artifacts/full-500
+          gh run download 43562211947 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/full-500
+          test -s artifacts/full-500/profiles-500.jsonl
+      - name: Count dated news and employer-job candidate evidence
+        run: |
+          python scripts/diagnose_500_news_jobs.py \
+            --profiles artifacts/full-500/profiles-500.jsonl \
+            --output artifacts/news-jobs-diagnostic.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: news-jobs-500-candidate-diagnostic
+          path: artifacts/news-jobs-diagnostic.json
