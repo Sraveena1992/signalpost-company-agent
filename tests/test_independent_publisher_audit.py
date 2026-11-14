@@ -48,3 +48,14 @@ def test_news_claim_needs_original_article_publisher_metadata():
             "value": NEWS, "source_url": URL, "retrieved_at": "2026-11-14T10:00:00+00:00"}
     assert check_claim(fact, "987531630", {URL: {"state": "available_html", "text": HTML}})[0] == "confirmed"
     assert check_claim(fact, "987531630", {URL: {"state": "available_html", "text": "<html>Article only</html>"}})[0] == "unverifiable"
+
+
+def test_wrong_company_site_host_is_rejected_before_confirming_claim():
+    fact = {"claim": "Verified company-site news", "classification": "verified_company_site_news",
+            "value": NEWS, "source_url": URL, "retrieved_at": "2026-11-14T10:00:00+00:00"}
+    fresh = {URL: {"state": "available_html", "text": HTML}}
+    assert check_claim(fact, "987531630", fresh,
+                       {"987531630": {"aas.speiding.no"}})[0] == "confirmed"
+    state, why = check_claim(fact, "111111111", fresh,
+                            {"111111111": {"other.no"}})
+    assert (state, why) == ("contradicted", "wrong_company_source_host")
