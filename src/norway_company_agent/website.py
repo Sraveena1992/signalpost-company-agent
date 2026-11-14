@@ -207,6 +207,42 @@ def _priority_links(base_url: str, soup: BeautifulSoup, limit: int = 6) -> list[
     return [url for url, _ in sorted(candidates.items(), key=lambda item: (item[1], item[0]))[:limit]]
 
 
+def _detail_links(page_url: str, soup: BeautifulSoup, limit: int = 5) -> list[str]:
+    """Bounded follow-through from company news/careers indexes to real entries.
+
+    Homepage or navigation menus do not prove dated company news or open jobs.
+    Never leave the exact verified origin host; individual linked pages still
+    undergo robots and network safety checks in _fetch_secondary_page.
+    """
+    base = urllib.parse.urlparse(page_url)
+    section = re.compile(r"/(?:news|press|aktuelt|nyheter|artikler|blog|careers|jobs|jobb|stillinger|ledige-stillinger)(?:/|$)", re.I)
+    if not section.search(base.path):
+        return []
+    links = []
+    seen = {page_url.rstrip("/")}
+    ignored = {"tag","category","categories","page","archive","arkiv","feed","rss","search","faq","contact","kontakt"}
+    for anchor in soup.select("a[href]"):
+        href = str(anchor.get("href") or "").strip()
+        absolute = urllib.parse.urljoin(page_url, href)
+        target = urllib.parse.urlparse(absolute)
+        if target.scheme not in {"http","https"} or target.netloc.casefold() != base.netloc.casefold():
+            continue
+        match = section.search(target.path)
+        if not match:
+            continue
+        remainder = target.path[match.end():].strip("/")
+        if not remainder or remainder.split("/")[0].casefold() in ignored:
+            continue
+        clean = urllib.parse.urlunparse((target.scheme,target.netloc,target.path or "/","","",""))
+        if clean.rstrip("/") in seen:
+            continue
+        seen.add(clean.rstrip("/"))
+        links.append(clean)
+        if len(links) >= limit:
+            break
+    return links
+
+
 def _published_date(soup: BeautifulSoup) -> str | None:
     """Return an explicit publication date, never a crawl/feed updated timestamp."""
     for selector, attribute in (
@@ -297,6 +333,7 @@ def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max
             visit(structured)
         page = {
             "job_postings": job_postings[:20],
+            "detail_links": _detail_links(final_url, page_soup),
             "url": final_url,
             "title": page_soup.title.get_text(" ", strip=True)[:500] if page_soup.title else "",
             "main_text_excerpt": page_text[:5000],
@@ -399,6 +436,31 @@ def fetch_website(url: str | None, *, timeout: float = 15.0, max_bytes: int = 2_
                 social.extend(page_social)
             elif page_error:
                 crawl_errors.append({"url": page_url, "error": page_error})
+        # One additional bounded depth: a news or hiring index is discovery,
+        # not verified evidence. Only fetched individual pages can be promoted.
+        seen_pages = {str(page.get("url") or "").rstrip("/") for page in pages}
+        candidate_details = []
+        for discovered in pages[1:]:
+            candidate_details.extend(discovered.get("detail_links") or [])
+        for detail_url in list(dict.fromkeys(candidate_details))[:5]:
+            if detail_url.rstrip("/") in seen_pages:
+                continue
+            seen_pages.add(detail_url.rstrip("/"))
+            detail, detail_social, reqs, detail_bytes, detail_elapsed, detail_error = _fetch_secondary_page(
+                detail_url,
+                homepage_domain=homepage_domain,
+                timeout=timeout,
+                max_bytes=min(max_bytes, 1_000_000),
+            )
+            requests += reqs
+            bytes_received += detail_bytes
+            if detail_elapsed:
+                page_latencies.append(detail_elapsed)
+            if detail:
+                pages.append(detail)
+                social.extend(detail_social)
+            elif detail_error:
+                crawl_errors.append({"url": detail_url, "error": detail_error})
         value["pages"] = pages
         value["social_links"] = list({(item["platform"], item["url"]): item for item in social}.values())
         value["crawl_errors"] = crawl_errors
