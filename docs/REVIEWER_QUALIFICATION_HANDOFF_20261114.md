@@ -26,3 +26,10 @@
 
 ## Independent audit fix in this branch
 `scripts/verify_all_claims_live.py` formerly incorrectly labelled `/oppslagstavle/<article>` as contradicted purely because URL path omitted. New isolated patch routes dated original publisher items to `unverifiable` pending true independent HTML/date check, instead of false contradicted.
+
+## Fresh-source recheck final result (14 Nov, latest 500 dataset)
+- [GitHub Actions source recheck](https://github.com/Sraveena1992/signalpost-company-agent/actions/runs/43604322580): **PASS**.
+- Of **7,673** source-linked synthesis claims: **7,671 confirmed**, **1 contradicted**, **1 unverifiable**. Re-fetched 1,467 distinct source URLs. Overall confirmation fraction 99.974% (NOT official Builderr precision and not independent human gold-label adjudication).
+- **Concrete mismatch**: org `995311321` “Website description”, URL https://www.1hjelp.no/ — fresh HTML description differs from archived claimed description. Needs temporal change review and source snapshot preservation; do not quietly relabel as correct.
+- **Date not independently adjudicated by this verifier**: org `987531630` “Verified company-site news”, original https://aas.speiding.no/oppslagstavle/utlysning-sommerjobb-som-aktivitetsledere/ — original exact publisher item was independently fetched and accepted in source-proof workflow, but separate recheck refuses to award full article/date confirmation without further HTML date adjudication.
+- The date-regex bug that falsely contradicted Norwegian noticeboard articles was fixed **only in the isolated audit branch**; not promoted to `main` and no production deployment required for that change.
