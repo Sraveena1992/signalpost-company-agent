@@ -357,3 +357,14 @@ def test_undefined_zero_base_revenue_growth_is_explicitly_unclaimed():
     response=answer_profile(profile,"company financial overview")
     assert not any(f["claim"]=="Revenue year-over-year change" for f in response["facts"])
     assert any("undefined" in message for message in response["unsupported_or_uncertain"])
+
+
+def test_generic_wordpress_placeholder_is_not_company_description():
+    from norway_company_agent.research import answer_profile
+    profile={"organisation_number":"999999991","name":"EXAMPLE AS","evidence":{
+        "website":{"status":"available","source_url":"https://example.no",
+                   "value":{"description":"Bare enda et WordPress-nettsted",
+                            "identity_assessment":{"publishable":True}}}}}
+    answer=answer_profile(profile,"company overview")
+    assert not any(f["claim"]=="Website description" for f in answer["facts"])
+    assert any("generic website template description" in s for s in answer["unsupported_or_uncertain"])
