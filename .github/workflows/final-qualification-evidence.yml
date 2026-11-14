@@ -2,7 +2,13 @@ name: Final qualification evidence gate
 on:
   push:
     branches: [final/qualification-evidence-20261114]
-    paths: ['.github/workflows/final-qualification-evidence.yml']
+    paths:
+      - '.github/workflows/final-qualification-evidence.yml'
+      - 'scripts/verify_all_claims_live.py'
+      - 'scripts/forensic_two_open_claims.py'
+      - 'scripts/forensic_registry_drift.py'
+      - 'scripts/extract_company_site_jobs.py'
+      - 'docs/SOHAM_FINAL_REVISED_SUBMISSION_20261114.md'
   workflow_dispatch:
 permissions:
   contents: read
@@ -36,6 +42,10 @@ jobs:
       - name: Fresh original-source 500-claim recheck
         run: |
           uv run python scripts/verify_all_claims_live.py --profiles artifacts/final-evidence/profiles-500.jsonl --output artifacts/final-evidence/fresh-source-validation.json --workers 8
+      - name: Capture two original-publisher source records
+        run: uv run python scripts/forensic_two_open_claims.py --output artifacts/final-evidence/forensic-two-original-sources.json
+      - name: Recompare omitted live BRREG keys with archived source
+        run: uv run python scripts/forensic_registry_drift.py --profiles artifacts/final-evidence/profiles-500.jsonl --output artifacts/final-evidence/registry-drift-932850753.json
       - name: Create reproducible machine-readable evidence manifest
         run: |
           python - <<'PY'
@@ -61,6 +71,8 @@ jobs:
             artifacts/final-evidence/gold-review-384.json
             artifacts/final-evidence/gold-review-manifest.json
             artifacts/final-evidence/fresh-source-validation.json
+            artifacts/final-evidence/forensic-two-original-sources.json
+            artifacts/final-evidence/registry-drift-932850753.json
             artifacts/final-evidence/FINAL_EVIDENCE_MANIFEST.json
           retention-days: 30
           if-no-files-found: warn
