@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-NEWS_PATH = re.compile(r"/(?:news|press|aktuelt|nyheter|artikler|blog)(?:/|$)", re.I)
+NEWS_PATH = re.compile(r"/(?:news|press|aktuelt|nyheter|artikler|blog|oppslagstavle|oppslagstavla)(?:/|$)", re.I)
 GENERIC_TOKENS = {"as", "asa", "ans", "da", "enk", "iks", "sa", "sam", "nuf", "ab", "ltd", "limited", "inc", "the", "og", "and"}
 
 

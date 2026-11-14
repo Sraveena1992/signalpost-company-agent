@@ -32,7 +32,7 @@ SOCIAL_HOSTS = {
 }
 PRIORITY_TERMS = (
     "careers", "career", "stillinger", "ledige-stillinger", "jobs", "jobb",
-    "news", "press", "aktuelt", "nyheter",
+    "news", "press", "aktuelt", "nyheter", "oppslagstavle", "oppslagstavla",
     "om-oss", "om_oss", "about", "kontakt", "contact", "ledelse", "management",
     "team", "people", "locations", "lokasjoner", "avdelinger", "butikker",
 )
@@ -408,7 +408,7 @@ def fetch_website(url: str | None, *, timeout: float = 15.0, max_bytes: int = 2_
                 social.extend(page_social)
                 # Only pages under explicit news/careers paths may supply a
                 # second hop, reducing unrelated service and social pages.
-                if re.search(r"/(?:news|press|aktuelt|nyheter|blog|careers|career|stillinger|ledige-stillinger|jobs|jobb)(?:/|$)", urllib.parse.urlparse(page_url).path, re.I):
+                if re.search(r"/(?:news|press|aktuelt|nyheter|oppslagstavle|oppslagstavla|blog|careers|career|stillinger|ledige-stillinger|jobs|jobb)(?:/|$)", urllib.parse.urlparse(page_url).path, re.I):
                     for child in page.get("article_and_job_links") or []:
                         parsed_child = urllib.parse.urlparse(child)
                         if parsed_child.scheme not in {"http", "https"} or parsed_child.netloc.lower() != urllib.parse.urlparse(final_url).netloc.lower():
