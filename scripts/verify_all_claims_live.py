@@ -174,11 +174,28 @@ def check_claim(f,org,fetched):
             reader.feed(result.get("text") or "")
             check=any(canon(meta)==canon(value) for meta in reader.descriptions)
     elif kind=="verified_company_site_news":
+        # Norwegian company-owned noticeboards are genuine individual update
+        # sources. URL format is a *candidate* filter, not independent proof.
         path=urlparse(src).path
-        valid_article=bool(re.search(r"/(?:news|press|aktuelt|nyheter|artikler|blog)/[^/]+",path,re.I))
-        date_str=str((value or {}).get("published_at") or "") if isinstance(value,dict) else ""
-        valid_date=bool(re.match(r"202[5-6]-",date_str))
-        check=False if not valid_article or not valid_date else None
+        article=bool(re.search(
+            r"/(?:news|press|aktuelt|nyheter|artikler|blog|oppslagstavle|oppslagstavla)/[^/]+",
+            path,re.I))
+        stamp=str((value or {}).get("published_at") or "") if isinstance(value,dict) else ""
+        headline=str((value or {}).get("headline_or_role") or "") if isinstance(value,dict) else ""
+        html=result.get("text") or ""
+        # Require a matching publisher page and article headline in newly
+        # fetched HTML. A path/date alone never confirms factual correctness.
+        if not article or not re.match(r"20\\d{2}-\\d{2}-\\d{2}",stamp):
+            check=False
+        elif result.get("state")!="available_html" or not headline:
+            check=None
+        elif canon(headline) in canon(html):
+            # Date may be encoded as JSON-LD/meta rather than visible text.
+            # Fresh page + matching exact headline corroborates article
+            # existence; publication date still needs independent review.
+            check=None
+        else:
+            check=None
     else:
         check=None  # Website description, social links and jobs need human/HTML assessment.
     if check is True:return "confirmed","fresh original source matches"
