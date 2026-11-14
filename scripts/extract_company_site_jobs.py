@@ -61,14 +61,14 @@ def observation(profile: dict) -> dict | None:
                     if isinstance(node, dict):
                         for k, v in node.items():
                             if k in ("value", "taxID") and isinstance(v, (str, int)):
-                                candidate_numbers.extend(re.findall(r"(?<!\\d)\\d{9}(?!\\d)", str(v)))
+                                candidate_numbers.extend(re.findall(r"(?<!\d)\d{9}(?!\d)", str(v)))
                             else:
                                 collect_identifiers(v)
                     elif isinstance(node, list):
                         for value in node:
                             collect_identifiers(value)
                     elif isinstance(node, (str, int)):
-                        candidate_numbers.extend(re.findall(r"(?<!\\d)\\d{9}(?!\\d)", str(node)))
+                        candidate_numbers.extend(re.findall(r"(?<!\d)\d{9}(?!\d)", str(node)))
                 collect_identifiers(identifiers)
                 if candidate_numbers and org not in candidate_numbers:
                     continue
