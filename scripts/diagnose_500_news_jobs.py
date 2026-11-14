@@ -16,7 +16,8 @@ def run(path: Path):
             "public_activity_status":Counter(),"website_identity_gate":Counter(),
             "page_count_total":0,"sites_with_pages":0,"dated_article_candidates":0,
             "jobposting_structured_candidates":0,"news_index_links":0,
-            "companies_with_verified_news":0,"companies_with_verified_jobs":0,\n            "dated_candidate_details":[] ,
+            "companies_with_verified_news":0,"companies_with_verified_jobs":0,
+            "dated_candidate_details":[],
             "activity_signal_types":Counter(),"sample_rejections":[]}
     for p in rows:
         ev=p.get("evidence") or {}
