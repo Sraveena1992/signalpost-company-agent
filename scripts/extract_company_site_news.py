@@ -41,6 +41,11 @@ def observation(profile: dict) -> dict | None:
         return None
     for page in (value.get("pages") or []):
         path = urlparse(str(page.get("url") or "")).path
+        # A generic /news/ or /nyheter/ index is NOT an article.
+        # Require a non-generic individual slug beyond the news section.
+        match = NEWS_PATH.search(path)
+        article_slug = path[match.end():].strip("/") if match else ""
+        individual_article = bool(article_slug and re.search(r"[a-zA-Z0-9æøåÆØÅ]", article_slug))
         title = str(page.get("title") or "").strip()
         published_at = str(page.get("published_at") or "").strip()
         excerpt = str(page.get("main_text_excerpt") or "").strip()
@@ -56,10 +61,10 @@ def observation(profile: dict) -> dict | None:
         if (
             urlparse(str(page.get("url") or "")).scheme in {"http", "https"}
             and urlparse(str(page.get("url") or "")).hostname
-            and NEWS_PATH.search(path)
+            and individual_article
             and published_at
             and page_host == owned_host
-            and publication_date <= date.today() + timedelta(days=1)
+            and date.today() - timedelta(days=730) <= publication_date <= date.today() + timedelta(days=1)
             and page.get("article_like") is True
             and len(excerpt) >= 120
             and title.casefold() not in generic_titles
