@@ -1,0 +1,48 @@
+name: 500 Company Full 10-Module Research Audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/audit_full_500_modules.py
+      - .github/workflows/full-500-ten-module-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install clean frozen dependencies
+        run: uv sync --frozen
+      - name: Select exact 500 fresh public registry companies
+        run: uv run python scripts/benchmark_public_500_identity.py prepare --directory artifacts/full-500
+      - name: Run 500 companies with all ten research modules
+        run: |
+          uv run python scripts/run_competition_batch.py \
+            --organisations artifacts/full-500/input-500.json \
+            --output artifacts/full-500/terminal-500.jsonl \
+            --profiles-output artifacts/full-500/profiles-500.jsonl \
+            --report artifacts/full-500/run-report-500.json \
+            --run-id full-500-all-modules-${{ github.run_id }} \
+            --expected-count 500 \
+            --workers 12 \
+            --checkpoint-every 25
+      - name: Audit coverage, provenance and all terminal states
+        run: |
+          uv run python scripts/audit_full_500_modules.py \
+            --profiles artifacts/full-500/profiles-500.jsonl \
+            --report artifacts/full-500/run-report-500.json \
+            --output artifacts/full-500/full-module-audit.json
+      - name: Save complete publicly reproducible run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-500-ten-module-audit
+          path: artifacts/full-500/
+          retention-days: 30
