@@ -185,7 +185,7 @@ def check_claim(f,org,fetched):
         html=result.get("text") or ""
         # Require a matching publisher page and article headline in newly
         # fetched HTML. A path/date alone never confirms factual correctness.
-        if not article or not re.match(r"20\\d{2}-\\d{2}-\\d{2}",stamp):
+        if not article or not re.match(r"20\d{2}-\d{2}-\d{2}",stamp):
             check=False
         elif result.get("state")!="available_html" or not headline:
             check=None
