@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+import unicodedata
 import urllib.parse
 import urllib.request
 
@@ -145,7 +146,34 @@ def qualify(entry, expected_org, now):
     }, None
 
 
-def enrich(profiles, *, get, token, max_pages=250, max_details=10000, since=None, now=None):
+def normalize_business_name(value):
+    value = str(value or "").casefold().replace("ø", "o").replace("æ", "ae").replace("å", "a")
+    value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
+    parts = re.findall(r"[a-z0-9]+", value)
+    while parts and parts[-1] in {"as", "asa", "ans", "da", "sa", "enk"}:
+        parts.pop()
+    return " ".join(parts)
+
+
+def possible_name_match(header_name, official_names):
+    candidate = normalize_business_name(header_name)
+    if not candidate:
+        return False
+    if candidate in official_names:
+        return True
+    candidate_tokens = set(candidate.split())
+    if len(candidate_tokens) < 2:
+        return False
+    for official in official_names:
+        tokens = set(official.split())
+        if len(tokens) >= 2 and len(candidate_tokens & tokens) >= 2 and (
+            candidate_tokens.issubset(tokens) or tokens.issubset(candidate_tokens)
+        ):
+            return True
+    return False
+
+
+def enrich(profiles, *, get, token, max_pages=250, max_details=10000, since=None, now=None, candidate_name_prefilter=False):
     now = now or utc_now()
     since = since or now - timedelta(days=190)
     orgs = {str(p.get("organisation_number") or "") for p in profiles}
@@ -156,6 +184,13 @@ def enrich(profiles, *, get, token, max_pages=250, max_details=10000, since=None
     rejects = {}
     details_checked = 0
     active = [(uid, item) for uid, (modified, item) in latest.items() if (item.get("_feed_entry") or {}).get("status") == "ACTIVE"]
+    total_active_headers = len(active)
+    official_names = {normalize_business_name(p.get("name") or "") for p in profiles}
+    if candidate_name_prefilter:
+        # This is a recall-limited optimization. Exact employer.orgnr is STILL
+        # mandatory; skipped name candidates are NEVER considered checked.
+        active = [(uid, item) for uid, item in active if possible_name_match(
+            (item.get("_feed_entry") or {}).get("businessName"), official_names)]
     detail_limit_hit = len(active) > max_details
     for uid, item in active[:max_details]:
         try:
@@ -175,7 +210,10 @@ def enrich(profiles, *, get, token, max_pages=250, max_details=10000, since=None
             category = "detail_fetch_or_parse_failure"
             rejects[category] = rejects.get(category, 0) + 1
     # An API error leaves uncertainty about vacancies; never claim a full scan.
-    complete = complete and not detail_limit_hit and not rejects.get("detail_fetch_or_parse_failure")
+    complete = (complete and not detail_limit_hit
+                and not rejects.get("detail_fetch_or_parse_failure")
+                and not candidate_name_prefilter
+                and since <= now - timedelta(days=180))
     output = []
     for profile in profiles:
         item = dict(profile)
@@ -195,7 +233,10 @@ def enrich(profiles, *, get, token, max_pages=250, max_details=10000, since=None
     report = {
         "companies": len(profiles), "matched_companies": sum(bool(matched.get(n)) for n in orgs),
         "verified_active_jobs": sum(len(v) for v in matched.values()),
-        "pages_read": pages, "unique_feed_ads": len(latest), "active_ads_examined": details_checked,
+        "pages_read": pages, "unique_feed_ads": len(latest),
+        "active_headers_seen": total_active_headers, "header_name_candidates": len(active),
+        "candidate_name_prefilter": candidate_name_prefilter,
+        "active_ads_examined": details_checked,
         "scan_complete": complete, "max_pages": max_pages, "max_details": max_details,
         "since": since.isoformat(), "checked_at": now.isoformat(), "rejected": rejects,
         "scope": "Exact NAV employer.orgnr matched to the supplied company batch. Incomplete scans are not no-job proof.",
@@ -211,8 +252,10 @@ def main():
     ap.add_argument("--token-env", default="NAV_FEED_TOKEN")
     ap.add_argument("--max-pages", type=int, default=250)
     ap.add_argument("--max-details", type=int, default=10000)
+    ap.add_argument("--candidate-name-prefilter", action="store_true", help="Experimental recall-limited header name candidate filter; exact orgnr still required")
+    ap.add_argument("--since-days", type=int, default=190, help="Lookback for NAV feed events; <180 days is an incomplete active-vacancy census")
     args = ap.parse_args()
-    if args.max_pages < 1 or args.max_details < 1:
+    if args.max_pages < 1 or args.max_details < 1 or not (1 <= args.since_days <= 365):
         ap.error("limits must be positive")
     token = os.environ.get(args.token_env, "").strip()
     if not token:
@@ -223,7 +266,10 @@ def main():
         ap.error("Original profile input cannot be overwritten")
     profiles = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines() if line.strip()]
     try:
-        result, report = enrich(profiles, get=fetch_json, token=token, max_pages=args.max_pages, max_details=args.max_details)
+        result, report = enrich(profiles, get=fetch_json, token=token,
+            max_pages=args.max_pages, max_details=args.max_details,
+            since=utc_now() - timedelta(days=args.since_days),
+            candidate_name_prefilter=args.candidate_name_prefilter)
     except (OSError, ValueError, RuntimeError) as exc:
         raise SystemExit("NAV scan failed: " + type(exc).__name__ + ": " + str(exc)) from None
     output.parent.mkdir(parents=True, exist_ok=True)
