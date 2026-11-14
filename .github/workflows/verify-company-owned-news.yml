@@ -1,0 +1,60 @@
+name: Verify dated company-owned news example
+on:
+  push:
+    branches: [fix/company-owned-dated-noticeboard-20261114]
+    paths:
+      - .github/workflows/verify-company-owned-news.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install clean frozen dependencies
+        run: uv sync --frozen
+      - name: Research exact company from official registry and company site
+        run: |
+          mkdir -p artifacts/company-owned-news
+          printf '["987531630"]\n' > artifacts/company-owned-news/orgs.json
+          uv run python scripts/run_competition_batch.py \
+            --organisations artifacts/company-owned-news/orgs.json \
+            --output artifacts/company-owned-news/terminal.jsonl \
+            --profiles-output artifacts/company-owned-news/profiles.jsonl \
+            --report artifacts/company-owned-news/report.json \
+            --run-id real-company-dated-source-${{ github.run_id }} \
+            --expected-count 1 --workers 1 --checkpoint-every 1
+      - name: Inspect exact company news and jobs without inventing status
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          profile=json.loads(Path('artifacts/company-owned-news/profiles.jsonl').read_text().splitlines()[0])
+          ev=profile.get('evidence') or {}
+          activity=ev.get('public_activity') or {}
+          observations=(activity.get('value') or {}).get('observations') or []
+          accepted=[{'signal_type':x.get('signal_type'),'source_url':x.get('source_url'),'published_at':x.get('published_at'),'exact_entity':x.get('exact_entity')} for x in observations if x.get('signal_type') in ('public_post','job_posting')]
+          report={'orgnr':profile['organisation_number'],'name':profile.get('name'),
+            'website_status':(ev.get('website') or {}).get('status'),
+            'website_verified':((ev.get('website') or {}).get('value') or {}).get('identity_assessment',{}).get('publishable'),
+            'activity_status':activity.get('status'),
+            'dated_company_news_count':sum(x['signal_type']=='public_post' for x in accepted),
+            'verified_company_job_count':sum(x['signal_type']=='job_posting' for x in accepted),
+            'accepted':accepted}
+          Path('artifacts/company-owned-news/source-proof.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          assert profile['organisation_number']=='987531630'
+          PY
+      - name: Upload complete source proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dated-company-owned-news-source-proof
+          path: artifacts/company-owned-news/
+          retention-days: 14
