@@ -16,7 +16,7 @@ def run(path: Path):
             "public_activity_status":Counter(),"website_identity_gate":Counter(),
             "page_count_total":0,"sites_with_pages":0,"dated_article_candidates":0,
             "jobposting_structured_candidates":0,"news_index_links":0,
-            "companies_with_verified_news":0,"companies_with_verified_jobs":0,
+            "companies_with_verified_news":0,"companies_with_verified_jobs":0,\n            "dated_candidate_details":[] ,
             "activity_signal_types":Counter(),"sample_rejections":[]}
     for p in rows:
         ev=p.get("evidence") or {}
@@ -33,6 +33,7 @@ def run(path: Path):
         for page in pages:
             if page.get("article_like") and page.get("published_at"):
                 result["dated_article_candidates"]+=1
+                result["dated_candidate_details"].append({"org":str(p.get("organisation_number") or ""),\n                    "name":p.get("name"),"identity_approved":identity.get("publishable") is True,\n                    "url":page.get("url"),"title":page.get("title"),"published_at":page.get("published_at")})
             result["jobposting_structured_candidates"]+=len(page.get("job_postings") or [])
             result["news_index_links"]+=len(page.get("article_and_job_links") or [])
         signals=[x for x in ((a.get("value") or {}).get("observations") or []) if isinstance(x,dict)]
