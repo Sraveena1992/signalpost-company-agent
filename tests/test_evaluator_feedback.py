@@ -368,3 +368,22 @@ def test_generic_wordpress_placeholder_is_not_company_description():
     answer=answer_profile(profile,"company overview")
     assert not any(f["claim"]=="Website description" for f in answer["facts"])
     assert any("generic website template description" in s for s in answer["unsupported_or_uncertain"])
+
+
+def test_second_level_article_and_vacancy_discovery_stays_on_verified_host():
+    from bs4 import BeautifulSoup
+    from norway_company_agent.website import _detail_links
+    index=BeautifulSoup("""
+      <a href="/nyheter/">Archive home</a>
+      <a href="/nyheter/2026/verified-company-news">Current company article</a>
+      <a href="/nyheter/page/2">Pagination</a>
+      <a href="https://squarespace.com/news/unrelated-company">Wrong company</a>
+      <a href="/careers/job/official-engineer-opening">Own job detail</a>
+      <a href="/news/tag/general">Generic tag</a>
+    ""","html.parser")
+    links=_detail_links("https://verified.no/nyheter/",index,limit=5)
+    assert links==[
+        "https://verified.no/nyheter/2026/verified-company-news",
+        "https://verified.no/careers/job/official-engineer-opening",
+    ]
+    assert not _detail_links("https://verified.no/",index)
