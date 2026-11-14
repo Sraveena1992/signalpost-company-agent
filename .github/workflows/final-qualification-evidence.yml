@@ -1,0 +1,66 @@
+name: Final qualification evidence gate
+on:
+  push:
+    branches: [final/qualification-evidence-20261114]
+    paths: ['.github/workflows/final-qualification-evidence.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  baseline-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen --all-groups
+      - name: Regression suite
+        run: uv run pytest -q
+      - name: Download verified original 500-company artifact
+        run: |
+          mkdir -p artifacts/final-evidence
+          gh run download 43601907908 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/final-evidence
+          test -s artifacts/final-evidence/profiles-500.jsonl
+      - name: Source 500-company job diagnostic
+        run: |
+          uv run python scripts/diagnose_exact_500_jobs.py --profiles artifacts/final-evidence/profiles-500.jsonl --output artifacts/final-evidence/jobs-diagnostic-500.jsonl --report artifacts/final-evidence/jobs-funnel-summary.json
+      - name: Blind independent human adjudication queue
+        run: |
+          uv run python scripts/build_blind_gold_review.py --mode sample --profiles artifacts/final-evidence/profiles-500.jsonl --queue artifacts/final-evidence/gold-review-384.json --manifest artifacts/final-evidence/gold-review-manifest.json
+      - name: Fresh original-source 500-claim recheck
+        run: |
+          uv run python scripts/verify_all_claims_live.py --profiles artifacts/final-evidence/profiles-500.jsonl --output artifacts/final-evidence/fresh-source-validation.json --workers 8
+      - name: Create reproducible machine-readable evidence manifest
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          d=Path('artifacts/final-evidence')
+          a=json.loads((d/'fresh-source-validation.json').read_text())
+          b=json.loads((d/'jobs-funnel-summary.json').read_text())
+          c=json.loads((d/'gold-review-manifest.json').read_text())
+          assert a['claims_total']==7673 and sum(a['claim_status'].values())==7673
+          assert b['companies']==500 and c['actual_sample_size']==384
+          out={'commit':os.environ['GITHUB_SHA'],'baseline_500_run':43601907908,'baseline_100_smoke':43601907928,'claim_source_validation':a['claim_status'],'job_candidate_funnel':b,'gold_review':{'sample':384,'reviewed':0,'accuracy_established':False},'official_builderr_score':None,'claim_boundary':'Fresh-source recheck != independent gold labels; only official evaluator determines qualification.'}
+          (d/'FINAL_EVIDENCE_MANIFEST.json').write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
+          print(json.dumps({'commit':out['commit'],'claims':a['claim_status'],'jobs':b['verified_jobs'],'gold_review_unreviewed':384},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signalpost-final-qualification-evidence
+          path: |
+            artifacts/final-evidence/jobs-diagnostic-500.jsonl
+            artifacts/final-evidence/jobs-funnel-summary.json
+            artifacts/final-evidence/gold-review-384.json
+            artifacts/final-evidence/gold-review-manifest.json
+            artifacts/final-evidence/fresh-source-validation.json
+            artifacts/final-evidence/FINAL_EVIDENCE_MANIFEST.json
+          retention-days: 30
+          if-no-files-found: warn
