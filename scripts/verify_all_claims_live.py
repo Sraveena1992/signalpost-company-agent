@@ -9,6 +9,9 @@ import argparse
 import concurrent.futures as cf
 import json
 import re
+import socket
+import ipaddress
+from html.parser import HTMLParser
 import time
 import urllib.error
 import urllib.request
@@ -25,14 +28,30 @@ def getpath(value, *parts):
 def canon(v):
     return re.sub(r"\s+"," ",str(v or "").strip()).casefold()
 
-def fresh(url):
-    host=urlparse(url).hostname or ""
-    if not(host=="data.brreg.no" or host.endswith(".speiding.no") or
-           host in {"www.speiding.no","speiding.no"}):
-        return {"state":"not_rechecked_other_site"}
+def fresh(url, approved_hosts):
+    parsed=urlparse(url)
+    host=(parsed.hostname or "").casefold()
+    # Sites are permitted only if individually identity-verified in the original
+    # official-company profile. Never fetch a social aggregator for another firm.
+    if parsed.scheme!="https" or parsed.username or parsed.password or (
+        host!="data.brreg.no" and host not in approved_hosts):
+        return {"state":"not_rechecked_unapproved_site"}
+    try:
+        # Block localhost, private and special networks even if a user-supplied
+        # site URL was incorrectly accepted during an earlier research run.
+        ips=[ipaddress.ip_address(info[4][0]) for info in socket.getaddrinfo(host,443,type=socket.SOCK_STREAM)]
+        if not ips or not all(ip.is_global for ip in ips):
+            return {"state":"blocked_nonpublic_network"}
+    except Exception:
+        return {"state":"unavailable","reason":"dns_resolution_failed"}
     try:
         request=urllib.request.Request(url,headers={"User-Agent":"SignalpostIndependentVerifier/1.0 (evidence-audit)","Accept":"application/json,text/html;q=0.8"})
-        with urllib.request.urlopen(request,timeout=18) as response:
+        # Do not follow redirects to a different host during verification.
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self,req,fp,code,msg,headers,newurl):
+                return None
+        opener=urllib.request.build_opener(NoRedirect())
+        with opener.open(request,timeout=18) as response:
             raw=response.read(4_000_000)
             if "json" in response.headers.get("Content-Type",""):
                 return {"state":"available","body":json.loads(raw)}
@@ -122,6 +141,16 @@ def compare_subunit(value,body):
             return True
     return False
 
+class DescriptionReader(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.descriptions=[]
+    def handle_starttag(self,tag,attrs):
+        if tag!="meta":return
+        meta=dict(attrs)
+        if (meta.get("name") or meta.get("property") or "").casefold() in ("description","og:description"):
+            self.descriptions.append(meta.get("content") or "")
+
 def check_claim(f,org,fetched):
     label=f.get("claim"); value=f.get("value"); kind=f.get("classification")
     src=str(f.get("source_url") or "")
@@ -138,6 +167,12 @@ def check_claim(f,org,fetched):
         check=compare_roles(label,value,body)
     elif kind=="official_subunit_record":
         check=compare_subunit(value,body)
+    elif kind=="company_reported_claim" and label=="Website description":
+        if result.get("state")!="available_html":check=None
+        else:
+            reader=DescriptionReader()
+            reader.feed(result.get("text") or "")
+            check=any(canon(meta)==canon(value) for meta in reader.descriptions)
     elif kind=="verified_company_site_news":
         path=urlparse(src).path
         valid_article=bool(re.search(r"/(?:news|press|aktuelt|nyheter|artikler|blog)/[^/]+",path,re.I))
@@ -162,8 +197,15 @@ def main():
                (row.get("synthesis") or {}).get("facts") or []]
     urls=sorted({str(f.get("source_url") or "") for _,f in all_facts if f.get("source_url")})
     fetched={}
+    approved_hosts=set()
+    for profile in rows:
+        site=(profile.get("evidence") or {}).get("website") or {}
+        val=site.get("value") or {}
+        if site.get("status")=="available" and (val.get("identity_assessment") or {}).get("publishable") is True:
+            host=(urlparse(str(val.get("final_url") or site.get("source_url") or "")).hostname or "").casefold()
+            if host:approved_hosts.add(host)
     with cf.ThreadPoolExecutor(max_workers=a.workers) as pool:
-        futures={pool.submit(fresh,url):url for url in urls}
+        futures={pool.submit(fresh,url,approved_hosts):url for url in urls}
         for future in cf.as_completed(futures):
             url=futures[future]
             try:fetched[url]=future.result()
