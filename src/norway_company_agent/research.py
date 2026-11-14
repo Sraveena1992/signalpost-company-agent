@@ -87,8 +87,10 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
                     {"SELSKAP": "company (standalone)", "KONSERN": "group (consolidated)"}.get(
                         str(latest.get("account_type") or "").upper(), "unknown"), financial, "official_annual_account"))
                 facts.append(_claim("Revenue currency", latest.get("currency") or "not specified", financial, "official_annual_account"))
-                if latest.get("revenue_yoy"):
+                if latest.get("revenue_yoy") and latest["revenue_yoy"].get("percentage_change") is not None:
                     facts.append(_claim("Revenue year-over-year change", latest["revenue_yoy"], financial, "derived_from_official_annual_accounts"))
+                elif latest.get("revenue_yoy"):
+                    unsupported.append("Revenue percentage change is undefined because the previous reporting period had zero revenue; no growth rate is claimed.")
             for label, key in (
                 ("Reporting period", "period"),
                 ("Revenue", "revenue"),
