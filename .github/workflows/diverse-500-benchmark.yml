@@ -20,12 +20,13 @@ jobs:
           python-version: '3.12'
       - name: Install frozen dependencies
         run: uv sync --frozen
-      - name: Select 500 exact company identities spread across 100 public pages
+      - name: Select 500 active 2025 filers across the complete official national CSV
         run: uv run python scripts/sample_diverse_500_companies.py
-      - name: Run all ten research modules for 500 diverse organisations
+      - name: Run all ten research modules for 500 diverse financial filers
         run: |
           uv run python scripts/run_competition_batch.py \
             --organisations artifacts/diverse-500/input-500.json \
+            --bulk .smoke-data/brreg-entities.csv.gz \
             --output artifacts/diverse-500/terminal-500.jsonl \
             --profiles-output artifacts/diverse-500/profiles-500.jsonl \
             --report artifacts/diverse-500/run-report-500.json \
