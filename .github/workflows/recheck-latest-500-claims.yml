@@ -4,6 +4,7 @@ on:
     branches: [audit/live-reviewer-proof-20261114]
     paths:
       - .github/workflows/recheck-latest-500-claims.yml
+      - scripts/verify_all_claims_live.py
   workflow_dispatch:
 permissions:
   contents: read
