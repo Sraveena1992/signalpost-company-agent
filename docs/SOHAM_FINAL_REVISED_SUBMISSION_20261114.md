@@ -34,7 +34,7 @@ Prepared 14 November 2026, before Soham's requested 15 November 09:00 IST reply.
 
 According to Soham's prior evaluation of a *different old commit*, old scores were Recall 18.66/50; Evidence 26.60/30; Synthesis 0/12; UX 4/8. 6 of 53 inspected claims belonged to wrong companies (88.68% correct). These are NOT the official scores for this revised branch.
 
-The revised branch uses exact-site source gates, refuses site-builder social profiles without independent account ownership, preserves missing source states, and has provenance-linked synthesis. No claims of new 65/100, 95% gold score, 12/12 synthesis or 8/8 UX unless the organiser publishes an official re-evaluation.
+The revised branch uses exact-site source gates, refuses site-builder social profiles without independent account ownership, preserves missing source states, and produces a reviewer-facing `synthesis.decision_brief` with ONLY source-linked findings, dated metadata and explicitly unknown categories. No claims of new 65/100, 95% gold score, 12/12 synthesis or 8/8 UX unless the organiser publishes an official re-evaluation.
 
 ## REPRODUCIBLE COMMANDS
 
