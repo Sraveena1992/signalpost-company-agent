@@ -34,7 +34,9 @@ def run(path: Path):
         for page in pages:
             if page.get("article_like") and page.get("published_at"):
                 result["dated_article_candidates"]+=1
-                result["dated_candidate_details"].append({"org":str(p.get("organisation_number") or ""),\n                    "name":p.get("name"),"identity_approved":identity.get("publishable") is True,\n                    "url":page.get("url"),"title":page.get("title"),"published_at":page.get("published_at")})
+                result["dated_candidate_details"].append({"org":str(p.get("organisation_number") or ""),
+                    "name":p.get("name"),"identity_approved":identity.get("publishable") is True,
+                    "url":page.get("url"),"title":page.get("title"),"published_at":page.get("published_at")})
             result["jobposting_structured_candidates"]+=len(page.get("job_postings") or [])
             result["news_index_links"]+=len(page.get("article_and_job_links") or [])
         signals=[x for x in ((a.get("value") or {}).get("observations") or []) if isinstance(x,dict)]
