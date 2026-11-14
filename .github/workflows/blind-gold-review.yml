@@ -1,0 +1,52 @@
+name: Blind gold-label review queue from latest 500-company output
+on:
+  push:
+    branches: [audit/stratified-gold-review-20261114]
+    paths: ['.github/workflows/blind-gold-review.yml', 'tests/test_blind_gold_review.py', 'scripts/build_blind_gold_review.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked project dependencies
+        run: uv sync --frozen
+      - name: Verify blind-review invariants
+        run: uv run pytest -q tests/test_blind_gold_review.py
+      - name: Download passing 500-company results
+        run: |
+          mkdir -p artifacts/independent-review
+          gh run download 43601907908 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/independent-review
+          test -s artifacts/independent-review/profiles-500.jsonl
+      - name: Create exact 384-case blind review queue
+        run: |
+          uv run python scripts/build_blind_gold_review.py --mode sample --profiles artifacts/independent-review/profiles-500.jsonl --queue artifacts/independent-review/review-queue.json --manifest artifacts/independent-review/review-manifest.json --sample-size 384
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('artifacts/independent-review/review-queue.json').read_text())
+          m=json.loads(Path('artifacts/independent-review/review-manifest.json').read_text())
+          assert len(q)==384 and m['actual_sample_size']==384
+          assert all(x['review']['status']=='UNREVIEWED' for x in q)
+          print('384 blind review cases generated; NO independent precision score yet')
+          print(json.dumps(m['category_sample_counts'], indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signalpost-blind-384-gold-review
+          path: |
+            artifacts/independent-review/review-queue.json
+            artifacts/independent-review/review-manifest.json
+          retention-days: 14
+          if-no-files-found: warn

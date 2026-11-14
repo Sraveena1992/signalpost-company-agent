@@ -48,10 +48,30 @@ def observation(profile: dict) -> dict | None:
             hiring = job.get("hiringOrganization") or {}
             employer_name = hiring.get("name") if isinstance(hiring, dict) else str(hiring)
             employer_tokens = set(_tokens(employer_name))
-            # When a structured employer explicitly disagrees with the official
-            # legal name, skip it. Subsidiary/parent postings are not target jobs.
-            if employer_tokens and not legal_tokens.issubset(employer_tokens):
+            # A missing employer is NOT exact-entity evidence. Do not infer it
+            # merely from a parent-group page or an inherited site owner.
+            if not legal_tokens or not employer_tokens or not legal_tokens.issubset(employer_tokens):
                 continue
+            # Explicit organisation numbers, when present, must match the
+            # Norwegian registry entity; related employers are rejected.
+            if isinstance(hiring, dict):
+                identifiers = hiring.get("identifier") or hiring.get("taxID")
+                candidate_numbers = []
+                def collect_identifiers(node):
+                    if isinstance(node, dict):
+                        for k, v in node.items():
+                            if k in ("value", "taxID") and isinstance(v, (str, int)):
+                                candidate_numbers.extend(re.findall(r"(?<!\d)\d{9}(?!\d)", str(v)))
+                            else:
+                                collect_identifiers(v)
+                    elif isinstance(node, list):
+                        for value in node:
+                            collect_identifiers(value)
+                    elif isinstance(node, (str, int)):
+                        candidate_numbers.extend(re.findall(r"(?<!\d)\d{9}(?!\d)", str(node)))
+                collect_identifiers(identifiers)
+                if candidate_numbers and org not in candidate_numbers:
+                    continue
             try:
                 posted_date = date.fromisoformat(posted[:10])
             except ValueError:

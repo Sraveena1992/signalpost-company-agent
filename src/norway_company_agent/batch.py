@@ -313,6 +313,59 @@ def attach_synthesis(profile: dict[str, Any], previous: dict[str, Any] | None = 
         "change_count": len(changes),
     }
     summary["unknowns"] = missing
+
+    # Reviewer-facing synthesis must communicate what evidence establishes,
+    # not just dump an unlabeled list of facts. Use existing source-linked
+    # claims ONLY, without attributing group/parent websites or inferring
+    # vacancies, fraud, sentiment or financial performance.
+    brief_labels = {
+        "Registered industry": "Official industry",
+        "Registry employee count": "Registered employee count",
+        "Revenue": "Reported revenue",
+        "Annual result": "Reported annual result",
+        "Registered role": "Registered leadership",
+        "Verified company-site news": "Dated company-owned activity",
+        "Verified company-site job posting": "Company-site job evidence",
+    }
+    highlights = []
+    used_labels = set()
+    for fact in summary.get("facts") or []:
+        label = str(fact.get("claim") or "")
+        if label not in brief_labels or label in used_labels:
+            continue
+        if not fact.get("source_url") or not fact.get("retrieved_at"):
+            continue
+        value = fact.get("value")
+        if value is None or isinstance(value, (list, dict)):
+            if label not in ("Verified company-site news", "Verified company-site job posting"):
+                continue
+            value = (value or {}).get("headline_or_role") if isinstance(value, dict) else None
+        if not str(value or "").strip():
+            continue
+        used_labels.add(label)
+        highlights.append({
+            "topic": brief_labels[label],
+            "text": f"{brief_labels[label]}: {value}.",
+            "source_url": fact["source_url"],
+            "retrieved_at": fact["retrieved_at"],
+            "classification": fact.get("classification"),
+        })
+        if len(highlights) == 6:
+            break
+    source_linked_overview = [
+        item for item in overview if item.get("source_url") and item.get("retrieved_at")
+    ]
+    summary["decision_brief"] = {
+        "identity": str(name or "Unknown Norwegian organisation"),
+        "verified_takeaways": source_linked_overview + highlights,
+        "verified_takeaway_count": len(source_linked_overview) + len(highlights),
+        "change_assessment": summary["what_changed"],
+        "evidence_gaps": missing,
+        "interpretation_policy": (
+            "Descriptive, primary-source-backed findings only. Absent or blocked "
+            "company news, open roles and websites are unknown, never proven absent."
+        ),
+    }
     summary["synthesis_policy"] = "Each assertion cites verified evidence; no unsupported interpretation or invented source."
     profile["changes"] = changes
     profile["synthesis"] = summary

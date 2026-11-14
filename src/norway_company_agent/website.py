@@ -207,6 +207,38 @@ def _priority_links(base_url: str, soup: BeautifulSoup, limit: int = 6) -> list[
     return [url for url, _ in sorted(candidates.items(), key=lambda item: (item[1], item[0]))[:limit]]
 
 
+
+# External recruitment services can only be discovered through links on a
+# registry-grounded company site. A link is NOT evidence of an open vacancy.
+ATS_HOSTS = (
+    "greenhouse.io", "lever.co", "teamtailor.com", "webcruiter.no",
+    "webcruiter.com", "jobbnorge.no", "recman.no", "ashbyhq.com",
+    "workable.com", "easycruit.com", "reachmee.com",
+)
+
+
+def _company_linked_ats(base_url: str, soup: BeautifulSoup, limit: int = 25) -> list[dict[str, str]]:
+    results = {}
+    for anchor in soup.select("a[href]"):
+        raw_href = str(anchor.get("href") or "").strip()
+        if not raw_href or raw_href.startswith(("javascript:", "data:", "mailto:", "tel:")):
+            continue
+        url = urllib.parse.urljoin(base_url, raw_href)
+        parsed = urllib.parse.urlparse(url)
+        host = (parsed.hostname or "").casefold().rstrip(".")
+        if parsed.scheme not in {"http", "https"} or parsed.username or parsed.password or not host:
+            continue
+        matched = next((domain for domain in ATS_HOSTS if host == domain or host.endswith("." + domain)), None)
+        if not matched:
+            continue
+        # Strip query, fragment and user-controlled parameters; retain exact link
+        # host/path. Do not fetch it, trust it, or count a vacancy from it here.
+        clean = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path or "/", "", "", ""))
+        results[clean] = {"url": clean, "linked_from": base_url,
+                          "ats_host": matched, "anchor": anchor.get_text(" ", strip=True)[:100]}
+    return [results[key] for key in sorted(results)[:limit]]
+
+
 def _published_date(soup: BeautifulSoup) -> str | None:
     """Return an explicit publication date, never a crawl/feed updated timestamp."""
     for selector, attribute in (
@@ -298,6 +330,7 @@ def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max
         page = {
             "job_postings": job_postings[:20],
             "article_and_job_links": _priority_links(final_url, page_soup, limit=8),
+            "ats_links_found": _company_linked_ats(final_url, page_soup),
             "url": final_url,
             "title": page_soup.title.get_text(" ", strip=True)[:500] if page_soup.title else "",
             "main_text_excerpt": page_text[:5000],
@@ -437,6 +470,15 @@ def fetch_website(url: str | None, *, timeout: float = 15.0, max_bytes: int = 2_
                 social.extend(page_social)
             elif page_error:
                 crawl_errors.append({"url": page_url, "error": page_error})
+        # Capture outbound ATS candidates from home and every permitted crawled
+        # internal page, including career indexes. Leave eligibility to a
+        # separate exact-employer/date/source verifier.
+        ats_candidates = _company_linked_ats(final_url, soup)
+        for page in pages[1:]:
+            ats_candidates.extend(page.get("ats_links_found") or [])
+        value["ats_links_found"] = list({
+            (item["url"], item["linked_from"]): item for item in ats_candidates
+        }.values())[:80]
         value["pages"] = pages
         value["social_links"] = list({(item["platform"], item["url"]): item for item in social}.values())
         value["crawl_errors"] = crawl_errors

@@ -1,0 +1,48 @@
+name: Qualification source-audit correction and 500-claim recheck
+on:
+  push:
+    branches: [fix/qualification-audit-source-gates-20261114]
+    paths: ['.github/workflows/qualification-source-recheck.yml', 'scripts/verify_all_claims_live.py', 'tests/test_independent_publisher_audit.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frozen dependencies
+        run: uv sync --frozen
+      - name: Run audit regression tests
+        run: uv run pytest -q tests/test_independent_publisher_audit.py
+      - name: Download latest 500 profiles
+        run: |
+          mkdir -p artifacts/qualification
+          gh run download 43601907908 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/qualification
+          test -s artifacts/qualification/profiles-500.jsonl
+      - name: Recheck source claims
+        run: |
+          python scripts/verify_all_claims_live.py --profiles artifacts/qualification/profiles-500.jsonl --output artifacts/qualification/fresh-source-validation.json --workers 8
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('artifacts/qualification/fresh-source-validation.json').read_text())
+          assert x['claims_total']==7673
+          assert sum(x['claim_status'].values())==7673
+          print(json.dumps({'statuses':x['claim_status'],'unresolved':x['examples_not_confirmed']},indent=2))
+          print('Not official Builderr precision or human adjudication')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qualification-500-source-recheck
+          path: artifacts/qualification/fresh-source-validation.json
+          retention-days: 14

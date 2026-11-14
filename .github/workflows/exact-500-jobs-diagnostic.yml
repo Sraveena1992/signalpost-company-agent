@@ -1,0 +1,50 @@
+name: Exact 500 jobs funnel diagnostic and precision gate
+on:
+  push:
+    branches: [fix/jobs-precision-diagnostic-final-20261114]
+    paths: ['.github/workflows/exact-500-jobs-diagnostic.yml', 'scripts/extract_company_site_jobs.py', 'scripts/diagnose_exact_500_jobs.py', 'tests/test_exact_500_jobs_diagnostic.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project frozen deps
+        run: uv sync --frozen
+      - name: Test exact company job gates
+        run: uv run pytest -q tests/test_exact_500_jobs_diagnostic.py
+      - name: Download latest 500 actual source profiles
+        run: |
+          mkdir -p artifacts/actual-500
+          gh run download 43601907908 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/actual-500
+          test -s artifacts/actual-500/profiles-500.jsonl
+      - name: Generate per-company verified jobs funnel
+        run: |
+          uv run python scripts/diagnose_exact_500_jobs.py --profiles artifacts/actual-500/profiles-500.jsonl --output artifacts/actual-500/jobs-diagnostic-500.jsonl --report artifacts/actual-500/jobs-funnel-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/actual-500/jobs-funnel-summary.json').read_text())
+          assert r['companies']==500
+          assert sum(r['status_categories'].values())==500
+          print(json.dumps(r,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exact-500-job-diagnostic
+          path: |
+            artifacts/actual-500/jobs-diagnostic-500.jsonl
+            artifacts/actual-500/jobs-funnel-summary.json
+          retention-days: 14
+          if-no-files-found: warn
