@@ -37,7 +37,7 @@ jobs:
             --profiles artifacts/nav-probe/input/profiles-500.jsonl \
             --output artifacts/nav-probe/profiles-with-nav-jobs.jsonl \
             --report artifacts/nav-probe/nav-500-report.json \
-            --max-pages 30 --max-details 300
+            --max-pages 120 --max-details 450 --since-days 45 --candidate-name-prefilter
           python - <<'PY'
           import json
           from pathlib import Path
