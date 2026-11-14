@@ -113,3 +113,31 @@ def test_nav_detail_failure_never_proves_no_jobs():
     assert report["scan_complete"] is False
     assert result[0]["evidence"]["nav_jobs"]["status"] == "source_error"
     assert report["rejected"]["detail_fetch_or_parse_failure"] == 1
+
+
+def test_name_prefilter_reduces_requests_but_never_replaces_orgnr():
+    good = ad("a1")
+    good["_feed_entry"]["businessName"] = "1. TANUM SPEIDERGRUPPE"
+    wrong = ad("a2")
+    wrong["_feed_entry"]["businessName"] = "NOT IN OUR SAMPLE"
+    pages = [{"items": [good, wrong], "next_url": None}]
+    profiles = [{"organisation_number": ORG, "name": "1 TANUM SPEIDERGRUPPE"}]
+    result, report = enrich(profiles, get=make_get(
+        pages, {"a1": detail(), "a2": detail("a2", ORG)}),
+        token="fixture", now=NOW, candidate_name_prefilter=True)
+    assert report["active_headers_seen"] == 2
+    assert report["header_name_candidates"] == 1
+    assert report["verified_active_jobs"] == 1
+    assert report["scan_complete"] is False
+
+
+def test_prefilter_never_claims_jobs_for_wrong_orgnr():
+    candidate = ad("a1")
+    candidate["_feed_entry"]["businessName"] = "1 TANUM SPEIDERGRUPPE"
+    profiles = [{"organisation_number": ORG, "name": "1 TANUM SPEIDERGRUPPE"}]
+    result, report = enrich(profiles, get=make_get(
+        [{"items": [candidate], "next_url": None}],
+        {"a1": detail(org="111111111")}),
+        token="fixture", now=NOW, candidate_name_prefilter=True)
+    assert report["verified_active_jobs"] == 0
+    assert report["rejected"]["not_in_batch"] == 1
