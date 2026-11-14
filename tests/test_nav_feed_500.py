@@ -100,3 +100,16 @@ def test_date_and_link_requirements():
     missing = detail()
     del missing["json"]["expires"]
     assert qualify(missing, ORG, NOW)[1] == "missing_dates"
+
+
+def test_nav_detail_failure_never_proves_no_jobs():
+    pages = [{"items": [ad("a1")], "next_url": None}]
+    def unavailable(url, token, **kwargs):
+        if url.endswith("/api/v1/feed"):
+            return pages[0]
+        raise OSError("network unavailable")
+    result, report = enrich([{"organisation_number": ORG}], get=unavailable,
+                            token="fixture", now=NOW)
+    assert report["scan_complete"] is False
+    assert result[0]["evidence"]["nav_jobs"]["status"] == "source_error"
+    assert report["rejected"]["detail_fetch_or_parse_failure"] == 1
