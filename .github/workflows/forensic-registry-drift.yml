@@ -1,0 +1,35 @@
+name: Forensic official register discrepancy
+on:
+  push:
+    branches: [final/qualification-evidence-20261114]
+    paths: ['.github/workflows/forensic-registry-drift.yml', 'scripts/forensic_registry_drift.py', 'tests/test_forensic_registry_drift.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - run: uv run pytest -q tests/test_forensic_registry_drift.py
+      - run: |
+          mkdir -p artifacts/reg-drift
+          gh run download 43601907908 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/reg-drift
+          test -s artifacts/reg-drift/profiles-500.jsonl
+      - run: uv run python scripts/forensic_registry_drift.py --profiles artifacts/reg-drift/profiles-500.jsonl --output artifacts/reg-drift/registry-drift-932850753.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: brreg-three-claim-source-discrepancy
+          path: artifacts/reg-drift/registry-drift-932850753.json
+          retention-days: 30
+          if-no-files-found: warn
