@@ -1,0 +1,36 @@
+name: Recheck Completed 500 Full-Module Research Artifact
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/audit_full_500_modules.py
+      - .github/workflows/recheck-full-500-artifact.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download original 500-company all-module research outputs
+        run: |
+          mkdir -p artifacts/full-500
+          gh run download 43551496321 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/full-500
+          test -s artifacts/full-500/profiles-500.jsonl
+          test -s artifacts/full-500/run-report-500.json
+      - name: Re-audit same 500 real results with fixed Brreg source attribution
+        run: |
+          python scripts/audit_full_500_modules.py \
+            --profiles artifacts/full-500/profiles-500.jsonl \
+            --report artifacts/full-500/run-report-500.json \
+            --output artifacts/full-500/rechecked-full-module-audit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audited-full-500-rechecked-report
+          path: artifacts/full-500/rechecked-full-module-audit.json
