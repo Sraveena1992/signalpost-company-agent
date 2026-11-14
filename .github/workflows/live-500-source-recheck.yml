@@ -1,0 +1,36 @@
+name: Re-fetch 500 Company Claim Sources
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/verify_all_claims_live.py
+      - .github/workflows/live-500-source-recheck.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download complete original 500-company research profiles
+        run: |
+          mkdir -p artifacts/full-500
+          gh run download 43551496321 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/full-500
+          test -s artifacts/full-500/profiles-500.jsonl
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Independent fresh reference verification across all claim classes
+        run: |
+          python scripts/verify_all_claims_live.py --profiles artifacts/full-500/profiles-500.jsonl --output artifacts/full-500/live-source-validation.json --workers 8
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signalpost-500-fresh-source-claim-audit
+          path: artifacts/full-500/live-source-validation.json
+          retention-days: 30
