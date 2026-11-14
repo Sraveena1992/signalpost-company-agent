@@ -11,7 +11,7 @@ permissions:
 jobs:
   nav-probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -37,7 +37,7 @@ jobs:
             --profiles artifacts/nav-probe/input/profiles-500.jsonl \
             --output artifacts/nav-probe/profiles-with-nav-jobs.jsonl \
             --report artifacts/nav-probe/nav-500-report.json \
-            --max-pages 8 --max-details 75
+            --max-pages 30 --max-details 300
           python - <<'PY'
           import json
           from pathlib import Path
