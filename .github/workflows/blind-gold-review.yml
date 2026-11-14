@@ -2,7 +2,7 @@ name: Blind gold-label review queue from latest 500-company output
 on:
   push:
     branches: [audit/stratified-gold-review-20261114]
-    paths: ['.github/workflows/blind-gold-review.yml']
+    paths: ['.github/workflows/blind-gold-review.yml', 'tests/test_blind_gold_review.py', 'scripts/build_blind_gold_review.py']
   workflow_dispatch:
 permissions:
   contents: read
