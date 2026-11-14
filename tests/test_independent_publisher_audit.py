@@ -59,3 +59,14 @@ def test_wrong_company_site_host_is_rejected_before_confirming_claim():
     state, why = check_claim(fact, "111111111", fresh,
                             {"111111111": {"other.no"}})
     assert (state, why) == ("contradicted", "wrong_company_source_host")
+
+def test_missing_live_registry_fields_cannot_contradict_historical_claims():
+    from verify_all_claims_live import compare_registry
+    raw = {"organisasjonsnummer": "932850753", "navn": "2 NK SOLUTION SP. Z O.O. SP. K"}
+    assert compare_registry("Bankruptcy flag", False, raw, "932850753") is None
+    assert compare_registry("Liquidation flag", False, raw, "932850753") is None
+    assert compare_registry("Registered business address", "ul. Dluga 25, Polen", raw, "932850753") is None
+    assert compare_registry("Bankruptcy flag", False, {**raw, "konkurs": False}, "932850753") is True
+    assert compare_registry("Bankruptcy flag", False, {**raw, "konkurs": True}, "932850753") is False
+    # Wrong company remains a contradiction, not an unknown.
+    assert compare_registry("Bankruptcy flag", False, raw, "111111111") is False
