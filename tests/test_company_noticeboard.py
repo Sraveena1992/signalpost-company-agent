@@ -77,3 +77,13 @@ def test_external_host_rejected():
     bad = _profile()
     bad["evidence"]["website"]["value"]["pages"][0]["url"] = "https://elsewhere.no/oppslagstavle/valid-item"
     assert observation(bad) is None
+
+
+def test_homepage_shows_source_linked_dated_example_without_claiming_active_vacancy():
+    from app import home
+    html = home().body.decode("utf-8")
+    assert 'id="verified-company-update"' in html
+    assert "https://aas.speiding.no/oppslagstavle/utlysning-sommerjobb-som-aktivitetsledere/" in html
+    assert "987531630" in html
+    assert "Active vacancy: not verified" in html
+    assert 'rel="noopener noreferrer"' in html
