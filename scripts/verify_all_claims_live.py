@@ -67,6 +67,18 @@ def address_raw(value):
 
 def compare_registry(label,value,body,org):
     if str(body.get("organisasjonsnummer"))!=org:return False
+    # Missing keys do not establish that a historical archived claim is
+    # contradicted. Especially important for non-Norwegian/foreign entities
+    # where the live official API can omit these optional fields altogether.
+    required_keys={
+        "Bankruptcy flag":"konkurs",
+        "Liquidation flag":"underAvvikling",
+        "Registered business address":"forretningsadresse",
+        "Registered postal address":"postadresse",
+    }
+    required_key=required_keys.get(label)
+    if required_key and body.get(required_key) is None:
+        return None
     mapping={
         "Registered name":body.get("navn"),
         "Organisation number":body.get("organisasjonsnummer"),
