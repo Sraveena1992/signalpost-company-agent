@@ -335,3 +335,25 @@ def test_stale_job_without_expiry_and_future_job_are_not_verified_openings():
     assert job_observation(profile) is None
     job["datePosted"]=date.today().isoformat()
     assert job_observation(profile) is not None
+
+
+def test_undefined_zero_base_revenue_growth_is_explicitly_unclaimed():
+    from norway_company_agent.research import answer_profile
+    profile={
+        "organisation_number":"999999991","name":"EXAMPLE AS",
+        "evidence":{
+            "registry":{"status":"available","source_url":"https://data.brreg.no/enhetsregisteret/api/enheter/999999991"},
+            "financials":{"status":"available","source_url":"https://data.brreg.no/regnskapsregisteret/regnskap/999999991",
+                          "retrieved_at":"2026-11-14T00:00:00Z",
+                          "value":{"records":[
+                              {"account_type":"SELSKAP","currency":"NOK","period":{"tilDato":"2025-12-31"},
+                               "revenue":0.0,"revenue_yoy":{"previous_year":2024,"current_year":2025,
+                                   "previous_revenue":0.0,"absolute_change":0.0,"percentage_change":None}},
+                              {"account_type":"SELSKAP","currency":"NOK","period":{"tilDato":"2024-12-31"},
+                               "revenue":0.0}
+                          ]}}
+        }
+    }
+    response=answer_profile(profile,"company financial overview")
+    assert not any(f["claim"]=="Revenue year-over-year change" for f in response["facts"])
+    assert any("undefined" in message for message in response["unsupported_or_uncertain"])
