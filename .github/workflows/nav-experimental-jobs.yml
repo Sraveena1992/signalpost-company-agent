@@ -1,0 +1,58 @@
+name: Experimental NAV 500-company vacancy exact-org scan
+on:
+  push:
+    branches: [feat/nav-feed-exact-org-20261114]
+    paths:
+      - '.github/workflows/nav-experimental-jobs.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  nav-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download existing successful 500-company profiles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts/nav-probe/input
+          gh run download 43562211947 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/nav-probe/input
+          test -s artifacts/nav-probe/input/profiles-500.jsonl
+      - name: Obtain experimental NAV public token without persisting it
+        run: |
+          TOKEN="$(curl --fail --silent --show-error --max-time 20 https://pam-stilling-feed.nav.no/api/publicToken | tail -n 1)"
+          if [ -z "$TOKEN" ]; then echo 'NAV token endpoint returned no token'; exit 1; fi
+          echo "::add-mask::$TOKEN"
+          echo "NAV_FEED_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+      - name: Run bounded authenticated vacancy scan with exact orgnr
+        run: |
+          python scripts/run_nav_feed_500.py \
+            --profiles artifacts/nav-probe/input/profiles-500.jsonl \
+            --output artifacts/nav-probe/profiles-with-nav-jobs.jsonl \
+            --report artifacts/nav-probe/nav-500-report.json \
+            --max-pages 120 --max-details 450 --since-days 45 --candidate-name-prefilter
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('artifacts/nav-probe/nav-500-report.json').read_text())
+          assert report['companies']==500
+          print('500-company NAV report:',json.dumps(report,indent=2))
+          print('LIMITATION: this experimental run is bounded; a partial scan cannot establish no vacancies')
+          PY
+      - name: Save research artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experimental-nav-exact-org-500
+          path: |
+            artifacts/nav-probe/nav-500-report.json
+            artifacts/nav-probe/profiles-with-nav-jobs.jsonl
+          retention-days: 7
+          if-no-files-found: warn
