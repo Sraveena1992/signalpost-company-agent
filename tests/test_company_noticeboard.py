@@ -1,6 +1,12 @@
 """Strict company-owned noticeboard evidence: dated article yes, expired job no."""
 import hashlib
+import sys
+from pathlib import Path
 from datetime import date, timedelta
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'src'))
+sys.path.insert(0, str(ROOT))
 
 from bs4 import BeautifulSoup
 
