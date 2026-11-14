@@ -7,7 +7,7 @@ import argparse
 import json
 from collections import Counter,defaultdict
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 MODULES=["registry","accounting_obligation","registry_live","financials",
          "financial_history","roles","group","locations","website","public_activity"]
@@ -47,8 +47,13 @@ def main():
                     host=urlparse(url).hostname or ""
                     if host and host not in {"data.brreg.no","data.brreg.no."}:
                         source_identity_mismatches.append({"organisation":org,"module":module,"reason":"not_official_host","url":url})
-                    # Official company-specific registry source URL must end at this org.
-                    if module in {"registry","registry_live","financials","financial_history","roles","group","locations"} and urlparse(url).path.strip("/") and org not in urlparse(url).path:
+                    # Brreg detail URLs embed the organisation in the path;
+                    # subsidiary /locations lookup uses ?overordnetEnhet=<org>.
+                    parsed=urlparse(url)
+                    query=parse_qs(parsed.query)
+                    in_path=(org in parsed.path)
+                    in_parent_query=(module=="locations" and query.get("overordnetEnhet")==[org])
+                    if parsed.path.strip("/") and not (in_path or in_parent_query):
                         source_identity_mismatches.append({"organisation":org,"module":module,"reason":"wrong_org_in_source_url","url":url})
         sy=profile.get("synthesis") or {}
         unsupported_count+=len(sy.get("unsupported_or_uncertain") or [])
