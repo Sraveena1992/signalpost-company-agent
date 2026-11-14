@@ -368,3 +368,57 @@ def test_generic_wordpress_placeholder_is_not_company_description():
     answer=answer_profile(profile,"company overview")
     assert not any(f["claim"]=="Website description" for f in answer["facts"])
     assert any("generic website template description" in s for s in answer["unsupported_or_uncertain"])
+
+
+def test_verified_site_crawler_reaches_individual_article_and_vacancy(monkeypatch):
+    """Bounded second-hop discovery without crawling unrelated third-party pages."""
+    import io
+    from unittest.mock import Mock
+    from norway_company_agent import website as module
+    landing = b"""<html><head><title>EXAMPLE COMPANY AS</title></head><body>
+      <a href="/news/">News</a><a href="/careers/">Careers</a>
+      <p>Example Company AS corporate official homepage based in Oslo Norway.</p></body></html>"""
+    class Response:
+        headers = {"content-type": "text/html"}
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def read(self, limit): return landing
+        def geturl(self): return "https://example.no/"
+    visited = []
+    def page_mock(url, **kwargs):
+        visited.append(url)
+        children = (
+            ["https://example.no/news/launch"]
+            if url == "https://example.no/news/" else
+            ["https://example.no/careers/engineer"]
+            if url == "https://example.no/careers/" else []
+        )
+        page = {"url":url, "title":"Example Company AS",
+                "article_and_job_links": children,
+                "main_text_excerpt":"EXAMPLE COMPANY AS"}
+        return page, [], 2, 100, 1, None
+    monkeypatch.setattr(module, "assert_public_url", lambda url: None)
+    monkeypatch.setattr(module, "_robots_allowed", lambda url, timeout: True)
+    monkeypatch.setattr(module, "_registered_domain", lambda url: "example.no")
+    monkeypatch.setattr(module, "_fetch_secondary_page", page_mock)
+    monkeypatch.setattr(module.SAFE_OPENER, "open", lambda *args, **kwargs: Response())
+    monkeypatch.setattr(module.extruct, "extract", lambda *args, **kwargs: {})
+    monkeypatch.setattr(module.trafilatura, "extract", lambda *args, **kwargs: "Example Company AS " * 10)
+    record, metrics = module.fetch_website("https://example.no")
+    assert record["status"] == "available"
+    assert "https://example.no/news/launch" in visited
+    assert "https://example.no/careers/engineer" in visited
+    assert len(visited) == 4
+    assert metrics["requests"] >= 8
+
+
+def test_website_priority_links_reject_external_domains():
+    from bs4 import BeautifulSoup
+    from norway_company_agent.website import _priority_links
+    soup=BeautifulSoup('''<a href="/news/article-one">News article</a>
+       <a href="/jobs/engineer">Engineer job</a>
+       <a href="https://other-company.no/jobs/engineer">Other employer</a>''', "html.parser")
+    links=_priority_links("https://example.no/news/",soup)
+    assert "https://example.no/news/article-one" in links
+    assert "https://example.no/jobs/engineer" in links
+    assert not any("other-company.no" in link for link in links)
