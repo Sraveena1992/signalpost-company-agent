@@ -142,19 +142,82 @@ def compare_subunit(value,body):
     return False
 
 class DescriptionReader(HTMLParser):
+    """Independently parse live HTML metadata, not the agent's stored prediction."""
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.descriptions=[]
-    def handle_starttag(self,tag,attrs):
-        if tag!="meta":return
-        meta=dict(attrs)
-        if (meta.get("name") or meta.get("property") or "").casefold() in ("description","og:description"):
-            self.descriptions.append(meta.get("content") or "")
+        self.descriptions = []
+        self.published = []
+        self.headlines = []
+        self._in_title = False
 
-def check_claim(f,org,fetched):
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "title":
+            self._in_title = True
+        if tag != "meta":
+            return
+        name = (attrs.get("name") or attrs.get("property") or attrs.get("itemprop") or "").casefold()
+        val = (attrs.get("content") or "").strip()
+        if name in ("description", "og:description"):
+            self.descriptions.append(val)
+        elif name in ("article:published_time", "datepublished", "date", "pubdate", "publishdate", "dc.date", "dc.date.issued"):
+            self.published.append(val)
+        elif name in ("og:title", "twitter:title"):
+            self.headlines.append(val)
+
+    def handle_endtag(self, tag):
+        if tag == "title":
+            self._in_title = False
+
+    def handle_data(self, data):
+        if self._in_title and data.strip():
+            self.headlines.append(data.strip())
+
+
+def verify_publisher_date(html, claimed):
+    """True only for a fresh publisher metadata date equal to the claimed date."""
+    reader = DescriptionReader()
+    reader.feed(html)
+    claimed_day = str(claimed or "")[:10]
+    if not re.fullmatch(r"20\d{2}-\d{2}-\d{2}", claimed_day):
+        return False
+    return any(raw[:10] == claimed_day for raw in reader.published)
+
+
+def check_company_news(url, value, fresh_html):
+    path = urlparse(url).path
+    article = bool(re.search(
+        r"/(?:news|press|aktuelt|nyheter|artikler|blog|oppslagstavle|oppslagstavla)/[^/]+",
+        path, re.I))
+    if not article or not isinstance(value, dict):
+        return False
+    title = str(value.get("headline_or_role") or "").strip()
+    published = str(value.get("published_at") or "")
+    if not title or not re.match(r"20\d{2}-\d{2}-\d{2}", published):
+        return False
+    reader = DescriptionReader()
+    reader.feed(fresh_html)
+    # A publisher date and article title are separate evidence requirements.
+    # A missing metadata date does NOT establish a contradiction.
+    if not reader.published:
+        return None
+    if not verify_publisher_date(fresh_html, published):
+        return None  # Website might have updated the article date
+    # Require headline directly in title metadata or rendered HTML, not URL.
+    return True if (
+        any(canon(title) in canon(t) for t in reader.headlines)
+        or canon(title) in canon(fresh_html)
+    ) else None
+
+
+def check_claim(f,org,fetched,owned_hosts=None):
     label=f.get("claim"); value=f.get("value"); kind=f.get("classification")
     src=str(f.get("source_url") or "")
     if not src or not f.get("retrieved_at"):return "contradicted","no source metadata"
+    if owned_hosts is not None and kind in ("company_reported_claim", "verified_company_site_news", "verified_company_site_job_posting"):
+        host = (urlparse(src).hostname or "").casefold().removeprefix("www.")
+        if host not in owned_hosts.get(str(org), set()):
+            return "contradicted", "wrong_company_source_host"
     result=fetched.get(src,{"state":"unavailable"})
     if result["state"] not in ("available","available_html"):
         return "unverifiable",result["state"]
@@ -172,13 +235,12 @@ def check_claim(f,org,fetched):
         else:
             reader=DescriptionReader()
             reader.feed(result.get("text") or "")
-            check=any(canon(meta)==canon(value) for meta in reader.descriptions)
+            # A changed live site does not demonstrate that an older
+            # timestamped description was false at extraction time.
+            # Keep differences as unknown, not automatically as correct.
+            check=True if any(canon(meta)==canon(value) for meta in reader.descriptions) else None
     elif kind=="verified_company_site_news":
-        path=urlparse(src).path
-        valid_article=bool(re.search(r"/(?:news|press|aktuelt|nyheter|artikler|blog)/[^/]+",path,re.I))
-        date_str=str((value or {}).get("published_at") or "") if isinstance(value,dict) else ""
-        valid_date=bool(re.match(r"202[5-6]-",date_str))
-        check=False if not valid_article or not valid_date else None
+        check=check_company_news(src,value,result.get("text") or "") if result.get("state")=="available_html" else None
     else:
         check=None  # Website description, social links and jobs need human/HTML assessment.
     if check is True:return "confirmed","fresh original source matches"
@@ -198,12 +260,15 @@ def main():
     urls=sorted({str(f.get("source_url") or "") for _,f in all_facts if f.get("source_url")})
     fetched={}
     approved_hosts=set()
+    org_approved_hosts={}
     for profile in rows:
         site=(profile.get("evidence") or {}).get("website") or {}
         val=site.get("value") or {}
         if site.get("status")=="available" and (val.get("identity_assessment") or {}).get("publishable") is True:
             host=(urlparse(str(val.get("final_url") or site.get("source_url") or "")).hostname or "").casefold()
-            if host:approved_hosts.add(host)
+            if host:
+                approved_hosts.add(host)
+                org_approved_hosts.setdefault(str(profile.get("organisation_number")),set()).add(host.removeprefix("www."))
     with cf.ThreadPoolExecutor(max_workers=a.workers) as pool:
         futures={pool.submit(fresh,url,approved_hosts):url for url in urls}
         for future in cf.as_completed(futures):
@@ -213,7 +278,7 @@ def main():
     statuses=Counter(); by_category={}
     examples=[]
     for org,f in all_facts:
-        state,why=check_claim(f,org,fetched)
+        state,why=check_claim(f,org,fetched,org_approved_hosts)
         statuses[state]+=1
         kind=str(f.get("classification") or "")
         by_category.setdefault(kind,Counter())[state]+=1
