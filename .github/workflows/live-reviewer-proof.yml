@@ -1,0 +1,41 @@
+name: Verify live reviewer evidence after PR48 merge
+on:
+  push:
+    branches: [audit/live-reviewer-proof-20261114]
+    paths:
+      - .github/workflows/live-reviewer-proof.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Render homepage and source-linked evidence is actually deployed
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 8); do
+            if curl --fail --silent --show-error --max-time 35 https://signalpost-company-agent.onrender.com/ -o /tmp/signalpost.html; then
+              if grep -q 'id="verified-company-update"' /tmp/signalpost.html; then
+                break
+              fi
+            fi
+            sleep 12
+          done
+          test -s /tmp/signalpost.html
+          grep -q 'id="verified-company-update"' /tmp/signalpost.html
+          grep -q 'aas.speiding.no/oppslagstavle/utlysning-sommerjobb-som-aktivitetsledere/' /tmp/signalpost.html
+          grep -q 'Active vacancy: not verified' /tmp/signalpost.html
+          grep -q '987531630' /tmp/signalpost.html
+          printf '{"homepage":"verified","company_owned_source":"visible","expired_vacancy_disclaimer":"visible"}\n' > /tmp/live-reviewer-proof.json
+          cat /tmp/live-reviewer-proof.json
+      - name: Export proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-reviewer-proof
+          path: /tmp/live-reviewer-proof.json
+          if-no-files-found: warn
+          retention-days: 7
