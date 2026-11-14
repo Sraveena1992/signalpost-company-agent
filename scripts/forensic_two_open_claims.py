@@ -58,7 +58,7 @@ def extract_raw_evidence(raw):
         "meta": parser.meta[:120],
         "time_tags": parser.time[:20],
         "article_visible_dates": list(dict.fromkeys(re.findall(
-            r"(?i)\\b(?:\\d{1,2}\\s+(?:januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)\\s*,?\\s*20\\d{2}|20\\d{2}-\\d{2}-\\d{2})\\b",
+            r"(?i)\b(?:\d{1,2}\s+(?:januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)\s*,?\s*20\d{2}|20\d{2}-\d{2}-\d{2})\b",
             display_text)))[:30],
         "title_and_article_excerpts": display_text[:3500],
     }
