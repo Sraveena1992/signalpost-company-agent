@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - scripts/audit_full_500_modules.py
+      - src/norway_company_agent/website.py
+      - scripts/extract_company_site_news.py
+      - scripts/extract_company_site_jobs.py
       - .github/workflows/full-500-ten-module-audit.yml
   workflow_dispatch:
 permissions:
