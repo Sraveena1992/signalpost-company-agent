@@ -1,4 +1,5 @@
 name: 500 Company Full 10-Module Research Audit
+# Recheck after precision fixes: stale news indexes, zero-base YoY, generic website boilerplate.
 on:
   pull_request:
     branches: [main]
