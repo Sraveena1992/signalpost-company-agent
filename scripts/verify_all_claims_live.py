@@ -105,7 +105,7 @@ def compare_roles(label,value,body):
         for person in group.get("roller") or []:
             typ=getpath(person,"type","beskrivelse") or getpath(group,"type","beskrivelse") or "Registered role"
             names=getpath(person,"person","navn") or {}
-            full=" ".join(str(names.get(k) or "") for k in ("fornavn","mellomnavn","etternavn")).strip()
+            full=" ".join(str(names.get(k)) for k in ("fornavn","mellomnavn","etternavn") if names.get(k)).strip()
             entity=person.get("enhet") or {}
             entityname=entity.get("navn")
             if isinstance(entityname,list):entityname=" ".join(str(t) for t in entityname)
