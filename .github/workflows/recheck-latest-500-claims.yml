@@ -41,6 +41,7 @@ jobs:
           assert data['claims_total']==7673
           assert sum(data['claim_status'].values())==7673
           print('Claim audit completed. This is NOT official Builderr gold-label accuracy.')
+          print('Unresolved cases:',json.dumps(data.get('examples_not_confirmed',[])[:10],ensure_ascii=False))
           print(json.dumps({key:data[key] for key in ('companies','claims_total','claim_status','confirmation_rate_over_all_claims','confirmed_fraction_among_decidable')},indent=2))
           PY
       - name: Upload latest 500 fresh-source audit results
