@@ -1,0 +1,28 @@
+name: Forensic original-source recheck of two disputed claims
+on:
+  push:
+    branches: [final/qualification-evidence-20261114]
+    paths: ['.github/workflows/forensic-two-claims.yml', 'scripts/forensic_two_open_claims.py', 'tests/test_forensic_two_claims.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - run: uv run pytest -q tests/test_forensic_two_claims.py
+      - run: uv run python scripts/forensic_two_open_claims.py --output artifacts/forensic-originals.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: two-original-source-forensic-records
+          path: artifacts/forensic-originals.json
+          retention-days: 30
+          if-no-files-found: warn
