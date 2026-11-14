@@ -20,7 +20,7 @@ jobs:
       - name: Download complete original 500-company research profiles
         run: |
           mkdir -p artifacts/full-500
-          gh run download 43551496321 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/full-500
+          gh run download 43557626537 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/full-500
           test -s artifacts/full-500/profiles-500.jsonl
       - uses: actions/setup-python@v5
         with:
