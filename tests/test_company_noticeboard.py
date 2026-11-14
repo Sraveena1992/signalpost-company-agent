@@ -61,7 +61,7 @@ def test_wrong_entity_and_unverified_site_blocked():
                                 published=date.today().isoformat(),
                                 )) is not None  # identity is checked against substantive article text
     bad = _profile()
-    bad["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = "An unrelated group" * 12
+    bad["evidence"]["website"]["value"]["pages"][0]["title"] = "Unrelated event"\n    bad["evidence"]["website"]["value"]["pages"][0]["main_text_excerpt"] = "An unrelated group" * 12
     assert observation(bad) is None
 
 
