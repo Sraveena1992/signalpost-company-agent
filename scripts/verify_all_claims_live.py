@@ -179,7 +179,7 @@ def verify_publisher_date(html, claimed):
     reader = DescriptionReader()
     reader.feed(html)
     claimed_day = str(claimed or "")[:10]
-    if not re.fullmatch(r"20\\d{2}-\\d{2}-\\d{2}", claimed_day):
+    if not re.fullmatch(r"20\d{2}-\d{2}-\d{2}", claimed_day):
         return False
     return any(raw[:10] == claimed_day for raw in reader.published)
 
@@ -193,7 +193,7 @@ def check_company_news(url, value, fresh_html):
         return False
     title = str(value.get("headline_or_role") or "").strip()
     published = str(value.get("published_at") or "")
-    if not title or not re.match(r"20\\d{2}-\\d{2}-\\d{2}", published):
+    if not title or not re.match(r"20\d{2}-\d{2}-\d{2}", published):
         return False
     reader = DescriptionReader()
     reader.feed(fresh_html)
