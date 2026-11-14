@@ -28,7 +28,10 @@ def diagnostic(profile):
     career_terms = ("job", "careers", "karriere", "stillinger", "stilling", "ledig", "recruit")
     links = sorted({str(url) for p in pages for url in p.get("article_and_job_links") or []
                     if isinstance(url, str) and urlparse(url).scheme in ("https", "http")})
-    ats = sorted(x for x in links if any(h in (urlparse(x).hostname or "").casefold() for h in ats_keywords))
+    ats = sorted({str(item.get("url")) for item in value.get("ats_links_found") or []
+                  if isinstance(item, dict) and item.get("url")} |
+                 {str(item.get("url")) for p in pages for item in p.get("ats_links_found") or []
+                  if isinstance(item, dict) and item.get("url")})
     careers = sorted(x for x in links if any(k in (urlparse(x).path or "").casefold() for k in career_terms))
     job_candidates = [(p, job) for p in pages for job in (p.get("job_postings") or []) if isinstance(job, dict)]
     verified = [x for x in observations if isinstance(x, dict) and x.get("signal_type") == "job_posting"
