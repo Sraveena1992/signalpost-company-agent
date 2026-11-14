@@ -1,67 +1,49 @@
 #!/usr/bin/env python3
-"""500-company public registry sample spread across the Norwegian national universe.
+"""500 reproducibly sampled 2025 active filers from full official Brreg CSV.
 
-Not the secret Builderr sample. Distinct from a page-0 alphabetical holdout.
+Unlike page=0 browsing, this samples the entire national public registry.
+This is not Builderr's private holdout set.
 """
-import concurrent.futures as cf
-import hashlib
+from __future__ import annotations
 import json
-import math
-import re
-import urllib.request
+import sys
 from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+sys.path.insert(0,str(ROOT/"src"))
+from scripts.run_100_company_smoke import ensure_snapshot
+from norway_company_agent.sampling import deterministic_financial_filer_sample
 
-BASE="https://data.brreg.no/enhetsregisteret/api/enheter"
 DIRECTORY=Path("artifacts/diverse-500")
-SAMPLE_PAGES=100
-PER_PAGE=5
-SEED="signalpost-cross-universe-norwegian-500-20261114"
-
-def fetch(page):
-    url=f"{BASE}?size=1000&page={page}"
-    req=urllib.request.Request(url,headers={"Accept":"application/json","User-Agent":"SignalpostDiversePublicHoldout/1.0"})
-    error=None
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req,timeout=35) as r:
-                data=json.load(r)
-            return page,data
-        except Exception as exc:
-            error=exc
-    raise RuntimeError(f"Public registry page {page} failed: {error}")
-
+SNAPSHOT=Path(".smoke-data/brreg-entities.csv.gz")
+SEED=20261114
 def main():
-    first=fetch(0)[1]
-    pages=int((first.get("page") or {}).get("totalPages") or 0)
-    if pages<SAMPLE_PAGES:
-        raise RuntimeError(f"Not enough registry pages for 100 distributed groups: {pages}")
-    # Midpoint of each uniform bin avoids a page-0 alphabetical-only sample.
-    indexes=sorted(set(min(pages-1,int((i+0.5)*pages/SAMPLE_PAGES)) for i in range(SAMPLE_PAGES)))
-    assert len(indexes)==SAMPLE_PAGES
-    result={0:first}
-    with cf.ThreadPoolExecutor(max_workers=6) as pool:
-        for page,data in pool.map(fetch,indexes):
-            result[page]=data
-    selected=[]
-    for page in indexes:
-        values=(result[page].get("_embedded") or {}).get("enheter") or []
-        valid=[{"organisation_number":str(item.get("organisasjonsnummer") or ""),
-                "name":item.get("navn"),"legal_form":((item.get("organisasjonsform") or {}).get("kode")),
-                "page":page} for item in values]
-        valid=[row for row in valid if re.fullmatch(r"\d{9}",row["organisation_number"]) and row["name"]]
-        valid.sort(key=lambda row:hashlib.sha256((SEED+"|"+row["organisation_number"]).encode()).hexdigest())
-        if len(valid)<PER_PAGE:raise RuntimeError(f"Too few valid companies on page {page}")
-        selected.extend(valid[:PER_PAGE])
-    orgs=[x["organisation_number"] for x in selected]
-    if len(orgs)!=500 or len(set(orgs))!=500:raise RuntimeError("Invalid diverse holdout count or duplicates")
     DIRECTORY.mkdir(parents=True,exist_ok=True)
-    (DIRECTORY/"input-500.json").write_text(json.dumps(orgs,ensure_ascii=False,indent=2)+"\n")
+    SNAPSHOT.parent.mkdir(parents=True,exist_ok=True)
+    ensure_snapshot(SNAPSHOT)
+    selected,meta=deterministic_financial_filer_sample(
+        SNAPSHOT,500,latest_year="2025",seed=SEED)
+    if len(selected)!=500 or len({row["organisation_number"] for row in selected})!=500:
+        raise RuntimeError("Invalid diverse 500-company sample")
+    orgs=[row["organisation_number"] for row in selected]
+    (DIRECTORY/"input-500.json").write_text(json.dumps(orgs,indent=2)+"\n",encoding="utf-8")
+    reference=[{
+        "organisation_number":row["organisation_number"],
+        "name":row.get("name"),"legal_form":row.get("legal_form"),
+        "industry_code":row.get("industry_code"),"municipality_number":row.get("municipality_number"),
+        "latest_submitted_accounts":row.get("latest_submitted_accounts"),
+        "evaluation_split":row.get("evaluation_split"),
+        "sample_slice":row.get("sample_slice"),
+    } for row in selected]
     (DIRECTORY/"reference-500.json").write_text(json.dumps({
-        "selection":"100 evenly spread public registry pages x 5 deterministic company names",
-        "not_Builderr_hidden":True,"page_count":pages,"selected_pages":indexes,"count":500,
-        "records":selected,
-    },ensure_ascii=False,indent=2)+"\n")
-    print(json.dumps({"total_pages":pages,"sampled_pages":len(indexes),"companies":len(orgs),
-                      "first_page":indexes[0],"last_page":indexes[-1],
-                      "first_company":selected[0]["name"],"last_company":selected[-1]["name"]},ensure_ascii=False,indent=2))
+        "selection":"deterministic full national public registry financial-filer sample",
+        "not_Builderr_hidden":True,
+        "source":"https://data.brreg.no/enhetsregisteret/api/enheter/lastned/csv",
+        "metadata":meta,"records":reference,
+    },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print(json.dumps({"source_rows":meta.get("registry_rows"),
+                      "eligible_2025_active_filers":meta.get("eligible_rows"),
+                      "selected":len(selected),
+                      "legal_form_counts":meta.get("legal_form_counts"),
+                      "evaluation_splits":meta.get("evaluation_splits")},ensure_ascii=False,indent=2),flush=True)
 if __name__=="__main__":main()
