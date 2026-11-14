@@ -27,7 +27,7 @@ jobs:
           test -s artifacts/nav-probe/input/profiles-500.jsonl
       - name: Obtain experimental NAV public token without persisting it
         run: |
-          TOKEN="$(curl --fail --silent --show-error --max-time 20 https://pam-stilling-feed.nav.no/api/publicToken)"
+          TOKEN="$(curl --fail --silent --show-error --max-time 20 https://pam-stilling-feed.nav.no/api/publicToken | tail -n 1 | tr -d '\\r\\n')"
           if [ -z "$TOKEN" ]; then echo 'NAV token endpoint returned no token'; exit 1; fi
           TOKEN="${TOKEN%\"}"; TOKEN="${TOKEN#\"}"
           echo "::add-mask::$TOKEN"
