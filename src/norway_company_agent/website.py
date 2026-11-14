@@ -297,6 +297,7 @@ def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max
             visit(structured)
         page = {
             "job_postings": job_postings[:20],
+            "article_and_job_links": _priority_links(final_url, page_soup, limit=8),
             "url": final_url,
             "title": page_soup.title.get_text(" ", strip=True)[:500] if page_soup.title else "",
             "main_text_excerpt": page_text[:5000],
@@ -383,7 +384,44 @@ def fetch_website(url: str | None, *, timeout: float = 15.0, max_bytes: int = 2_
         bytes_received = len(raw)
         page_latencies = [elapsed]
         homepage_domain = value["registered_domain"]
-        for page_url in _priority_links(final_url, soup):
+        first_hop = _priority_links(final_url, soup)
+        visited = {final_url.rstrip("/")}
+        second_hop: list[str] = []
+        # Discover article and vacancy detail pages linked from site-owned news
+        # and careers indexes. No unbounded crawler / third-party attribution.
+        for page_url in first_hop:
+            if page_url.rstrip("/") in visited:
+                continue
+            visited.add(page_url.rstrip("/"))
+            page, page_social, page_requests, page_bytes, page_elapsed, page_error = _fetch_secondary_page(
+                page_url,
+                homepage_domain=homepage_domain,
+                timeout=timeout,
+                max_bytes=min(max_bytes, 1_000_000),
+            )
+            requests += page_requests
+            bytes_received += page_bytes
+            if page_elapsed:
+                page_latencies.append(page_elapsed)
+            if page:
+                pages.append(page)
+                social.extend(page_social)
+                # Only pages under explicit news/careers paths may supply a
+                # second hop, reducing unrelated service and social pages.
+                if re.search(r"/(?:news|press|aktuelt|nyheter|blog|careers|career|stillinger|ledige-stillinger|jobs|jobb)(?:/|$)", urllib.parse.urlparse(page_url).path, re.I):
+                    for child in page.get("article_and_job_links") or []:
+                        parsed_child = urllib.parse.urlparse(child)
+                        if parsed_child.scheme not in {"http", "https"} or parsed_child.netloc.lower() != urllib.parse.urlparse(final_url).netloc.lower():
+                            continue
+                        if child.rstrip("/") not in visited and child not in second_hop:
+                            second_hop.append(child)
+            elif page_error:
+                crawl_errors.append({"url": page_url, "error": page_error})
+        # Upper bound: eight extra detail requests per company, never deeper.
+        for page_url in second_hop[:8]:
+            if page_url.rstrip("/") in visited:
+                continue
+            visited.add(page_url.rstrip("/"))
             page, page_social, page_requests, page_bytes, page_elapsed, page_error = _fetch_secondary_page(
                 page_url,
                 homepage_domain=homepage_domain,
