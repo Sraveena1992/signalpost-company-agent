@@ -1,0 +1,27 @@
+{
+  "research_date_utc": "2026-11-14",
+  "scope": "Independent public-original-source discovery outside the archived bounded 500 company crawl",
+  "verified_active_jobs_count": 0,
+  "candidate_count": 1,
+  "candidates": [
+    {
+      "organisation_number": "987428317",
+      "legal_name": "180.NO NUMMEROPPLYSNINGEN AS",
+      "brreg_original_source": "https://virksomhet.brreg.no/nb/oppslag/enheter/987428317",
+      "registry_website": "www.180.no",
+      "original_employer_recruitment_page": "https://jobb.180.no/",
+      "job_title_on_page": "Salgskonsulent B2B",
+      "original_site_observation": "Employer-branded recruitment page displays job title and a candidate application form.",
+      "original_source_publication_date": null,
+      "original_source_expiry_date": null,
+      "currently_active_independently_verified": false,
+      "status": "CANDIDATE_REQUIRES_PUBLISHER_DATE_AND_ACTIVE_STATUS_ADJUDICATION",
+      "why_not_verified": "No dated individual job posting or independently established application deadline/status. Never promote merely from role text/form.",
+      "links": [
+        "https://virksomhet.brreg.no/nb/oppslag/enheter/987428317",
+        "https://jobb.180.no/"
+      ]
+    }
+  ],
+  "disclaimer": "This original-source discovery is not a fake verified job count and is not necessarily discovered by the current automated ATS crawler."
+}
