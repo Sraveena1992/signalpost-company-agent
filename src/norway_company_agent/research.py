@@ -87,8 +87,10 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
                     {"SELSKAP": "company (standalone)", "KONSERN": "group (consolidated)"}.get(
                         str(latest.get("account_type") or "").upper(), "unknown"), financial, "official_annual_account"))
                 facts.append(_claim("Revenue currency", latest.get("currency") or "not specified", financial, "official_annual_account"))
-                if latest.get("revenue_yoy"):
+                if latest.get("revenue_yoy") and latest["revenue_yoy"].get("percentage_change") is not None:
                     facts.append(_claim("Revenue year-over-year change", latest["revenue_yoy"], financial, "derived_from_official_annual_accounts"))
+                elif latest.get("revenue_yoy"):
+                    unsupported.append("Revenue percentage change is undefined because the previous reporting period had zero revenue; no growth rate is claimed.")
             for label, key in (
                 ("Reporting period", "period"),
                 ("Revenue", "revenue"),
@@ -122,8 +124,17 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     if all_topics or "social" in q:
         value = website.get("value") or {}
         website_publishable = (value.get("identity_assessment") or {}).get("publishable") is True
-        if value.get("description") and website_publishable:
-            facts.append(_claim("Website description", value["description"], website, "company_reported_claim"))
+        description = str(value.get("description") or "").strip()
+        boilerplate_descriptions = {
+            "bare enda et wordpress-nettsted",
+            "just another wordpress site",
+            "welcome to wordpress",
+            "another wordpress site",
+        }
+        if description and website_publishable and description.casefold().rstrip(".!") not in boilerplate_descriptions:
+            facts.append(_claim("Website description", description, website, "company_reported_claim"))
+        elif description and website_publishable:
+            unsupported.append("Only a generic website template description was found; not promoted as a company fact.")
         for item in (value.get("social_links") or []) if website_publishable else []:
             facts.append(_claim(f"Declared {item['platform']} profile", item["url"], website, "company_linked_social_profile"))
         if website.get("status") == "available" and not website_publishable:

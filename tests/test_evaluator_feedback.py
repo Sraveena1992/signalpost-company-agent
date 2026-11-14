@@ -286,3 +286,85 @@ def test_registry_failure_does_not_promote_unsourced_bulk_identity():
     }
     summary=answer_profile(profile,"Give me a company overview")
     assert not any(item["classification"]=="official_registry_fact" for item in summary["facts"])
+
+
+def test_news_archive_index_and_stale_content_never_becomes_verified_article():
+    import hashlib
+    from datetime import date, timedelta
+    from scripts.extract_company_site_news import observation as news_observation
+    page={
+        "url":"https://example.no/nyheter/",
+        "title":"Nyheter - EXAMPLE AS",
+        "published_at":date.today().isoformat(),
+        "article_like":True,
+        "main_text_excerpt":("EXAMPLE AS publishes general updates. " * 6),
+        "content_sha256":hashlib.sha256(b"archive").hexdigest(),
+    }
+    profile={"organisation_number":"999999991","name":"EXAMPLE AS","evidence":{"website":{
+        "status":"available","source_url":"https://example.no",
+        "retrieved_at":date.today().isoformat(),
+        "value":{"final_url":"https://example.no",
+                 "identity_assessment":{"publishable":True,"score":1},
+                 "pages":[page]},
+    }}}
+    assert news_observation(profile) is None
+    page["url"]="https://example.no/nyheter/unique-company-article"
+    page["published_at"]=(date.today()-timedelta(days=3000)).isoformat()
+    assert news_observation(profile) is None
+    page["published_at"]=date.today().isoformat()
+    page["title"]="EXAMPLE AS announces validated expansion"
+    assert news_observation(profile) is not None
+
+
+def test_stale_job_without_expiry_and_future_job_are_not_verified_openings():
+    import hashlib
+    from datetime import date, timedelta
+    from scripts.extract_company_site_jobs import observation as job_observation
+    job={"title":"Engineer","datePosted":(date.today()-timedelta(days=200)).isoformat(),
+         "hiringOrganization":{"name":"EXAMPLE AS"},"url":"https://example.no/jobs/engineer"}
+    profile={"organisation_number":"999999991","name":"EXAMPLE AS","evidence":{"website":{
+        "status":"available","source_url":"https://example.no","retrieved_at":date.today().isoformat(),
+        "value":{"final_url":"https://example.no",
+                 "identity_assessment":{"publishable":True,"score":1},
+                 "pages":[{"url":"https://example.no/jobs/engineer",
+                           "content_sha256":hashlib.sha256(b"job").hexdigest(),
+                           "job_postings":[job]}]},
+    }}}
+    assert job_observation(profile) is None
+    job["datePosted"]=(date.today()+timedelta(days=10)).isoformat()
+    assert job_observation(profile) is None
+    job["datePosted"]=date.today().isoformat()
+    assert job_observation(profile) is not None
+
+
+def test_undefined_zero_base_revenue_growth_is_explicitly_unclaimed():
+    from norway_company_agent.research import answer_profile
+    profile={
+        "organisation_number":"999999991","name":"EXAMPLE AS",
+        "evidence":{
+            "registry":{"status":"available","source_url":"https://data.brreg.no/enhetsregisteret/api/enheter/999999991"},
+            "financials":{"status":"available","source_url":"https://data.brreg.no/regnskapsregisteret/regnskap/999999991",
+                          "retrieved_at":"2026-11-14T00:00:00Z",
+                          "value":{"records":[
+                              {"account_type":"SELSKAP","currency":"NOK","period":{"tilDato":"2025-12-31"},
+                               "revenue":0.0,"revenue_yoy":{"previous_year":2024,"current_year":2025,
+                                   "previous_revenue":0.0,"absolute_change":0.0,"percentage_change":None}},
+                              {"account_type":"SELSKAP","currency":"NOK","period":{"tilDato":"2024-12-31"},
+                               "revenue":0.0}
+                          ]}}
+        }
+    }
+    response=answer_profile(profile,"company financial overview")
+    assert not any(f["claim"]=="Revenue year-over-year change" for f in response["facts"])
+    assert any("undefined" in message for message in response["unsupported_or_uncertain"])
+
+
+def test_generic_wordpress_placeholder_is_not_company_description():
+    from norway_company_agent.research import answer_profile
+    profile={"organisation_number":"999999991","name":"EXAMPLE AS","evidence":{
+        "website":{"status":"available","source_url":"https://example.no",
+                   "value":{"description":"Bare enda et WordPress-nettsted",
+                            "identity_assessment":{"publishable":True}}}}}
+    answer=answer_profile(profile,"company overview")
+    assert not any(f["claim"]=="Website description" for f in answer["facts"])
+    assert any("generic website template description" in s for s in answer["unsupported_or_uncertain"])

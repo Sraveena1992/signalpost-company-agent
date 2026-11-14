@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta, date
 from urllib.parse import urlparse
 
 from norway_company_agent.identity import _tokens
@@ -52,13 +52,24 @@ def observation(profile: dict) -> dict | None:
             # legal name, skip it. Subsidiary/parent postings are not target jobs.
             if employer_tokens and not legal_tokens.issubset(employer_tokens):
                 continue
+            try:
+                posted_date = date.fromisoformat(posted[:10])
+            except ValueError:
+                continue
+            today = datetime.now(timezone.utc).date()
+            # A decade-old jobs page is not an active vacancy. If no
+            # validity date is supplied, only very recent listings qualify.
+            if posted_date > today + timedelta(days=1):
+                continue
             if expires:
                 try:
-                    expiry = datetime.fromisoformat(expires[:10]).replace(tzinfo=timezone.utc)
+                    expiry = date.fromisoformat(expires[:10])
                 except ValueError:
                     continue
-                if expiry.date() < datetime.now(timezone.utc).date():
+                if expiry < today or posted_date < today - timedelta(days=365):
                     continue
+            elif posted_date < today - timedelta(days=45):
+                continue
             digest = str(page.get("content_sha256") or "")
             if not re.fullmatch(r"[0-9a-f]{64}", digest, re.I):
                 continue
