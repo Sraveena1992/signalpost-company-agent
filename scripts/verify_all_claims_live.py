@@ -210,10 +210,14 @@ def check_company_news(url, value, fresh_html):
     ) else None
 
 
-def check_claim(f,org,fetched):
+def check_claim(f,org,fetched,owned_hosts=None):
     label=f.get("claim"); value=f.get("value"); kind=f.get("classification")
     src=str(f.get("source_url") or "")
     if not src or not f.get("retrieved_at"):return "contradicted","no source metadata"
+    if owned_hosts is not None and kind in ("company_reported_claim", "verified_company_site_news", "verified_company_site_job_posting"):
+        host = (urlparse(src).hostname or "").casefold().removeprefix("www.")
+        if host not in owned_hosts.get(str(org), set()):
+            return "contradicted", "wrong_company_source_host"
     result=fetched.get(src,{"state":"unavailable"})
     if result["state"] not in ("available","available_html"):
         return "unverifiable",result["state"]
@@ -256,12 +260,15 @@ def main():
     urls=sorted({str(f.get("source_url") or "") for _,f in all_facts if f.get("source_url")})
     fetched={}
     approved_hosts=set()
+    org_approved_hosts={}
     for profile in rows:
         site=(profile.get("evidence") or {}).get("website") or {}
         val=site.get("value") or {}
         if site.get("status")=="available" and (val.get("identity_assessment") or {}).get("publishable") is True:
             host=(urlparse(str(val.get("final_url") or site.get("source_url") or "")).hostname or "").casefold()
-            if host:approved_hosts.add(host)
+            if host:
+                approved_hosts.add(host)
+                org_approved_hosts.setdefault(str(profile.get("organisation_number")),set()).add(host.removeprefix("www."))
     with cf.ThreadPoolExecutor(max_workers=a.workers) as pool:
         futures={pool.submit(fresh,url,approved_hosts):url for url in urls}
         for future in cf.as_completed(futures):
@@ -271,7 +278,7 @@ def main():
     statuses=Counter(); by_category={}
     examples=[]
     for org,f in all_facts:
-        state,why=check_claim(f,org,fetched)
+        state,why=check_claim(f,org,fetched,org_approved_hosts)
         statuses[state]+=1
         kind=str(f.get("classification") or "")
         by_category.setdefault(kind,Counter())[state]+=1
