@@ -174,7 +174,8 @@ def enrich(profiles, *, get, token, max_pages=250, max_details=10000, since=None
         except (ValueError, KeyError, OSError, RuntimeError) as exc:
             category = "detail_fetch_or_parse_failure"
             rejects[category] = rejects.get(category, 0) + 1
-    complete = complete and not detail_limit_hit
+    # An API error leaves uncertainty about vacancies; never claim a full scan.
+    complete = complete and not detail_limit_hit and not rejects.get("detail_fetch_or_parse_failure")
     output = []
     for profile in profiles:
         item = dict(profile)
