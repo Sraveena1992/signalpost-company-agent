@@ -1,0 +1,55 @@
+name: Frozen 384 AI source adjudication
+on:
+  push:
+    branches: [audit/ai-384-source-adjudication-20261115]
+    paths: ['.github/workflows/frozen-384-ai-audit.yml', 'scripts/audit_frozen_384_live.py', 'tests/test_frozen_384_live_audit.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen --all-groups
+      - name: Verify independent source-recheck integrity rules
+        run: uv run pytest -q tests/test_frozen_384_live_audit.py
+      - name: Download original frozen 384 queue and exact 500 source profiles
+        run: |
+          mkdir -p artifacts/independent-384
+          gh run download 43621390338 --repo "${{ github.repository }}" --name signalpost-final-qualification-evidence --dir artifacts/independent-384
+          gh run download 43601907908 --repo "${{ github.repository }}" --name full-500-ten-module-audit --dir artifacts/independent-384
+          test -s artifacts/independent-384/gold-review-384.json
+          test -s artifacts/independent-384/profiles-500.jsonl
+      - name: Independently re-fetch sampled original source URLs
+        run: |
+          uv run python scripts/audit_frozen_384_live.py --queue artifacts/independent-384/gold-review-384.json --profiles artifacts/independent-384/profiles-500.jsonl --output artifacts/independent-384/source-by-source-384.json --summary artifacts/independent-384/source-audit-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path("artifacts/independent-384")
+          rows=json.loads((d/"source-by-source-384.json").read_text())
+          summary=json.loads((d/"source-audit-summary.json").read_text())
+          assert len(rows)==384
+          assert len({x["claim_id"] for x in rows})==384
+          assert sum(summary["machine_source_verdict_counts"].values())==384
+          assert summary["human_gold_labels"]==0
+          print(json.dumps(summary,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frozen-384-independently-refetched-ai-source-audit
+          path: |
+            artifacts/independent-384/source-by-source-384.json
+            artifacts/independent-384/source-audit-summary.json
+          retention-days: 14
+          if-no-files-found: warn
