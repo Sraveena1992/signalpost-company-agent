@@ -1,4 +1,8 @@
 """Gold review queue: no circular labels, deterministic category coverage."""
+import sys
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 from scripts.build_blind_gold_review import build_queue, evaluate_adjudicated
 import pytest
 
