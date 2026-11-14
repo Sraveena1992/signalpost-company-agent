@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/final-qualification-evidence.yml'
       - 'scripts/verify_all_claims_live.py'
+      - 'src/norway_company_agent/batch.py'
+      - 'tests/test_reviewer_decision_brief.py'
       - 'scripts/forensic_two_open_claims.py'
       - 'scripts/forensic_registry_drift.py'
       - 'scripts/extract_company_site_jobs.py'
