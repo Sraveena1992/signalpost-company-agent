@@ -2,7 +2,7 @@ name: Qualification source-audit correction and 500-claim recheck
 on:
   push:
     branches: [fix/qualification-audit-source-gates-20261114]
-    paths: ['.github/workflows/qualification-source-recheck.yml']
+    paths: ['.github/workflows/qualification-source-recheck.yml', 'scripts/verify_all_claims_live.py', 'tests/test_independent_publisher_audit.py']
   workflow_dispatch:
 permissions:
   contents: read
