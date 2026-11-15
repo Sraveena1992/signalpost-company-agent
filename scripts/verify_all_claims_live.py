@@ -127,7 +127,14 @@ def compare_finance(label,value,body):
             records.setdefault(key,[]).append(revenue)
         key=(str(value["current_year"]),value.get("account_type"),value.get("currency"))
         old=(str(value["previous_year"]),value.get("account_type"),value.get("currency"))
-        return any(r==current for r in records.get(key,[])) and any(r==prev for r in records.get(old,[])) and round((current-prev)/abs(prev)*100,2)==round(pct,2)
+        # Live accounting endpoints can return a shorter set of years than the
+        # archived snapshot. A missing period is UNKNOWN, not a contradiction.
+        # Never hide a real mismatch when both years are present.
+        if not records.get(key) or not records.get(old):
+            return None
+        if not any(r==current for r in records[key]) or not any(r==prev for r in records[old]):
+            return False
+        return round((current-prev)/abs(prev)*100,2)==round(pct,2)
     return None
 
 def compare_roles(label,value,body):
