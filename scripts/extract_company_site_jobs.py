@@ -54,9 +54,9 @@ def observation(profile: dict) -> dict | None:
                 continue
             # Explicit organisation numbers, when present, must match the
             # Norwegian registry entity; related employers are rejected.
+            candidate_numbers = []
             if isinstance(hiring, dict):
                 identifiers = hiring.get("identifier") or hiring.get("taxID")
-                candidate_numbers = []
                 def collect_identifiers(node):
                     if isinstance(node, dict):
                         for k, v in node.items():
@@ -108,8 +108,46 @@ def observation(profile: dict) -> dict | None:
                 "rights_status": "approved",
                 "source_class": "company_site",
                 "evidence_span": title[:200],
+                # Explicit registry organisation-number corroboration is required
+                # for the stronger dashboard employer-verified designation.
+                "employer_verified": org in candidate_numbers,
+                # The original vacancy URL must have been fetched directly,
+                # with a still-valid expiry; links from a career index alone
+                # cannot be labelled independently active.
+                "active_verified": bool(expires and source_url.rstrip("/") == page_url.rstrip("/")),
+                "expires_at": expires or None,
                 "metrics": {"title": title, "valid_through": expires or None,
                             "opening_status": "not independently verified" if not expires else "not expired according to posted validity"},
                 "strategy": "verified_company_site_jobposting",
             }
     return None
+
+
+def observations(profile: dict, max_items: int = 5) -> list[dict]:
+    """Collect distinct structured job postings from directly crawled company pages."""
+    site = (profile.get("evidence") or {}).get("website") or {}
+    pages = ((site.get("value") or {}).get("pages") or [])
+    if not isinstance(pages, list):
+        return []
+    results = {}
+    for page in pages:
+        if not isinstance(page, dict):
+            continue
+        for job in (page.get("job_postings") or []):
+            scoped_page = {**page, "job_postings": [job]}
+            scoped_profile = {
+                **profile,
+                "evidence": {
+                    **(profile.get("evidence") or {}),
+                    "website": {
+                        **site,
+                        "value": {**(site.get("value") or {}), "pages": [scoped_page]},
+                    },
+                },
+            }
+            item = observation(scoped_profile)
+            if item:
+                results[item["source_url"]] = item
+    return sorted(results.values(), key=lambda item: (
+        str(item.get("published_at") or ""), str(item.get("source_url") or "")
+    ), reverse=True)[:max(0, max_items)]
