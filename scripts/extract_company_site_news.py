@@ -99,7 +99,14 @@ def observation(profile: dict) -> dict | None:
         "rights_status": "approved",
         "source_class": "company_site",
         "evidence_span": title[:1200],
-        "metrics": {"captured_news_pages": len(pages), "interpretation": "Company-owned activity; not independent sentiment."},
+        "metrics": {
+            "captured_news_pages": len(pages),
+            "interpretation": "Company-owned activity; not independent sentiment.",
+            "publication_date_conflict": bool(page.get("publication_date_conflict")),
+            "publisher_visible_date": page.get("published_at_visible"),
+            "publisher_metadata_date": page.get("published_at_metadata"),
+            "date_claim_scope": "Visible publisher byline takes precedence where publisher metadata conflicts.",
+        },
         "strategy": "company_site_activity",
     }
 

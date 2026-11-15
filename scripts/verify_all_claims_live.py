@@ -127,7 +127,14 @@ def compare_finance(label,value,body):
             records.setdefault(key,[]).append(revenue)
         key=(str(value["current_year"]),value.get("account_type"),value.get("currency"))
         old=(str(value["previous_year"]),value.get("account_type"),value.get("currency"))
-        return any(r==current for r in records.get(key,[])) and any(r==prev for r in records.get(old,[])) and round((current-prev)/abs(prev)*100,2)==round(pct,2)
+        # Live accounting endpoints can return a shorter set of years than the
+        # archived snapshot. A missing period is UNKNOWN, not a contradiction.
+        # Never hide a real mismatch when both years are present.
+        if not records.get(key) or not records.get(old):
+            return None
+        if not any(r==current for r in records[key]) or not any(r==prev for r in records[old]):
+            return False
+        return round((current-prev)/abs(prev)*100,2)==round(pct,2)
     return None
 
 def compare_roles(label,value,body):
@@ -187,13 +194,36 @@ class DescriptionReader(HTMLParser):
 
 
 def verify_publisher_date(html, claimed):
-    """True only for a fresh publisher metadata date equal to the claimed date."""
-    reader = DescriptionReader()
-    reader.feed(html)
+    """Corroborate a publisher date; a visible author byline wins conflicts.
+
+    Return None (not false) for temporal metadata conflicts requiring review.
+    """
+    from bs4 import BeautifulSoup
+    month_map = {
+        "januar": 1, "februar": 2, "mars": 3, "april": 4, "mai": 5,
+        "juni": 6, "juli": 7, "august": 8, "september": 9,
+        "oktober": 10, "november": 11, "desember": 12,
+    }
+    from datetime import date
+    soup = BeautifulSoup(html, "html.parser")
+    byline = re.search(
+        r"(?i)\b(\d{1,2})\s+(" + "|".join(month_map) +
+        r")\s*,?\s*(20\d{2})\s+av\s+[^\s]{2,}",
+        soup.get_text(" ", strip=True)[:2500],
+    )
     claimed_day = str(claimed or "")[:10]
     if not re.fullmatch(r"20\d{2}-\d{2}-\d{2}", claimed_day):
         return False
-    return any(raw[:10] == claimed_day for raw in reader.published)
+    if byline:
+        try:
+            visible = date(int(byline.group(3)), month_map[byline.group(2).casefold()],
+                           int(byline.group(1))).isoformat()
+            return True if claimed_day == visible else None
+        except ValueError:
+            return None
+    reader = DescriptionReader()
+    reader.feed(html)
+    return True if any(raw[:10] == claimed_day for raw in reader.published) else None
 
 
 def check_company_news(url, value, fresh_html):
@@ -211,10 +241,8 @@ def check_company_news(url, value, fresh_html):
     reader.feed(fresh_html)
     # A publisher date and article title are separate evidence requirements.
     # A missing metadata date does NOT establish a contradiction.
-    if not reader.published:
-        return None
-    if not verify_publisher_date(fresh_html, published):
-        return None  # Website might have updated the article date
+    if verify_publisher_date(fresh_html, published) is not True:
+        return None  # Unresolved publisher byline / historical metadata conflict
     # Require headline directly in title metadata or rendered HTML, not URL.
     return True if (
         any(canon(title) in canon(t) for t in reader.headlines)

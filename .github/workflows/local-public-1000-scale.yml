@@ -1,0 +1,63 @@
+name: Public 1000 Company Local Scale Contract Test
+on:
+  push:
+    branches: [fix/news-visible-date-provenance-20261115]
+    paths:
+      - '.github/workflows/local-public-1000-scale.yml'
+      - 'scripts/prepare_local_public_1000.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-1000:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - name: Select 1000 real organisations from public registry
+        run: |
+          uv run python scripts/prepare_local_public_1000.py --output artifacts/public-1000/input.jsonl --manifest artifacts/public-1000/manifest.json
+      - name: Execute entire public 1000-company local contract
+        run: |
+          uv run python scripts/run_competition_batch.py \
+            --organisations artifacts/public-1000/input.jsonl \
+            --output artifacts/public-1000/terminal-results.jsonl \
+            --profiles-output artifacts/public-1000/profiles.jsonl \
+            --report artifacts/public-1000/run-report.json \
+            --run-id public-1000-local-${{ github.run_id }} \
+            --expected-count 1000 --workers 12 --checkpoint-every 25
+      - name: Exact 1000 envelope membership, state, report check
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('artifacts/public-1000')
+          load=lambda path:[json.loads(line) for line in (root/path).read_text().splitlines() if line.strip()]
+          inputs=load('input.jsonl')
+          envelopes=load('terminal-results.jsonl')
+          profiles=load('profiles.jsonl')
+          report=json.loads((root/'run-report.json').read_text())
+          expected={str(x['organisation_number']) for x in inputs}
+          actual=[str(x['organisation_number']) for x in envelopes]
+          allowed={'available','not_available','blocked','not_applicable','ambiguous','failed'}
+          assert len(inputs)==len(envelopes)==len(profiles)==1000
+          assert len(set(actual))==1000 and set(actual)==expected
+          assert {x['organisation_number'] for x in profiles}==expected
+          assert all(e['state'] in allowed for e in envelopes)
+          assert report['validation']['passed']
+          print(json.dumps({'count':1000,'unique':1000,
+                            'validation':report['validation']['passed'],
+                            'important':'Public 1000-scale, NOT Builderr official or scored'},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signalpost-local-public-1000
+          path: artifacts/public-1000/
+          retention-days: 14
+          if-no-files-found: warn
