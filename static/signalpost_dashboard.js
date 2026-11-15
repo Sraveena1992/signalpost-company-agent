@@ -71,12 +71,12 @@
     // Discovery leads are not equivalent to verified live job vacancies.
     const activity = e.public_activity || {};
     const observations = list(activity.value?.observations);
-    const ownedHost = (() => { try { return new URL(e.website?.value?.final_url || e.website?.source_url).hostname.toLowerCase().replace(/^www\\./, ''); } catch { return ''; } })();
+    const ownedHost = (() => { try { return new URL(e.website?.value?.final_url || e.website?.source_url).hostname.toLowerCase().replace(/^www\./, ''); } catch { return ''; } })();
     const confirmedObservation = item => {
       if (!item || item.exact_entity !== true || String(item.organisation_number || '') !== String(org)) return false;
       if (item.rights_status !== 'approved' || !/^[0-9a-f]{64}$/i.test(String(item.content_sha256 || ''))) return false;
-      if (!/^\\d{4}-\\d{2}-\\d{2}/.test(String(item.published_at || ''))) return false;
-      try { const u = new URL(item.source_url); return u.protocol === 'https:' && !!ownedHost && u.hostname.toLowerCase().replace(/^www\\./, '') === ownedHost; } catch { return false; }
+      if (!/^\d{4}-\d{2}-\d{2}/.test(String(item.published_at || ''))) return false;
+      try { const u = new URL(item.source_url); return u.protocol === 'https:' && !!ownedHost && u.hostname.toLowerCase().replace(/^www\./, '') === ownedHost; } catch { return false; }
     };
     const verifiedNews = observations.filter(item => item.signal_type === 'public_post' && confirmedObservation(item));
     const news = verifiedNews.length
