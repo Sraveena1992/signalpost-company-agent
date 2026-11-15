@@ -20,7 +20,7 @@ from norway_company_agent.identity import apply_website_identity_gate  # noqa: E
 from norway_company_agent.official import accounting_obligation_assessment, fetch_official_modules  # noqa: E402
 from norway_company_agent.website import fetch_website  # noqa: E402
 from scripts.extract_company_site_activity import observation as site_activity_observation  # noqa: E402
-from scripts.extract_company_site_news import observation as site_news_observation  # noqa: E402
+from scripts.extract_company_site_news import observations as site_news_observations  # noqa: E402
 from scripts.extract_company_site_jobs import observation as site_jobs_observation  # noqa: E402
 from scripts.run_tavily_discovery import discover as tavily_discover  # noqa: E402
 
@@ -205,7 +205,7 @@ def main() -> None:
             website_record = profile["evidence"].get("website") or {}
             website_value = website_record.get("value") or {}
             observations = []
-            for extractor in (site_activity_observation, site_news_observation, site_jobs_observation):
+            for extractor in (site_activity_observation, site_jobs_observation):
                 try:
                     observation = extractor(profile)
                     if observation:
@@ -213,6 +213,17 @@ def main() -> None:
                 except Exception:
                     # A malformed optional activity extraction must not abort a company.
                     continue
+            try:
+                observations.extend(site_news_observations(profile))
+            except Exception:
+                # Malformed optional news extraction must not abort a company.
+                pass
+            # A page reached by both site-activity and article discovery is one claim.
+            unique_observations = {}
+            for item in observations:
+                identity = (item.get("signal_type"), item.get("source_url"))
+                unique_observations.setdefault(identity, item)
+            observations = list(unique_observations.values())
             website_source = website_value.get("final_url") or website_record.get("source_url") or "https://www.brreg.no/"
             website_time = website_record.get("retrieved_at") or utc_now()
             if observations:
