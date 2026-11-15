@@ -67,9 +67,30 @@
           <pre class="sp-json">${esc(JSON.stringify(w, null, 2))}</pre>
         </details>`;
     })();
+    // Render only source-backed observations already returned by the research API.
+    // Discovery leads are not equivalent to verified live job vacancies.
+    const activity = e.public_activity || {};
+    const observations = list(activity.value?.observations);
+    const ownedHost = (() => { try { return new URL(e.website?.value?.final_url || e.website?.source_url).hostname.toLowerCase().replace(/^www\\./, ''); } catch { return ''; } })();
+    const confirmedObservation = item => {
+      if (!item || item.exact_entity !== true || String(item.organisation_number || '') !== String(org)) return false;
+      if (item.rights_status !== 'approved' || !/^[0-9a-f]{64}$/i.test(String(item.content_sha256 || ''))) return false;
+      if (!/^\\d{4}-\\d{2}-\\d{2}/.test(String(item.published_at || ''))) return false;
+      try { const u = new URL(item.source_url); return u.protocol === 'https:' && !!ownedHost && u.hostname.toLowerCase().replace(/^www\\./, '') === ownedHost; } catch { return false; }
+    };
+    const verifiedNews = observations.filter(item => item.signal_type === 'public_post' && confirmedObservation(item));
+    const news = verifiedNews.length
+      ? table(['Published','Article','Original source'], verifiedNews.map(item => [cell(item.published_at), cell(item.evidence_span || item.metrics?.title), link(item.source_url, 'Read original article')]))
+      : '<p class="sp-empty">No exact-company, dated, source-backed news article was returned for this company. This does not mean none exists.</p>';
+    const jobLeads = observations.filter(item => item && item.signal_type === 'job_posting');
+    const verifiedJobs = jobLeads.filter(item => confirmedObservation(item) && item.active_verified === true && item.employer_verified === true && item.expires_at && new Date(item.expires_at).getTime() >= Date.now());
+    const jobs = verifiedJobs.length
+      ? table(['Role','Expiry','Original posting'], verifiedJobs.map(item => [cell(item.evidence_span || item.metrics?.title), cell(item.expires_at), link(item.source_url, 'View active vacancy')]))
+      : '<p class="sp-empty">No currently active, exact-employer job vacancy is independently verified in this research response. This does not prove the employer has no openings.</p>';
+    const jobDisclosure = jobLeads.length > verifiedJobs.length ? '<p class="sp-disclaimer">Other job leads were found but withheld from verified active jobs pending employer, expiry or live-status confirmation.</p>' : '';
     const audit = table(['Evidence module','Status','Source','Retrieved'],Object.entries(e).map(([key,v])=>[esc(key.replaceAll('_',' ')),cell(status(v?.status)),link(v?.source_url),cell(v?.retrieved_at)]));
     const sections = [
-      ['Overview',e.registry,overview],['Financials',e.financials,financials],['Leadership',e.roles,leadership],['Locations',e.locations,locations],['Website',e.website,website],['Evidence & audit',null,audit]
+      ['Overview',e.registry,overview],['Financials',e.financials,financials],['Leadership',e.roles,leadership],['Locations',e.locations,locations],['Website',e.website,website],['News',activity,news],['Jobs',activity,jobs + jobDisclosure],['Evidence & audit',null,audit]
     ];
     const root=document.createElement('section'); root.className='sp-dashboard';
     root.innerHTML=`<div class="sp-head"><span class="sp-eyebrow">SOURCE-LINKED COMPANY RESEARCH</span><h2>${esc(name)}</h2><p>Organisation ${fmt(org)} · Run ${fmt(data.run_id)} · ${fmt(data.terminal?.terminal_state||data.terminal?.status||'Status not reported')}</p><div class="sp-metrics"><div><strong>${fin.length}</strong><span>Financial records</span></div><div><strong>${roles.length}</strong><span>Role records</span></div><div><strong>${loc.length}</strong><span>Location records</span></div></div></div><nav class="sp-tabs" aria-label="Company research sections">${sections.map((s,i)=>`<button type="button" class="sp-tab${i===0?' active':''}" data-index="${i}" aria-pressed="${i===0}">${esc(s[0])}</button>`).join('')}</nav><div class="sp-panels">${sections.map((s,i)=>`<div class="sp-panel" ${i?'hidden':''}>${evidenceCard(s[0],s[1],s[2])}</div>`).join('')}</div><p class="sp-disclaimer">Evidence states describe returned source records, not independent guarantees of completeness or correctness. ${esc(data.scope_note||'')}</p>`;
