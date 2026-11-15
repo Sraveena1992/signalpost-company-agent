@@ -45,3 +45,12 @@ def test_conflict_disclosed_within_valid_original_company_news():
     assert x["metrics"]["publication_date_conflict"] is True
     assert x["metrics"]["publisher_metadata_date"].startswith("2026-05-14")
     assert x["signal_type"]=="public_post"  # Not falsely called active job
+
+def test_source_audit_accepts_visible_author_date_not_conflicting_metadata():
+    from pathlib import Path
+    sys.path.insert(0,str(ROOT / "scripts"))
+    from verify_all_claims_live import verify_publisher_date
+    html = """<html><meta property="article:published_time" content="2026-05-14T09:01:21Z">
+    <body><p>24 juli, 2026 av marius</p><p>Søknadsfrist 30.05.2026</p></body></html>"""
+    assert verify_publisher_date(html,"2026-07-24") is True
+    assert verify_publisher_date(html,"2026-05-14T09:01:21Z") is None
