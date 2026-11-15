@@ -21,7 +21,7 @@ from norway_company_agent.official import accounting_obligation_assessment, fetc
 from norway_company_agent.website import fetch_website  # noqa: E402
 from scripts.extract_company_site_activity import observation as site_activity_observation  # noqa: E402
 from scripts.extract_company_site_news import observations as site_news_observations  # noqa: E402
-from scripts.extract_company_site_jobs import observation as site_jobs_observation  # noqa: E402
+from scripts.extract_company_site_jobs import observations as site_jobs_observations  # noqa: E402
 from scripts.run_tavily_discovery import discover as tavily_discover  # noqa: E402
 
 
@@ -205,7 +205,7 @@ def main() -> None:
             website_record = profile["evidence"].get("website") or {}
             website_value = website_record.get("value") or {}
             observations = []
-            for extractor in (site_activity_observation, site_jobs_observation):
+            for extractor in (site_activity_observation,):
                 try:
                     observation = extractor(profile)
                     if observation:
@@ -217,6 +217,11 @@ def main() -> None:
                 observations.extend(site_news_observations(profile))
             except Exception:
                 # Malformed optional news extraction must not abort a company.
+                pass
+            try:
+                observations.extend(site_jobs_observations(profile))
+            except Exception:
+                # Malformed optional jobs extraction must not abort a company.
                 pass
             # A page reached by both site-activity and article discovery is one claim.
             unique_observations = {}
