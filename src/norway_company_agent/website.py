@@ -282,6 +282,38 @@ def _published_date(soup: BeautifulSoup) -> str | None:
     return None
 
 
+
+_NORWEGIAN_MONTHS = {
+    "januar": 1, "februar": 2, "mars": 3, "april": 4,
+    "mai": 5, "juni": 6, "juli": 7, "august": 8,
+    "september": 9, "oktober": 10, "november": 11, "desember": 12,
+}
+
+
+def _visible_article_date(soup: BeautifulSoup) -> str | None:
+    """Read publisher's date-and-author line, not arbitrary dates in article body.
+
+    A deadline or a copyright year does not establish publication time.
+    The narrow Norwegian '24 juli, 2026 av author' form is used when present.
+    """
+    for node in soup.select("time, .entry-date, .posted-on, .entry-meta, .post-meta, article, body"):
+        excerpt = node.get_text(" ", strip=True)[:2500]
+        found = re.search(
+            r"(?i)\\b(\\d{1,2})\\s+("
+            + "|".join(_NORWEGIAN_MONTHS)
+            + r")\\s*,?\\s*(20\\d{2})\\s+av\\s+[^\\s]{2,}",
+            excerpt,
+        )
+        if not found:
+            continue
+        try:
+            from datetime import date
+            return date(int(found.group(3)), _NORWEGIAN_MONTHS[found.group(2).casefold()], int(found.group(1))).isoformat()
+        except ValueError:
+            continue
+    return None
+
+
 def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max_bytes: int) -> tuple[dict[str, Any] | None, list[dict[str, str]], int, int, int, str | None]:
     if not _robots_allowed(url, timeout):
         return None, [], 1, 0, 0, "robots.txt disallows page"
@@ -334,7 +366,15 @@ def _fetch_secondary_page(url: str, *, homepage_domain: str, timeout: float, max
             "url": final_url,
             "title": page_soup.title.get_text(" ", strip=True)[:500] if page_soup.title else "",
             "main_text_excerpt": page_text[:5000],
-            "published_at": _published_date(page_soup),
+            # Prefer the original publisher's visible byline over stale,
+            # conflicting machine metadata. Keep both for reviewer forensics.
+            "published_at": _visible_article_date(page_soup) or _published_date(page_soup),
+            "published_at_metadata": _published_date(page_soup),
+            "published_at_visible": _visible_article_date(page_soup),
+            "publication_date_conflict": bool(
+                _visible_article_date(page_soup) and _published_date(page_soup)
+                and _visible_article_date(page_soup)[:10] != _published_date(page_soup)[:10]
+            ),
             "article_like": article_type in {"article", "newsarticle", "blogposting"} or bool(page_soup.select_one("article")),
             "content_sha256": __import__("hashlib").sha256(raw).hexdigest(),
         }
