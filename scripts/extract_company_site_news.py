@@ -111,6 +111,39 @@ def observation(profile: dict) -> dict | None:
     }
 
 
+
+def observations(profile: dict, max_items: int = 5) -> list[dict]:
+    """Return independently validated, deduplicated company-owned article records.
+
+    Preserve observation(profile)'s existing single-item contract for callers.
+    Do not promote index pages, undated posts, or unrelated employers.
+    """
+    website = (profile.get("evidence") or {}).get("website") or {}
+    pages = ((website.get("value") or {}).get("pages") or [])
+    if not isinstance(pages, list):
+        return []
+    results = {}
+    for page in pages:
+        if not isinstance(page, dict):
+            continue
+        scoped_value = {**(website.get("value") or {}), "pages": [page]}
+        scoped_profile = {
+            **profile,
+            "evidence": {
+                **(profile.get("evidence") or {}),
+                "website": {**website, "value": scoped_value},
+            },
+        }
+        item = observation(scoped_profile)
+        if item:
+            results[item["source_url"]] = item
+    return sorted(
+        results.values(),
+        key=lambda item: (str(item.get("published_at") or ""), str(item.get("source_url") or "")),
+        reverse=True,
+    )[:max(0, max_items)]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Extract company-owned activity from exact-site bounded news pages.")
     parser.add_argument("--profiles", required=True)
