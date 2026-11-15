@@ -49,6 +49,12 @@ def diff_profile(previous: dict[str, Any], current: dict[str, Any]) -> list[dict
             continue
         record = _evidence_for(current, field)
         previous_record = _evidence_for(previous, field)
+        # A transient fetch failure, blocked request or missing new module is
+        # not a factual change from the last verified company snapshot.
+        # It is an availability change, recorded in terminal module states.
+        # Preserve the previous evidence instead of inventing a deletion.
+        if previous_record.get("status") == "available" and record.get("status") not in ("available",):
+            continue
         changes.append({
             "organisation_number": new_org,
             "field": field,
@@ -58,6 +64,10 @@ def diff_profile(previous: dict[str, Any], current: dict[str, Any]) -> list[dict
             "retrieved_at": record.get("retrieved_at"),
             "effective_at": record.get("effective_at") or record.get("as_of"),
             "source_class": record.get("source_class") or record.get("source_type"),
+            "previous_source_url": previous_record.get("source_url"),
+            "previous_retrieved_at": previous_record.get("retrieved_at"),
+            "previous_effective_at": previous_record.get("effective_at") or previous_record.get("as_of"),
+            "previous_source_status": previous_record.get("status"),
             "old_content_sha256": previous_record.get("content_sha256"),
             "new_content_sha256": record.get("content_sha256"),
             "status": record.get("status"),
