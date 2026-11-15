@@ -299,9 +299,9 @@ def _visible_article_date(soup: BeautifulSoup) -> str | None:
     for node in soup.select("time, .entry-date, .posted-on, .entry-meta, .post-meta, article, body"):
         excerpt = node.get_text(" ", strip=True)[:2500]
         found = re.search(
-            r"(?i)\\b(\\d{1,2})\\s+("
+            r"(?i)\b(\d{1,2})\s+("
             + "|".join(_NORWEGIAN_MONTHS)
-            + r")\\s*,?\\s*(20\\d{2})\\s+av\\s+[^\\s]{2,}",
+            + r")\s*,?\s*(20\d{2})\s+av\s+[^\s]{2,}",
             excerpt,
         )
         if not found:
