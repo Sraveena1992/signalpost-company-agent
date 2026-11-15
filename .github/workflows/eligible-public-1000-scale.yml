@@ -1,0 +1,65 @@
+name: Eligible Public Universe 1000-Company Scale Test
+on:
+  push:
+    branches: [fix/news-visible-date-provenance-20261115]
+    paths:
+      - '.github/workflows/eligible-public-1000-scale.yml'
+      - 'scripts/prepare_eligible_public_1000.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-eligible-1000:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - name: Download and hash-verify Builderr published eligible universe
+        run: uv run python scripts/prepare_eligible_public_1000.py --directory artifacts/eligible-1000
+      - name: Run 1000 official-universe-eligible companies locally
+        run: |
+          uv run python scripts/run_competition_batch.py \
+            --organisations artifacts/eligible-1000/input-eligible-1000.jsonl \
+            --output artifacts/eligible-1000/terminal.jsonl \
+            --profiles-output artifacts/eligible-1000/profiles.jsonl \
+            --report artifacts/eligible-1000/report.json \
+            --run-id eligible-public-1000-local-${{ github.run_id }} \
+            --expected-count 1000 --workers 12 --checkpoint-every 25
+      - name: Verify all 1000 original identities, envelopes and states
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path('artifacts/eligible-1000')
+          load=lambda p:[json.loads(x) for x in (d/p).read_text().splitlines() if x.strip()]
+          inputs=load('input-eligible-1000.jsonl')
+          terminals=load('terminal.jsonl')
+          profiles=load('profiles.jsonl')
+          report=json.loads((d/'report.json').read_text())
+          exp={str(x['organisation_number']) for x in inputs}
+          actual=[str(x['organisation_number']) for x in terminals]
+          states={'available','not_available','blocked','not_applicable','ambiguous','failed'}
+          assert len(exp)==len(actual)==len(profiles)==1000
+          assert len(set(actual))==1000 and set(actual)==exp
+          assert {str(x['organisation_number']) for x in profiles}==exp
+          assert all(x['state'] in states for x in terminals)
+          assert report['validation']['passed']
+          print('Eligible PUBLIC local 1000-company membership/contract PASS. Not official hidden scoring.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signalpost-eligible-public-1000
+          path: |
+            artifacts/eligible-1000/input-eligible-1000.jsonl
+            artifacts/eligible-1000/eligibility-manifest.json
+            artifacts/eligible-1000/terminal.jsonl
+            artifacts/eligible-1000/profiles.jsonl
+            artifacts/eligible-1000/report.json
+          retention-days: 14
+          if-no-files-found: warn
