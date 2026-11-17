@@ -210,6 +210,16 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
             ):
                 continue
             kind = item["signal_type"]
+            if kind == "job_posting":
+                # A dated JobPosting alone is not proof that a vacancy is
+                # still open or belongs to this exact legal employer.
+                try:
+                    expiry = date.fromisoformat(str(item.get("expires_at") or "")[:10])
+                except ValueError:
+                    continue
+                if not (item.get("employer_verified") is True and
+                        item.get("active_verified") is True and expiry >= date.today()):
+                    continue
             label = "Verified company-site news" if kind == "public_post" else "Verified company-site job posting"
             summary = str(item.get("evidence_span") or (item.get("metrics") or {}).get("title") or "").strip()
             if not summary:
