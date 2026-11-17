@@ -25,7 +25,12 @@ def test_additional_official_fields_are_normalized():
 def test_live_values_are_cited_to_live_registry_not_older_bulk():
     live = {"field": "registry_live", "status": "available",
             "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/987654321",
-            "retrieved_at": "2026-11-17T00:00:00Z"}
+            "retrieved_at": "2026-11-17T00:00:00Z",
+            "value": {"organisation_number": "987654321", "name": "Eksempel AS",
+                      "bankrupt": False, "established_at": "2010-02-03",
+                      "registered_in_business_register": True,
+                      "registered_in_vat_register": False,
+                      "secondary_industry": {"kode": "62.020", "beskrivelse": "Consultancy"}}}
     bulk = {"field": "registry", "status": "available",
             "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/lastned/csv",
             "retrieved_at": "2026-10-01T00:00:00Z"}
@@ -54,3 +59,17 @@ def test_wrong_organisation_identity_is_quarantined():
     result, _ = fetch_official_modules("987654321", {"registry_live"}, fetcher=wrong_fetch)
     assert result["registry_live"]["status"] == "ambiguous"
     assert "does not match" in result["registry_live"].get("note", "").lower() or "differs" in result["registry_live"].get("note", "").lower()
+
+
+def test_bulk_only_municipality_keeps_snapshot_provenance():
+    live = {"status": "available", "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/987654321",
+            "retrieved_at": "2026-11-17T00:00:00Z",
+            "value": {"organisation_number": "987654321", "name": "Eksempel AS"}}
+    bulk = {"status": "available", "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/lastned/csv",
+            "retrieved_at": "2026-10-01T00:00:00Z"}
+    profile = {"organisation_number": "987654321", "name": "Eksempel AS",
+               "municipality": "OSLO", "evidence": {"registry": bulk, "registry_live": live}}
+    facts = {item["claim"]: item for item in answer_profile(profile, "company")["facts"]}
+    assert facts["Registered name"]["source_url"] == live["source_url"]
+    assert facts["Municipality"]["source_url"] == bulk["source_url"]
+    assert facts["Municipality"]["retrieved_at"] == bulk["retrieved_at"]
