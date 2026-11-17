@@ -142,7 +142,7 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
             years = ((history.get("value") or {}).get("years") or [])
             # The official annual-copy index proves which copy years were
             # returned, not revenues, complete filing history or audited values.
-            for year in sorted({str(y) for y in years if re.fullmatch(r"20\\d{2}", str(y))}, reverse=True)[:15]:
+            for year in sorted({str(y) for y in years if re.fullmatch(r"20\d{2}", str(y))}, reverse=True)[:15]:
                 facts.append(_claim("Annual accounts copy listed for year", year,
                                     history, "official_annual_copy_index"))
 
@@ -169,7 +169,7 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
         seen_subunits = set()
         for item in items[:100]:
             subunit_org = str(item.get("organisation_number") or "")
-            if not re.fullmatch(r"\\d{9}", subunit_org) or subunit_org in seen_subunits:
+            if not re.fullmatch(r"\d{9}", subunit_org) or subunit_org in seen_subunits:
                 continue
             seen_subunits.add(subunit_org)
             facts.append(_claim("Registered subunit", {
