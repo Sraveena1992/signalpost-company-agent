@@ -27,7 +27,11 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     facts: list[dict[str, Any]] = []
     unsupported: list[str] = []
 
-    registry = evidence.get("registry", {})
+    # The batch overlays live registry values on the frozen snapshot. Attribute
+    # those normalized values to that exact live response rather than the older
+    # bulk snapshot; fall back to bulk only when no live identity exists.
+    live_registry = evidence.get("registry_live") or {}
+    registry = live_registry if live_registry.get("status") == "available" else evidence.get("registry", {})
     if (all_topics or "employee" in q) and registry.get("status") == "available" and registry.get("source_url"):
         for label, value in (
             ("Registered name", row.get("name")),
@@ -54,11 +58,24 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
             for label, key in (
                 ("Bankruptcy flag", "bankrupt"),
                 ("Liquidation flag", "liquidating"),
+                ("Compulsory dissolution flag", "compulsory_dissolution"),
                 ("Latest reported annual accounts period", "latest_submitted_accounts"),
+                ("Date established", "established_at"),
+                ("Registered in Entity Register on", "registry_registered_at"),
+                ("Business Register registration flag", "registered_in_business_register"),
+                ("VAT Register registration flag", "registered_in_vat_register"),
+                ("Voluntary Register registration flag", "registered_in_voluntary_register"),
             ):
                 value = row.get(key)
                 if value is not None and value != "":
                     facts.append(_claim(label, value, registry, "official_registry_fact"))
+            for label, key in (
+                ("Secondary industry", "secondary_industry"),
+                ("Tertiary industry", "tertiary_industry"),
+            ):
+                industry_value = row.get(key)
+                if isinstance(industry_value, dict) and industry_value.get("kode"):
+                    facts.append(_claim(label, {"code": industry_value["kode"], "description": industry_value.get("beskrivelse")}, registry, "official_registry_fact"))
             for label, key in (
                 ("Registered business address", "business_address"),
                 ("Registered postal address", "postal_address"),
