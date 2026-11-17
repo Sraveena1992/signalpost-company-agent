@@ -371,6 +371,26 @@ def attach_synthesis(profile: dict[str, Any], previous: dict[str, Any] | None = 
             "company news, open roles and websites are unknown, never proven absent."
         ),
     }
+    # Decision-useful synthesis: explain exactly which follow-up verification
+    # would close observed evidence gaps, without pretending a negative finding.
+    follow_up_by_topic = {
+        "verified company website": "Verify the exact legal entity's website before relying on company-published content.",
+        "normalized annual accounts": "Retrieve or confirm annual-account records and reporting period before comparing financial performance.",
+        "registered roles": "Check the current official roles register before identifying decision makers.",
+        "registered subunits": "Check official subunits before assessing physical operating locations.",
+        "dated company news or job postings": "Recheck dated original company announcements and active vacancy sources; no finding is not evidence of absence.",
+    }
+    summary["decision_brief"]["next_verification_steps"] = [
+        {"topic": gap["topic"], "action": follow_up_by_topic[gap["topic"]],
+         "reason": gap["state"]}
+        for gap in missing
+        if gap["topic"] in follow_up_by_topic
+    ][:5]
+    summary["decision_brief"]["executive_summary"] = (
+        f"{name}: {len(source_linked_overview) + len(highlights)} source-linked overview and highlight statements; "
+        f"{len(missing)} evidence topics unresolved in this run. "
+        "This summary does not certify the company, infer missing vacancies, or replace original sources."
+    )
     summary["synthesis_policy"] = "Each assertion cites verified evidence; no unsupported interpretation or invented source."
     profile["changes"] = changes
     profile["synthesis"] = summary
