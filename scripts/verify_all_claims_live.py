@@ -66,34 +66,58 @@ def address_raw(value):
     return ", ".join(str(x) for x in [*lines,value.get("postnummer"),value.get("poststed"),value.get("kommune"),value.get("land")] if x not in (None,""))
 
 def compare_registry(label,value,body,org):
-    if str(body.get("organisasjonsnummer"))!=org:return False
-    # Missing keys do not establish that a historical archived claim is
-    # contradicted. Especially important for non-Norwegian/foreign entities
-    # where the live official API can omit these optional fields altogether.
-    required_keys={
-        "Bankruptcy flag":"konkurs",
-        "Liquidation flag":"underAvvikling",
-        "Registered business address":"forretningsadresse",
-        "Registered postal address":"postadresse",
+    if str(body.get("organisasjonsnummer")) != org:
+        return False
+    # Check the exact field, not just the presence of a company's registry page.
+    # Missing official keys cannot contradict an archived fact.
+    fields = {
+        "Registered name": ("navn",),
+        "Organisation number": ("organisasjonsnummer",),
+        "Legal form": ("organisasjonsform", "kode"),
+        "Registry employee count": ("antallAnsatte",),
+        "Registered industry": ("naeringskode1", "beskrivelse"),
+        "Registered industry code": ("naeringskode1", "kode"),
+        "Bankruptcy flag": ("konkurs",),
+        "Liquidation flag": ("underAvvikling",),
+        "Compulsory dissolution flag": ("underTvangsavviklingEllerTvangsopplosning",),
+        "Latest reported annual accounts period": ("sisteInnsendteAarsregnskap",),
+        "Date established": ("stiftelsesdato",),
+        "Registered in Entity Register on": ("registreringsdatoEnhetsregisteret",),
+        "Business Register registration flag": ("registrertIForetaksregisteret",),
+        "VAT Register registration flag": ("registrertIMvaregisteret",),
+        "Voluntary Register registration flag": ("registrertIFrivillighetsregisteret",),
+        "Secondary industry": ("naeringskode2",),
+        "Tertiary industry": ("naeringskode3",),
+        "Registered business address": ("forretningsadresse",),
+        "Registered postal address": ("postadresse",),
     }
-    required_key=required_keys.get(label)
-    if required_key and body.get(required_key) is None:
+    if label not in fields:
         return None
-    mapping={
-        "Registered name":body.get("navn"),
-        "Organisation number":body.get("organisasjonsnummer"),
-        "Legal form":getpath(body,"organisasjonsform","kode"),
-        "Registry employee count":body.get("antallAnsatte"),
-        "Registered industry":getpath(body,"naeringskode1","beskrivelse"),
-        "Registered industry code":getpath(body,"naeringskode1","kode"),
-        "Bankruptcy flag":body.get("konkurs"),
-        "Liquidation flag":body.get("underAvvikling"),
-        "Latest reported annual accounts period":body.get("sisteInnsendteAarsregnskap"),
-        "Registered business address":address_raw(body.get("forretningsadresse")),
-        "Registered postal address":address_raw(body.get("postadresse")),
-    }
-    if label not in mapping:return None
-    return value==mapping[label]
+    observed = getpath(body, *fields[label])
+    if observed is None:
+        return None
+    if label in ("Registered business address", "Registered postal address"):
+        observed = address_raw(observed)
+    elif label in ("Secondary industry", "Tertiary industry"):
+        if not isinstance(observed, dict):
+            return None
+        observed = {"code": observed.get("kode"), "description": observed.get("beskrivelse")}
+    return value == observed
+
+
+def compare_annual_copy_year(label, value, body, url, org):
+    """Verify listed filing-copy years against the exact organisation's live BRREG index.
+
+    Absence from the current index is unresolved, not a historical contradiction.
+    """
+    expected = f"https://data.brreg.no/regnskapsregisteret/regnskap/aarsregnskap/kopi/{org}/aar"
+    if label != "Annual accounts copy listed for year" or url != expected:
+        return None
+    if not isinstance(body, list) or not re.fullmatch(r"20\\d{2}", str(value)):
+        return None
+    years = {str(year) for year in body if str(year).isdigit()}
+    return True if str(value) in years else None
+
 
 def compare_finance(label,value,body):
     if not isinstance(body,list):return None
@@ -264,6 +288,8 @@ def check_claim(f,org,fetched,owned_hosts=None):
     body=result.get("body")
     if kind=="official_registry_fact":
         check=compare_registry(label,value,body,org) if isinstance(body,dict) else None
+    elif kind=="official_annual_copy_index":
+        check=compare_annual_copy_year(label,value,body,src,org)
     elif kind in ("official_annual_account","derived_from_official_annual_accounts"):
         check=compare_finance(label,value,body)
     elif kind=="official_role_record":
@@ -317,11 +343,12 @@ def main():
             except Exception as exc:fetched[url]={"state":"unavailable","reason":type(exc).__name__}
             if n % 25 == 0 or n == len(futures):
                 print(f"Fetched {n}/{len(futures)} unique source URLs", flush=True)
-    statuses=Counter(); by_category={}
+    statuses=Counter(); by_category={}; unresolved_reasons=Counter()
     examples=[]
     for org,f in all_facts:
         state,why=check_claim(f,org,fetched,org_approved_hosts)
         statuses[state]+=1
+        if state=="unverifiable": unresolved_reasons[why]+=1
         kind=str(f.get("classification") or "")
         by_category.setdefault(kind,Counter())[state]+=1
         if state!="confirmed" and len(examples)<150:
@@ -334,6 +361,7 @@ def main():
         "companies":len(rows),"claims_total":len(all_facts),"unique_urls":len(urls),
         "urls_status":dict(Counter(item["state"] for item in fetched.values())),
         "claim_status":dict(statuses),
+        "unverifiable_reasons":dict(unresolved_reasons),
         "confirmation_rate_over_all_claims":round(statuses["confirmed"]/len(all_facts),5),
         "confirmed_fraction_among_decidable":round(statuses["confirmed"]/max(1,statuses["confirmed"]+statuses["contradicted"]),5),
         "category_status":{k:dict(v) for k,v in by_category.items()},
