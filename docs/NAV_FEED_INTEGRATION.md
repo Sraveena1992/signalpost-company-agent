@@ -2,8 +2,7 @@
 
 Source: https://navikt.github.io/pam-stilling-feed/
 
-This feature is **off by default**. It does not change existing company-site
-jobs/news extraction, registry facts, or production behavior.
+This feature is **off by default**. The normal competition batch remains token-free and unchanged. NAV enrichment is activated only by the explicit `--nav-feed` flag and an authorized `NAV_FEED_TOKEN`. Job-feed outputs are separate evidence, and no job is automatically published on a name-only match.
 
 ## Authentication
 
@@ -73,4 +72,4 @@ uv run pytest -q tests/test_nav_feed_500.py
 uv run pytest -q
 ```
 
-Do not merge into main or deploy before reviewing CI and source-access terms.
+For official Builderr evaluation, use the default token-free command unless Builderr expressly supplies a permitted NAV credential and confirms runtime budget. A NAV scan may be incomplete; never interpret zero exact matches from an incomplete scan as no vacancies.
