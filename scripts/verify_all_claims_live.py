@@ -293,7 +293,7 @@ def main():
     p.add_argument("--output",type=Path,required=True)
     p.add_argument("--workers",type=int,default=10)
     a=p.parse_args()
-    rows=[json.loads(x) for x in a.profiles.open() if x.strip()]
+    rows=[json.loads(x) for x in a.profiles.open(encoding="utf-8") if x.strip()]
     assert len(rows)==500
     all_facts=[(str(row["organisation_number"]),fact) for row in rows for fact in
                (row.get("synthesis") or {}).get("facts") or []]
@@ -311,10 +311,12 @@ def main():
                 org_approved_hosts.setdefault(str(profile.get("organisation_number")),set()).add(host.removeprefix("www."))
     with cf.ThreadPoolExecutor(max_workers=a.workers) as pool:
         futures={pool.submit(fresh,url,approved_hosts):url for url in urls}
-        for future in cf.as_completed(futures):
+        for n, future in enumerate(cf.as_completed(futures), start=1):
             url=futures[future]
             try:fetched[url]=future.result()
             except Exception as exc:fetched[url]={"state":"unavailable","reason":type(exc).__name__}
+            if n % 25 == 0 or n == len(futures):
+                print(f"Fetched {n}/{len(futures)} unique source URLs", flush=True)
     statuses=Counter(); by_category={}
     examples=[]
     for org,f in all_facts:
