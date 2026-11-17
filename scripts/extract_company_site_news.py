@@ -151,12 +151,21 @@ def main() -> None:
     parser.add_argument("--report", required=True)
     args = parser.parse_args()
     profiles = [json.loads(line) for line in Path(args.profiles).read_text(encoding="utf-8").splitlines() if line.strip()]
-    rows = [item for profile in profiles if (item := observation(profile))]
+    rows = []
+    companies_with_activity = 0
+    for profile in profiles:
+        found = observations(profile)
+        if found:
+            companies_with_activity += 1
+            rows.extend(found)
+    # A reproducible export must not count the same article twice.
+    rows = list({(item["organisation_number"], item["source_url"]): item for item in rows}.values())
+    rows.sort(key=lambda item: (item["organisation_number"], item["source_url"]))
     Path(args.output).write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
     report = {
-        "connector": "exact_company_site_news_activity_v1",
+        "connector": "exact_company_site_news_activity_v2",
         "profiles": len(profiles),
-        "companies_with_activity": len(rows),
+        "companies_with_activity": companies_with_activity,
         "observations": len(rows),
         "claim_boundary": "Company-owned activity only; never treated as independent sentiment.",
     }
