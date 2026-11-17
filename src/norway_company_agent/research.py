@@ -136,19 +136,46 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
         else:
             unsupported.append("No normalized annual-account record was returned; missing values are not interpreted as zero.")
 
+    history = evidence.get("financial_history") or {}
+    if (all_topics or any(term in q for term in financial_terms)):
+        if history.get("status") == "available" and history.get("source_url"):
+            years = ((history.get("value") or {}).get("years") or [])
+            # The official annual-copy index proves which copy years were
+            # returned, not revenues, complete filing history or audited values.
+            for year in sorted({str(y) for y in years if re.fullmatch(r"20\\d{2}", str(y))}, reverse=True)[:15]:
+                facts.append(_claim("Annual accounts copy listed for year", year,
+                                    history, "official_annual_copy_index"))
+
     roles = evidence.get("roles", {})
     if all_topics or any(term in q for term in ("lead", "role")):
         people = [item for item in (roles.get("value") or {}).get("roles", []) if not item.get("inactive")]
-        for person in people[:12]:
-            facts.append(_claim(person.get("role") or person.get("group") or "Registered role", person.get("name") or person.get("organisation_number"), roles, "official_role_record"))
+        seen_roles = set()
+        for person in people[:75]:
+            label = person.get("role") or person.get("group") or "Registered role"
+            value = person.get("name") or person.get("organisation_number")
+            if not value:
+                continue
+            key = (str(label), str(value), str(person.get("organisation_number") or ""))
+            if key in seen_roles:
+                continue
+            seen_roles.add(key)
+            facts.append(_claim(label, value, roles, "official_role_record"))
         if not people:
             unsupported.append("No active public role holder was returned.")
 
     locations = evidence.get("locations", {})
     if all_topics or any(term in q for term in ("location", "where")):
         items = (locations.get("value") or {}).get("locations", [])
-        for item in items[:12]:
-            facts.append(_claim("Registered subunit", {"name": item.get("name"), "address": item.get("address")}, locations, "official_subunit_record"))
+        seen_subunits = set()
+        for item in items[:100]:
+            subunit_org = str(item.get("organisation_number") or "")
+            if not re.fullmatch(r"\\d{9}", subunit_org) or subunit_org in seen_subunits:
+                continue
+            seen_subunits.add(subunit_org)
+            facts.append(_claim("Registered subunit", {
+                "organisation_number": subunit_org,
+                "name": item.get("name"), "address": item.get("address"),
+            }, locations, "official_subunit_record"))
         if not items:
             unsupported.append("No registered subunit was returned; this does not prove the company has no physical presence.")
 
