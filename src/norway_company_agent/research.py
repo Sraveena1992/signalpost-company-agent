@@ -32,16 +32,31 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
     # bulk snapshot; fall back to bulk only when no live identity exists.
     live_registry = evidence.get("registry_live") or {}
     registry = live_registry if live_registry.get("status") == "available" else evidence.get("registry", {})
+    bulk_registry = evidence.get("registry") or {}
+
+    def registry_source(field: str) -> dict[str, Any]:
+        """Cite each field to the response that actually supplied its value.
+
+        A successful live response may omit fields retained from a frozen CSV;
+        the live URL cannot corroborate those older snapshot-only values.
+        """
+        live_value = (live_registry.get("value") or {}) if live_registry.get("status") == "available" else {}
+        if isinstance(live_value, dict) and field in live_value and live_value[field] is not None and live_value[field] == row.get(field):
+            return live_registry
+        return bulk_registry if bulk_registry.get("status") == "available" else {}
+
     if (all_topics or "employee" in q) and registry.get("status") == "available" and registry.get("source_url"):
-        for label, value in (
-            ("Registered name", row.get("name")),
-            ("Organisation number", row.get("organisation_number")),
-            ("Legal form", row.get("legal_form")),
-            ("Municipality", row.get("municipality")),
-            ("Registry employee count", row.get("employees")),
+        for label, field in (
+            ("Registered name", "name"),
+            ("Organisation number", "organisation_number"),
+            ("Legal form", "legal_form"),
+            ("Municipality", "municipality"),
+            ("Registry employee count", "employees"),
         ):
-            if value not in (None, ""):
-                facts.append(_claim(label, value, registry, "official_registry_fact"))
+            value = row.get(field)
+            source_record = registry_source(field)
+            if value not in (None, "") and source_record.get("source_url"):
+                facts.append(_claim(label, value, source_record, "official_registry_fact"))
 
     # Direct official registry fields provide useful high-confidence coverage.
     # Preserve the difference between a company-listed URL and proven ownership.
@@ -54,7 +69,7 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
                     ("Registered industry code", industry.get("kode")),
                 ):
                     if value not in (None, ""):
-                        facts.append(_claim(label, value, registry, "official_registry_fact"))
+                        facts.append(_claim(label, value, registry_source("industry"), "official_registry_fact"))
             for label, key in (
                 ("Bankruptcy flag", "bankrupt"),
                 ("Liquidation flag", "liquidating"),
@@ -68,14 +83,14 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
             ):
                 value = row.get(key)
                 if value is not None and value != "":
-                    facts.append(_claim(label, value, registry, "official_registry_fact"))
+                    facts.append(_claim(label, value, registry_source(key), "official_registry_fact"))
             for label, key in (
                 ("Secondary industry", "secondary_industry"),
                 ("Tertiary industry", "tertiary_industry"),
             ):
                 industry_value = row.get(key)
                 if isinstance(industry_value, dict) and industry_value.get("kode"):
-                    facts.append(_claim(label, {"code": industry_value["kode"], "description": industry_value.get("beskrivelse")}, registry, "official_registry_fact"))
+                    facts.append(_claim(label, {"code": industry_value["kode"], "description": industry_value.get("beskrivelse")}, registry_source(key), "official_registry_fact"))
             for label, key in (
                 ("Registered business address", "business_address"),
                 ("Registered postal address", "postal_address"),
@@ -90,7 +105,7 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
                           address.get("kommune"), address.get("land")]
                 display = ", ".join(str(v) for v in fields if v not in (None, ""))
                 if display:
-                    facts.append(_claim(label, display, registry, "official_registry_fact"))
+                    facts.append(_claim(label, display, registry_source(key), "official_registry_fact"))
 
     financial = evidence.get("financials", {})
     if all_topics or any(term in q for term in financial_terms):
