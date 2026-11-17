@@ -198,6 +198,11 @@ def terminal_envelope(
         "completed_at": completed_at,
         "modules": module_states,
         "profile": profile,
+        # Keep the original nested profile contract, but surface the exact
+        # same deterministic decision brief at the terminal envelope level.
+        # Evaluators consuming one JSONL row need not infer a prose synthesis
+        # from the full evidence tree.
+        "synthesis": profile.get("synthesis") or {},
     }
 
 
