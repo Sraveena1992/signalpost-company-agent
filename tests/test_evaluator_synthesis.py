@@ -26,6 +26,9 @@ def test_terminal_envelope_exposes_existing_synthesis_at_root():
     assert brief["verified_takeaway_count"] > 0
     assert all(item["source_url"] and item["retrieved_at"] for item in brief["verified_takeaways"])
     assert brief["evidence_gaps"]
+    assert brief["next_verification_steps"]
+    assert brief["executive_summary"].startswith("Example AS:")
+    assert all(step["action"] and step["reason"] for step in brief["next_verification_steps"])
 
 
 def test_unverified_site_job_not_promoted_to_active_vacancy():
