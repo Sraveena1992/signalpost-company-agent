@@ -113,7 +113,7 @@ def compare_annual_copy_year(label, value, body, url, org):
     expected = f"https://data.brreg.no/regnskapsregisteret/regnskap/aarsregnskap/kopi/{org}/aar"
     if label != "Annual accounts copy listed for year" or url != expected:
         return None
-    if not isinstance(body, list) or not re.fullmatch(r"20\\d{2}", str(value)):
+    if not isinstance(body, list) or not re.fullmatch(r"20\d{2}", str(value)):
         return None
     years = {str(year) for year in body if str(year).isdigit()}
     return True if str(value) in years else None
