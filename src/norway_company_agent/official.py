@@ -229,6 +229,14 @@ def normalize_entity(body: Any) -> dict[str, Any]:
         "business_address": body.get("forretningsadresse"),
         "postal_address": body.get("postadresse"),
         "latest_submitted_accounts": body.get("sisteInnsendteAarsregnskap"),
+        "established_at": body.get("stiftelsesdato"),
+        "registry_registered_at": body.get("registreringsdatoEnhetsregisteret"),
+        "registered_in_business_register": body.get("registrertIForetaksregisteret"),
+        "registered_in_vat_register": body.get("registrertIMvaregisteret"),
+        "registered_in_voluntary_register": body.get("registrertIFrivillighetsregisteret"),
+        "compulsory_dissolution": body.get("underTvangsavviklingEllerTvangsopplosning"),
+        "secondary_industry": body.get("naeringskode2"),
+        "tertiary_industry": body.get("naeringskode3"),
     }
 
 
