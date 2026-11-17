@@ -84,9 +84,21 @@
       : '<p class="sp-empty">No exact-company, dated, source-backed news article was returned for this company. This does not mean none exists.</p>';
     const jobLeads = observations.filter(item => item && item.signal_type === 'job_posting');
     const verifiedJobs = jobLeads.filter(item => confirmedObservation(item) && item.active_verified === true && item.employer_verified === true && item.expires_at && new Date(item.expires_at).getTime() >= Date.now());
-    const jobs = verifiedJobs.length
-      ? table(['Role','Expiry','Original posting'], verifiedJobs.map(item => [cell(item.evidence_span || item.metrics?.title), cell(item.expires_at), link(item.source_url, 'View active vacancy')]))
-      : '<p class="sp-empty">No currently active, exact-employer job vacancy is independently verified in this research response. This does not prove the employer has no openings.</p>';
+    const navJobs = list(e.nav_jobs?.value?.postings).filter(item =>
+      String(item.organisation_number || '') === String(org)
+      && item.status === 'active_at_retrieval'
+      && item.source_class === 'nav_official_job_feed'
+      && item.expires_at && new Date(item.expires_at).getTime() >= Date.now()
+      && safeUrl(item.nav_source_url || '') && safeUrl(item.source_url || '')
+    );
+    const allVerifiedJobs = [
+      ...verifiedJobs.map(item => ({title: item.evidence_span || item.metrics?.title, expires: item.expires_at, url: item.source_url, origin: 'Company site'})),
+      ...navJobs.map(item => ({title: item.title, expires: item.expires_at, url: item.source_url, origin: 'Official NAV feed'}))
+    ];
+    const uniqueJobs = [...new Map(allVerifiedJobs.map(item => [item.url, item])).values()];
+    const jobs = uniqueJobs.length
+      ? table(['Role','Expiry','Original posting','Source'], uniqueJobs.map(item => [cell(item.title), cell(item.expires), link(item.url, 'View active vacancy'), cell(item.origin)]))
+      : '<p class="sp-empty">No currently active, exact-employer job vacancy is verified in this research response. This does not prove the employer has no openings.</p>';
     const jobDisclosure = jobLeads.length > verifiedJobs.length ? '<p class="sp-disclaimer">Other job leads were found but withheld from verified active jobs pending employer, expiry or live-status confirmation.</p>' : '';
     const audit = table(['Evidence module','Status','Source','Retrieved'],Object.entries(e).map(([key,v])=>[esc(key.replaceAll('_',' ')),cell(status(v?.status)),link(v?.source_url),cell(v?.retrieved_at)]));
     const sections = [
