@@ -198,6 +198,36 @@ def answer_profile(row: dict[str, Any], question: str) -> dict[str, Any]:
         if confirmed == 0:
             unsupported.append("No exact-company, dated company-site news or open posting could be verified in this run; this does not prove none exist.")
 
+    # NAV official-feed observations are optional and must remain separate from
+    # company-owned articles. ACTIVE is a status at retrieval, not a guarantee
+    # that the job remains open indefinitely.
+    nav_record = evidence.get("nav_jobs") or {}
+    if (all_topics or any(word in q for word in ("jobs", "hiring", "vacanc", "posting"))) and nav_record.get("status") == "available":
+        for posting in ((nav_record.get("value") or {}).get("postings") or [])[:20]:
+            if not isinstance(posting, dict):
+                continue
+            if str(posting.get("organisation_number") or "") != str(row.get("organisation_number") or ""):
+                continue
+            if posting.get("status") != "active_at_retrieval" or posting.get("source_class") != "nav_official_job_feed":
+                continue
+            try:
+                expiry = date.fromisoformat(str(posting.get("expires_at") or "")[:10])
+            except ValueError:
+                continue
+            if expiry < date.today():
+                continue
+            nav_source = str(posting.get("nav_source_url") or "")
+            if not nav_source.startswith("https://pam-stilling-feed.nav.no/api/v1/"):
+                continue
+            facts.append(_claim(
+                "NAV job marked active at retrieval",
+                {"role": posting.get("title"), "expires_at": posting.get("expires_at"),
+                 "original_url": posting.get("source_url"), "verification_scope": "NAV exact employer organisation number"},
+                {"source_url": nav_source, "retrieved_at": posting.get("retrieved_at"),
+                 "source_class": "nav_official_job_feed"},
+                "official_nav_job_at_retrieval",
+            ))
+
     if "sentiment" in q:
         unsupported.append("Sentiment is not scored: no labelled Norwegian news/social evaluation corpus has been run, and company-owned pages are structurally promotional.")
 

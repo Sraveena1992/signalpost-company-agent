@@ -23,6 +23,7 @@ from scripts.extract_company_site_activity import observation as site_activity_o
 from scripts.extract_company_site_news import observations as site_news_observations  # noqa: E402
 from scripts.extract_company_site_jobs import observations as site_jobs_observations  # noqa: E402
 from scripts.run_tavily_discovery import discover as tavily_discover  # noqa: E402
+from scripts.run_nav_feed_500 import enrich as nav_enrich, fetch_json as nav_fetch_json  # noqa: E402
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -49,6 +50,9 @@ def main() -> None:
     parser.add_argument("--tavily-max-requests", type=int, default=1, help="Maximum Tavily searches per run")
     parser.add_argument("--checkpoint-every", type=int, default=25)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--nav-feed", action="store_true", help="Optional authorized NAV feed matching by exact employer org number")
+    parser.add_argument("--nav-max-pages", type=int, default=250)
+    parser.add_argument("--nav-max-details", type=int, default=10000)
     parser.add_argument(
         "--modules",
         default="registry,accounting_obligation,registry_live,financials,financial_history,roles,group,locations,website,public_activity",
@@ -56,6 +60,10 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if args.nav_feed and not os.environ.get("NAV_FEED_TOKEN", "").strip():
+        parser.error("--nav-feed requires NAV_FEED_TOKEN from an authorized NAV consumer")
+    if args.nav_max_pages < 1 or args.nav_max_details < 1:
+        parser.error("NAV scan page and detail limits must be positive")
     if args.workers < 1 or args.checkpoint_every < 1:
         raise SystemExit("--workers and --checkpoint-every must be positive integers")
 
@@ -321,8 +329,21 @@ def main() -> None:
                 checkpoint = [state[org] for org in orgs if org in state]
                 write_jsonl(profiles_output, checkpoint)
 
-    completed_at = utc_now()
     ordered_profiles = [state[org] for org in orgs]
+    nav_report = {"enabled": False}
+    if args.nav_feed:
+        try:
+            ordered_profiles, nav_report = nav_enrich(
+                ordered_profiles,
+                get=nav_fetch_json,
+                token=os.environ["NAV_FEED_TOKEN"].strip(),
+                max_pages=args.nav_max_pages,
+                max_details=args.nav_max_details,
+            )
+            nav_report["enabled"] = True
+        except (ValueError, OSError, RuntimeError) as exc:
+            raise SystemExit("NAV enrichment failed safely: " + type(exc).__name__ + ": " + str(exc)) from None
+    completed_at = utc_now()
     previous_by_org = {}
     if args.previous_profiles:
         previous_rows = [
@@ -364,6 +385,7 @@ def main() -> None:
         "profiles_fetched_this_run": len(pending_profiles),
         "modules": requested_modules,
         "registry": registry_metadata,
+        "nav_job_feed": nav_report,
         "refresh": change_counts,
         "operations": operations,
         "third_party_cost_usd": None if args.tavily_discovery else 0.0,
