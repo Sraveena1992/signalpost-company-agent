@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install HTML parser for source audit
+        run: python -m pip install 'beautifulsoup4>=4.12,<5'
       - name: Independent fresh reference verification across all claim classes
         run: |
           python -X utf8 -u scripts/verify_all_claims_live.py --profiles artifacts/full-500/profiles-500.jsonl --output artifacts/full-500/live-source-validation.json --workers 8
