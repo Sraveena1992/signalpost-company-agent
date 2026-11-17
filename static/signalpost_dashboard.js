@@ -100,9 +100,25 @@
       ? table(['Role','Expiry','Original posting','Source'], uniqueJobs.map(item => [cell(item.title), cell(item.expires), link(item.url, 'View active vacancy'), cell(item.origin)]))
       : '<p class="sp-empty">No currently active, exact-employer job vacancy is verified in this research response. This does not prove the employer has no openings.</p>';
     const jobDisclosure = jobLeads.length > verifiedJobs.length ? '<p class="sp-disclaimer">Other job leads were found but withheld from verified active jobs pending employer, expiry or live-status confirmation.</p>' : '';
+    const synthesis = data.synthesis || p.synthesis || {};
+    const brief = synthesis.decision_brief || {};
+    const takeaways = list(brief.verified_takeaways).filter(item => item && item.source_url && item.retrieved_at);
+    const gaps = list(brief.evidence_gaps);
+    const nextSteps = list(brief.next_verification_steps);
+    const synthesisPanel = brief.identity
+      ? '<p class="sp-disclaimer">' + esc(brief.executive_summary || 'Source-backed company overview with explicit evidence limitations.') + '</p>'
+        + '<h4>Verified takeaways</h4>'
+        + (takeaways.length ? table(['Finding','Original source','Retrieved'],takeaways.map(item => [cell(item.text),link(item.source_url,'Inspect source'),cell(item.retrieved_at)])) : '<p class="sp-empty">No verified takeaway is available.</p>')
+        + '<h4>Changes since previous snapshot</h4><p>' + cell(brief.change_assessment?.status || 'Not assessed') + ' · ' + cell(brief.change_assessment?.change_count ?? 'Not reported') + ' reported changes</p>'
+        + '<h4>Evidence gaps</h4>'
+        + (gaps.length ? table(['Unverified topic','State'],gaps.map(item => [cell(item.topic),cell(item.state)])) : '<p>No unresolved topic reported in this run.</p>')
+        + '<h4>Recommended next verification</h4>'
+        + (nextSteps.length ? table(['Topic','Action'],nextSteps.map(item => [cell(item.topic),cell(item.action)])) : '<p>No next steps specified.</p>')
+        + '<p class="sp-disclaimer">Interpretations do not establish facts without original evidence. No open vacancy or missing financial information is inferred from an absent source.</p>'
+      : '<p class="sp-empty">No reviewer-visible decision brief was returned. Company facts and evidence states remain available in the other tabs.</p>';
     const audit = table(['Evidence module','Status','Source','Retrieved'],Object.entries(e).map(([key,v])=>[esc(key.replaceAll('_',' ')),cell(status(v?.status)),link(v?.source_url),cell(v?.retrieved_at)]));
     const sections = [
-      ['Overview',e.registry,overview],['Financials',e.financials,financials],['Leadership',e.roles,leadership],['Locations',e.locations,locations],['Website',e.website,website],['News',activity,news],['Jobs',activity,jobs + jobDisclosure],['Evidence & audit',null,audit]
+      ['Overview',e.registry,overview],['Synthesis',{status: brief.identity ? 'available' : 'not_found', note: 'Synthesis is derived from explicitly cited source records'},synthesisPanel],['Financials',e.financials,financials],['Leadership',e.roles,leadership],['Locations',e.locations,locations],['Website',e.website,website],['News',activity,news],['Jobs',activity,jobs + jobDisclosure],['Evidence & audit',null,audit]
     ];
     const root=document.createElement('section'); root.className='sp-dashboard';
     root.innerHTML=`<div class="sp-head"><span class="sp-eyebrow">SOURCE-LINKED COMPANY RESEARCH</span><h2>${esc(name)}</h2><p>Organisation ${fmt(org)} · Run ${fmt(data.run_id)} · ${fmt(data.terminal?.terminal_state||data.terminal?.status||'Status not reported')}</p><div class="sp-metrics"><div><strong>${fin.length}</strong><span>Financial records</span></div><div><strong>${roles.length}</strong><span>Role records</span></div><div><strong>${loc.length}</strong><span>Location records</span></div></div></div><nav class="sp-tabs" aria-label="Company research sections">${sections.map((s,i)=>`<button type="button" class="sp-tab${i===0?' active':''}" data-index="${i}" aria-pressed="${i===0}">${esc(s[0])}</button>`).join('')}</nav><div class="sp-panels">${sections.map((s,i)=>`<div class="sp-panel" ${i?'hidden':''}>${evidenceCard(s[0],s[1],s[2])}</div>`).join('')}</div><p class="sp-disclaimer">Evidence states describe returned source records, not independent guarantees of completeness or correctness. ${esc(data.scope_note||'')}</p>`;
