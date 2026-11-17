@@ -267,5 +267,12 @@ def fetch_official_modules(org: str, modules: set[str], fetcher: Callable[[str],
         normalized = None
         if result.status == 200:
             normalized = normalize_entity(result.body) if module == "registry_live" else normalize_financials(result.body) if module == "financials" else normalize_financial_history(result.body, org) if module == "financial_history" else normalize_roles(result.body) if module == "roles" else normalize_locations(result.body) if module == "locations" else result.body
+        if module == "registry_live" and result.status == 200 and str((normalized or {}).get("organisation_number") or "") != str(org):
+            records[module] = evidence(
+                module, "ambiguous", source_type, result.url,
+                note="Official response organisation number differs from requested legal entity; suppress identity facts",
+                content_sha256=result.content_sha256, retrieved_at=result.retrieved_at,
+            )
+            continue
         records[module] = _classified(module, source_type, result, value=normalized)
     return records, metrics
